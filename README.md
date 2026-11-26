@@ -19,19 +19,19 @@ M3U bạn tự thêm, xem [Truyền hình · Radio](#truyền-hình--radio-từ-
 [Cài trên Android TV bằng Downloader](#cài-trên-android-tv-bằng-downloader).
 
 **Bản iPad / iPhone** (iOS / iPadOS 15+, cài bằng TrollStore): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_ios/ConBangTV-iPad.ipa)
-(link cố định) · [release `ios-v1.21`](https://github.com/conbangtv/ChimToTV/releases/tag/ios-v1.21)
+(link cố định) · [release `ios-v1.28`](https://github.com/conbangtv/ChimToTV/releases/tag/ios-v1.28)
 — xem mục [Bản iPad](#bản-ipad). TV và iPad / iPhone đồng bộ được với nhau — xem [Đồng bộ trong nhà](#đồng-bộ-trong-nhà-từ-22).
 
 **Bản Windows** (Windows 10 / 11, một tệp `.exe` chạy ngay): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_windows/ConBangTV-Windows.exe)
-(link cố định) · [release `win-v1.19`](https://github.com/conbangtv/ChimToTV/releases/tag/win-v1.19)
+(link cố định) · [release `win-v1.22`](https://github.com/conbangtv/ChimToTV/releases/tag/win-v1.22)
 — xem mục [Bản Windows](#bản-windows). Đồng bộ được với TV và iPad / iPhone.
 
 **Bản Mac** (macOS 12+, máy Intel và chip Apple): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_macos/ConBangTV-Mac.zip)
-(link cố định) · [release `mac-v1.21`](https://github.com/conbangtv/ChimToTV/releases/tag/mac-v1.21)
+(link cố định) · [release `mac-v1.28`](https://github.com/conbangtv/ChimToTV/releases/tag/mac-v1.28)
 — xem mục [Bản Mac](#bản-mac) (lần đầu mở: Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở).
 
 **Bản Linux** (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, máy 64-bit, tệp `.deb`): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_linux/ConBangTV-Linux.deb)
-(link cố định) · [release `linux-v1.5`](https://github.com/conbangtv/ChimToTV/releases/tag/linux-v1.5)
+(link cố định) · [release `linux-v1.8`](https://github.com/conbangtv/ChimToTV/releases/tag/linux-v1.8)
 — xem mục [Bản Linux](#bản-linux). Đồng bộ được với TV, iPad / iPhone, Windows và Mac.
 
 **Mã nguồn mở:** giấy phép GPL-3.0 — xem [Giấy phép](#giấy-phép).

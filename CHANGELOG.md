@@ -9,6 +9,59 @@ Bản Windows (Windows 10 / 11, một tệp `.exe`) ghi riêng với tiêu đề
 Bản Mac (macOS 12+, từ 13/11/2026, cùng mã nguồn và số bản với bản iPad) ghi riêng với tiêu đề "Mac …", tag `mac-v…`.
 Bản Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, từ 13/11/2026, tệp `.deb`) ghi riêng với tiêu đề "Linux …", tag `linux-v…`.
 
+## 2.24 — 26/11/2026 (biểu tượng mới như bản Côn Bằng TV Legacy)
+
+Anh: «đồng bộ toàn bộ icon app của Côn Bằng TV giống với icon logo hiện tại của Côn Bằng TV Legacy», rồi «phát hành trên 5 nền tảng nha
+e». Cùng đợt với iPad / iPhone / Mac 1.28, Windows 1.22, Linux 1.8.
+
+- **Biểu tượng mới:** ô kính vuông bo tròn 4 góc, trong suốt, viền sáng, vòng ensō vàng và ấn 鵬 nổi khối — đúng biểu tượng bản Legacy từ
+  18/11 (trước: đĩa kính tròn). Đổi icon app (icon thích ứng: ô kính trong vùng an toàn 66dp, nền trong suốt), banner trên màn hình chính tivi,
+  logo đầu menu. Vẽ bằng `design/logo.html` phương án E (`node design/render.mjs export e`).
+- bản 2.24 · versionCode 48 · tag `v2.24` (Latest) · commit `351278b` (icon: `d3fdb97`) · `ConBangTV-2.24.apk` = `ConBangTV.apk` = `ChimToTV.apk`
+  151 566 380 byte · SHA-256 `4949d3dae05eb8fe36ec58630e5c769264f7cd61c99bab175380e0d1ad3915ef` · chứng chỉ `949ef2b5…177b`
+- Thử: APK thử chứa đủ 14 tệp icon / banner / logo mới (khớp byte với tệp nguồn); `aapt2`: `vn.chimto.tv` 48 / 2.24. TX3 không bật nên thử trên
+  điện thoại S10e (launcher TiviKit).
+- Đăng lúc 11:24:15 bằng `release.ps1 tv` (Latest = `v2.24`, ba tệp cùng SHA-256, hai link cố định đúng 2.24). **Tự cập nhật thật 2.23 → 2.24
+  trên S10e**: «Có bản mới 2.24 (đang dùng 2.23)» đủ «Có gì mới» → «Cài đặt ngay» → **2.24 lúc 11:34:36**; logo trong app và banner trên màn
+  hình chính của launcher đã là ô kính mới. Tivi Skyworth (2.23) chờ người nhà cập nhật khi mở app (cài trên tivi đó vướng khoá phụ huynh).
+- Trang giới thiệu: logo đầu trang + biểu tượng màn hình chính iPhone theo icon mới (site `e519a00`), dòng số bản → TV 2.24 · iPad / iPhone 1.28 ·
+  Windows 1.22 · Mac 1.28 · Linux 1.8 (site `b0d47f0`).
+
+## iPad / iPhone 1.28 và Mac 1.28 — 26/11/2026 (biểu tượng mới như bản Legacy)
+
+- **Biểu tượng mới:** ô kính vuông bo tròn, vòng vàng và ấn 鵬 nổi khối như bản Legacy. iPad / iPhone: ô kính phủ cả khung trên nền nâu tối
+  (iOS tô đen phần trong suốt của icon); Mac: ô kính trong suốt theo lưới icon macOS, bóng đổ ngoài ô; logo đầu menu đổi theo.
+- iPad / iPhone: bản 1.28 (build 36) · tag `ios-v1.28` · `ConBangTV-iPad-1.28.ipa` 6 452 630 byte · SHA-256
+  `a4127d48c309942123a88136b6d4b1b7a9b2041844066e1edd96905fe6ab2865`; Mac: bản 1.28 (build 36) · tag `mac-v1.28` · `ConBangTV-Mac-1.28.zip`
+  9 756 205 byte (x86_64 + arm64, ký ad-hoc, `codesign --verify` đạt, không cổng gỡ lỗi) · SHA-256
+  `e6dff45e4c7238274b01399d3adec85608c6a902c69757f13f9af293b0a7c2b6` · commit `351278b` (icon: `d3fdb97`) · dựng trên Mac mini
+- Thử: test lõi Swift 184 đạt. IPA chính `vn.chimto.tv` 1.28 / 36 (cảnh CarPlay + `SBStarkCapable`, không `no-container`, không cổng gỡ lỗi)
+  cài lên iPad thử bằng TrollStore, mở được. Icon `AppIcon.icns` trong gói Mac là ô kính mới.
+- Đăng lúc 11:28:02 (iPad) và 11:28:19 (Mac) bằng `release.ps1 ipad|mac -File dist\mac\…` (`--latest=false`); `-Verify` đạt cả hai. **Tự cập
+  nhật thật Mac 1.27 → 1.28** (Mac mini): «Có bản mới 1.28» đủ «Có gì mới» → «Cài đặt ngay» → mở lại 1.28 / 36 lúc 11:30:55, `codesign` đạt,
+  logo đầu menu là ô kính mới.
+
+## Windows 1.22 — 26/11/2026 (biểu tượng mới như bản Legacy)
+
+- **Biểu tượng mới:** ô kính vuông bo tròn, vòng vàng và ấn 鵬 nổi khối như bản Legacy — `app.ico` (9 cỡ, biểu tượng tệp chạy / thanh tác vụ)
+  và logo trong app.
+- bản 1.22.0 · tag `win-v1.22` · `ConBangTV-Windows-1.22.exe` 120 421 861 byte · SHA-256
+  `a881ec52c9aa3ad57976afc18761e6a0016bb68750117606c209ea469c976771` · commit `351278b` (icon: `d3fdb97`)
+- Thử: `windows\build.ps1` — test lõi Rust + tích hợp đạt, .NET 38 đạt (lần dựng đầu hết RAM khi biên dịch Rust vì Gradle còn giữ bộ nhớ →
+  dựng lại với `CARGO_BUILD_JOBS=2`). Icon lấy ra từ tệp `.exe` là ô kính mới; tệp đóng gói chạy với thư mục dữ liệu riêng, mở cửa sổ «Côn Bằng TV».
+- Đăng lúc 11:25:55 bằng `release.ps1 windows`; link cố định `conbangtv_windows` = 1.22. **Tự cập nhật thật 1.21 → 1.22** (bản 1.21 tải từ
+  GitHub, chạy riêng): hộp «Có bản mới» → «Cập nhật ngay» → tệp chạy thành 1.22.0 (SHA-256 trùng bản phát hành) lúc 11:36:50, mở lại `--updated`.
+
+## Linux 1.8 — 26/11/2026 (biểu tượng mới như bản Legacy)
+
+- **Biểu tượng mới:** ô kính vuông bo tròn, vòng vàng và ấn 鵬 nổi khối như bản Legacy — icon gói (6 cỡ, menu ứng dụng / thanh tác vụ).
+- bản 1.8.0 · tag `linux-v1.8` · `ConBangTV-Linux-1.8.deb` 6 302 844 byte · SHA-256 `ad00b4a192a4f397e5f368b713a53c14b83a26a6e32e7cfee622326ef49bf802` ·
+  commit `351278b` (icon: `d3fdb97`) · dựng trong container Ubuntu 22.04 (glibc ≤ 2.34), tệp chạy không có cổng gỡ lỗi
+- Thử: `dpkg-deb -f` = `conbangtv` 1.8.0 amd64; icon 256 trong gói khớp byte với icon mới.
+- Đăng lúc 11:26:26 bằng `release.ps1 linux`; link cố định `conbangtv_linux` = 1.8. **Tự cập nhật thật 1.7 → 1.8** trên máy ảo (mở từ biểu tượng
+  trên thanh dock): «Có bản mới: Côn Bằng TV 1.8» → «Cập nhật ngay» → gói 1.8.0, mở lại `--updated` lúc ~11:33; biểu tượng thanh dock và logo
+  đầu menu đã là ô kính mới.
+
 ## iPad / iPhone 1.27 và Mac 1.27 — 26/11/2026 (TubeMini: ảnh thu nhỏ nét hơn, chọn chất lượng video — mặc định 1080p)
 
 Anh: «tăng độ phân giải của Thumbnail video», «chọn được độ phân giải của video, mặc định 1080p», rồi «ok phát hành nha e».
