@@ -276,8 +276,8 @@ jobs:
           echo "--- apksigner verify (stdout+stderr) ---"
           printf '%s\n' "$VERIFY_OUT"
           echo "--- end apksigner verify ---"
-          SIGNER_DN=$(printf '%s\n' "$VERIFY_OUT" | awk '/certificate DN:/ {sub(/^[^:]*: /, ""); print; exit}')
-          CERT_SHA256=$(printf '%s\n' "$VERIFY_OUT" | awk '/certificate SHA-256 digest:/ {sub(/^[^:]*: /, ""); gsub(/[[:space:]:]/, ""); print tolower($0); exit}')
+          SIGNER_DN=$(printf '%s\n' "$VERIFY_OUT" | awk '/certificate DN:/ {sub(/^.*certificate DN:[[:space:]]*/, ""); print; exit}')
+          CERT_SHA256=$(printf '%s\n' "$VERIFY_OUT" | awk '/certificate SHA-256 digest:/ {sub(/^.*certificate SHA-256 digest:[[:space:]]*/, ""); gsub(/[[:space:]:]/, ""); print tolower($0); exit}')
 
           if [[ -z "$SIGNER_DN" || -z "$CERT_SHA256" ]]; then
             echo "::error::Không trích xuất được DN hoặc SHA-256 chứng chỉ từ apksigner"
