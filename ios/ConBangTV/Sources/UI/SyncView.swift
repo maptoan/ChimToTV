@@ -65,7 +65,7 @@ struct SyncView: View {
                 if others.isEmpty {
                     HStack(spacing: 10) {
                         ProgressView()
-                        Text("Đang tìm TV / iPad / iPhone có Côn Bằng TV trong mạng…").foregroundColor(Theme.dim)
+                        Text("Đang tìm TV / iPad / iPhone có MTV trong mạng…").foregroundColor(Theme.dim)
                     }
                 }
                 ForEach(others) { f in
@@ -117,7 +117,7 @@ struct SyncView: View {
                 }
                 if !message.isEmpty { Text(message).foregroundColor(Theme.dim) }
             } header: { Text("Ghép với máy khác") } footer: {
-                Text("Hai máy phải cùng mạng Wi‑Fi trong nhà. TV cần Côn Bằng TV 2.2 trở lên. Lần đầu iPad / iPhone hỏi cho phép app tìm thiết bị trong mạng cục bộ: chọn Cho phép.")
+                Text("Hai máy phải cùng mạng Wi‑Fi trong nhà. TV cần MTV 2.2 trở lên. Lần đầu iPad / iPhone hỏi cho phép app tìm thiết bị trong mạng cục bộ: chọn Cho phép.")
             }
         }
         .navigationTitle("Đồng bộ trong nhà")

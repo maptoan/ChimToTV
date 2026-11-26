@@ -93,7 +93,7 @@ enum MacWindow {
     static func configure() {
         #if targetEnvironment(macCatalyst)
         for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
-            scene.title = "Côn Bằng TV"
+            scene.title = "MTV"
             scene.sizeRestrictions?.minimumSize = minimumSize
             if let bar = scene.titlebar {
                 bar.titleVisibility = .hidden

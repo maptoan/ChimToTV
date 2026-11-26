@@ -1109,7 +1109,7 @@ final class PlayerModel: NSObject, ObservableObject, WKNavigationDelegate, WKUID
     /// WebKit — player-agent.js); nút phát / dừng / tua do WebKit tự lo, nút tập trước / sau báo ngược lên app.
     private func sendNowPlaying() {
         guard native == nil, let d = detail else { return } // AVPlayer: poll() cập nhật màn hình khoá
-        var meta: [String: Any] = ["title": d.title, "artist": episodes[safe: index]?.title ?? "", "album": "Côn Bằng TV"]
+        var meta: [String: Any] = ["title": d.title, "artist": episodes[safe: index]?.title ?? "", "album": "MTV"]
         if let p = d.poster, !p.isEmpty { meta["artwork"] = [["src": p, "sizes": "512x512"]] }
         guard let data = try? JSONSerialization.data(withJSONObject: meta), let json = String(data: data, encoding: .utf8) else { return }
         let js = "window.chimtoCmd&&chimtoCmd('meta'," + json.replacingOccurrences(of: "</", with: "<\\/") + ")"

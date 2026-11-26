@@ -25,7 +25,7 @@ impl Page for InvitePage {
     fn start(self: Rc<Self>) {
         let b = &self.base;
         b.clear();
-        b.add(&ui::header("Cài Côn Bằng TV lên tivi"));
+        b.add(&ui::header("Cài MTV lên tivi"));
         let n = ui::dim("Tivi / box Android nào cũng cài được bằng app Downloader — không cần USB hay máy tính.");
         n.set_margin_bottom(px(16.0));
         b.add(&n);

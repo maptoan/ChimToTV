@@ -1,5 +1,5 @@
-# Đóng gói Côn Bằng TV cho Windows: một tệp .exe tự chạy (kèm .NET, không cần cài gì thêm ngoài WebView2 Runtime có sẵn
-# trên Windows 10 / 11) → ..\dist\ConBangTV-Windows-<bản>.exe
+﻿# Đóng gói MTV cho Windows: một tệp .exe tự chạy (kèm .NET, không cần cài gì thêm ngoài WebView2 Runtime có sẵn
+# trên Windows 10 / 11) → ..\dist\MTV-Windows-<bản>.exe
 # Số hiệu bản: <Version> trong ConBangTV\ConBangTV.csproj.
 param([string]$Version = "")
 
@@ -75,8 +75,8 @@ if ($LASTEXITCODE -ne 0) { throw "Đóng gói lỗi" }
 
 $dist = Join-Path (Split-Path $here -Parent) "dist"
 New-Item -ItemType Directory -Force $dist | Out-Null
-$exe = Join-Path $dist "ConBangTV-Windows-$short.exe"
-Copy-Item (Join-Path $out "ConBangTV.exe") $exe -Force
+$exe = Join-Path $dist "MTV-Windows-$short.exe"
+Copy-Item (Join-Path $out "MTV.exe") $exe -Force
 $info = Get-Item $exe
 $sha = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
 Write-Host ("Xong: {0} ({1:N1} MB)" -f $exe, ($info.Length / 1MB))

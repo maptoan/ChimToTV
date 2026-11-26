@@ -67,7 +67,7 @@ public partial class App : Application
             var r = MessageBox.Show(
                 "Máy chưa có Microsoft Edge WebView2 Runtime (Windows 10 / 11 cập nhật thường có sẵn) — app cần nó để phát phim.\n\n" +
                 "Nhấn OK để mở trang tải WebView2 (chọn «Evergreen Bootstrapper»), cài xong thì mở lại app.",
-                "Côn Bằng TV", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                "MTV", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
             if (r == MessageBoxResult.OK) UI.Ui.OpenBrowser("https://developer.microsoft.com/microsoft-edge/webview2/");
             Shutdown();
             return;

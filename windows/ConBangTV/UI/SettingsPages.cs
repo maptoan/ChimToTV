@@ -369,12 +369,12 @@ public sealed class SettingsPage : Page
             "Chuột: rê để hiện thanh điều khiển, bấm vào phim để phát / dừng, bấm đúp để toàn màn hình.", 14.5));
 
         Body.Children.Add(Ui.Header("Giới thiệu", new Thickness(0, 26, 0, 10)));
-        Body.Children.Add(Ui.Dim($"Côn Bằng TV cho Windows — bản {UpdateCheck.CurrentVersion}", 15));
+        Body.Children.Add(Ui.Dim($"MTV cho Windows — bản {UpdateCheck.CurrentVersion}", 15));
         // Mã Downloader để cài bản TV lên tivi của mình / của người quen (InvitePage)
         Body.Children.Add(Ui.Row(
             Ui.Pill($"Cài lên tivi / mời bạn bè — mã Downloader {Invite.Code}", () => Main.Push(new InvitePage()))));
         Body.Children.Add(Ui.Row(
-            Ui.Pill("Liên hệ: t.me/tivikit", () => Ui.OpenBrowser("https://t.me/tivikit")),
+            Ui.Pill("Báo lỗi / góp ý: github.com/maptoan/MTV/issues", () => Ui.OpenBrowser("https://github.com/maptoan/MTV/issues")),
             Ui.Pill("Miễn trừ trách nhiệm & quyền riêng tư", () => _ = Main.ShowDisclaimer(false)),
             Ui.Pill("Trang phát hành", () => Ui.OpenBrowser(UpdateCheck.ReleasesPage))));
         Body.Children.Add(Ui.Dim($"Dữ liệu của app: {Prefs.DataDir}", 13, new Thickness(0, 6, 0, 0)));

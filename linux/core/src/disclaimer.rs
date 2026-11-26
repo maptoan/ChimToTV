@@ -11,7 +11,7 @@ pub const SECTIONS: &[(&str, &str)] = &[
     (
         "1. App chỉ là trình xem",
         concat!(
-            "Côn Bằng TV là ứng dụng miễn phí giúp xem các trang phim công khai trên Internet bằng remote hoặc màn hình cảm ứng. App không ",
+            "MTV là ứng dụng miễn phí giúp xem các trang phim công khai trên Internet bằng remote hoặc màn hình cảm ứng. App không ",
             "lưu trữ, không tải lên, không sở hữu và không phát tán phim, hình ảnh hay phụ đề nào. Mọi nội dung do các trang web bên thứ ba ",
             "cung cấp và nằm trên máy chủ của họ.",
         ),
@@ -19,7 +19,7 @@ pub const SECTIONS: &[(&str, &str)] = &[
     (
         "2. Bản quyền thuộc chủ sở hữu",
         concat!(
-            "Tên phim, hình ảnh, video và nhãn hiệu thuộc về chủ sở hữu hợp pháp. Côn Bằng TV không liên kết với, không được tài trợ hay ",
+            "Tên phim, hình ảnh, video và nhãn hiệu thuộc về chủ sở hữu hợp pháp. MTV không liên kết với, không được tài trợ hay ",
             "bảo trợ bởi trang web, hãng phim hay nhà phát hành nào. Chủ sở hữu muốn app ngừng hỗ trợ một trang, xin liên hệ ở mục 9.",
         ),
     ),
@@ -70,7 +70,7 @@ pub const SECTIONS: &[(&str, &str)] = &[
     ),
     (
         "9. Liên hệ",
-        "Góp ý, báo lỗi hoặc yêu cầu về bản quyền: Telegram t.me/tivikit.",
+        "Góp ý, báo lỗi hoặc yêu cầu về bản quyền: https://github.com/maptoan/MTV/issues.",
     ),
 ];
 
@@ -88,9 +88,9 @@ pub fn accept() {
 /// Dòng dưới tiêu đề hộp: lần đầu (gate) nhắc đọc hết rồi «Đồng ý»; mở lại từ Cài đặt thì ghi bản + tháng.
 pub fn intro(gate: bool) -> String {
     if gate {
-        format!("Côn Bằng TV — {TITLE}. Đọc hết rồi chọn «Đồng ý» để vào app.")
+        format!("MTV — {TITLE}. Đọc hết rồi chọn «Đồng ý» để vào app.")
     } else {
-        format!("Côn Bằng TV · bản {VERSION} – {DATE}")
+        format!("MTV · bản {VERSION} – {DATE}")
     }
 }
 
@@ -108,7 +108,7 @@ mod tests {
         assert_eq!(VERSION, 1);
         assert_eq!(SECTIONS.len(), 9);
         assert!(SECTIONS.iter().enumerate().all(|(i, (t, b))| t.starts_with(&format!("{}. ", i + 1)) && !b.is_empty()));
-        assert_eq!(SECTIONS[8], ("9. Liên hệ", "Góp ý, báo lỗi hoặc yêu cầu về bản quyền: Telegram t.me/tivikit."));
+        assert_eq!(SECTIONS[8], ("9. Liên hệ", "Góp ý, báo lỗi hoặc yêu cầu về bản quyền: https://github.com/maptoan/MTV/issues."));
         // ghép chuỗi không mất dấu cách giữa hai dòng
         assert!(SECTIONS.iter().all(|(_, b)| !b.contains("  ") && b.ends_with('.')));
         assert!(SECTIONS[0].1.contains("màn hình cảm ứng. App không lưu trữ"));

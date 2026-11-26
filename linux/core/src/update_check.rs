@@ -1,7 +1,7 @@
 //! Tự cập nhật từ GitHub Releases (bản Android: Updater.kt, iPad: UpdateCheck.swift, Windows: UpdateCheck.cs). Bản Linux phát
 //! hành bằng tag riêng "linux-v…" và không bao giờ là bản "latest" (app TV đọc releases/latest và lấy tệp .apk) → duyệt danh
 //! sách release, lấy tag linux-v* có tệp .deb (không lấy release của nền tảng khác: TV `v…`, Windows `win-v`, iPad `ios-v`,
-//! Mac `mac-v`). Cài: tải tệp .deb vào ~/.cache/conbangtv, kiểm đúng cỡ + SHA-256 GitHub báo + đúng gói `conbangtv` và số bản
+//! Mac `mac-v`). Cài: tải tệp .deb vào ~/.cache/mtv, kiểm đúng cỡ + SHA-256 GitHub báo + đúng gói `conbangtv` và số bản
 //! (`dpkg-deb -f`), rồi `pkexec apt-get install -y <tệp>` (không có thì `pkexec dpkg -i`) và mở lại app (`relaunch`).
 
 use crate::json::{self, Obj};
@@ -11,16 +11,16 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::Duration;
 
-pub const RELEASES_API: &str = "https://api.github.com/repos/conbangtv/ChimToTV/releases?per_page=100";
-pub const RELEASES_PAGE: &str = "https://github.com/conbangtv/ChimToTV/releases";
+pub const RELEASES_API: &str = "https://api.github.com/repos/maptoan/MTV/releases?per_page=100";
+pub const RELEASES_PAGE: &str = "https://github.com/maptoan/MTV/releases";
 pub const PREFIX: &str = "linux-v";
 /// Tự kiểm tối đa 2 giờ một lần.
 pub const CHECK_EVERY: i64 = 2 * 60 * 60 * 1000;
 /// «Để sau»: không hỏi lại bản đó trong 24 giờ.
 pub const SNOOZE: i64 = 24 * 60 * 60 * 1000;
 /// Tên gói .deb và nơi cài tệp chạy.
-pub const PACKAGE: &str = "conbangtv";
-pub const INSTALLED_BIN: &str = "/usr/bin/conbangtv";
+pub const PACKAGE: &str = "mtv";
+pub const INSTALLED_BIN: &str = "/usr/bin/mtv";
 
 /// `api_url`: link tải cùng tệp qua API (api.github.com/…/releases/assets/<id>) — dùng khi link github.com lỗi.
 #[derive(Debug, Clone, PartialEq)]
@@ -213,7 +213,7 @@ pub fn up_to_date_text() -> String {
 }
 
 pub fn dialog_title(rel: &Release) -> String {
-    format!("Có bản mới: Côn Bằng TV {}", rel.version)
+    format!("Có bản mới: MTV {}", rel.version)
 }
 
 pub fn dialog_text(rel: &Release) -> String {
@@ -223,13 +223,13 @@ pub fn dialog_text(rel: &Release) -> String {
 
 // ---- Tải + cài ----
 
-/// Thư mục tải bản cập nhật (~/.cache/conbangtv).
+/// Thư mục tải bản cập nhật (~/.cache/mtv).
 pub fn download_dir() -> PathBuf {
-    dirs::cache_dir().map(|d| d.join("conbangtv")).unwrap_or_else(|| crate::prefs::data_dir().join("update"))
+    dirs::cache_dir().map(|d| d.join("mtv")).unwrap_or_else(|| crate::prefs::data_dir().join("update"))
 }
 
 fn is_update_file(name: &str) -> bool {
-    name.starts_with("ConBangTV-Linux-") && name.ends_with(".deb")
+    name.starts_with("MTV-Linux-") && name.ends_with(".deb")
 }
 
 /// Lúc mở app: dọn tệp .deb của lần cập nhật trước.
@@ -249,7 +249,7 @@ pub async fn download(rel: &Release, progress: impl Fn(f64) + Send + Sync) -> Re
     let dir = download_dir();
     tokio::fs::create_dir_all(&dir).await?;
     cleanup();
-    let file = dir.join(format!("ConBangTV-Linux-{}.deb", rel.version));
+    let file = dir.join(format!("MTV-Linux-{}.deb", rel.version));
     // Link github.com lỗi (11/2026: máy chủ GitHub vùng Đông Nam Á trả 504 hàng giờ liền trong khi API vẫn chạy) → tải cùng
     // tệp qua API (http::download gửi Accept: application/octet-stream). Tệp từ đường nào cũng phải khớp cỡ + SHA-256 + số bản.
     let sources: Vec<&str> = [Some(rel.deb_url.as_str()), rel.api_url.as_deref()].into_iter().flatten().collect();
@@ -303,13 +303,13 @@ pub async fn download(rel: &Release, progress: impl Fn(f64) + Send + Sync) -> Re
         Err(e) => return Err(e.into()),
     };
     if !out.status.success() {
-        return Err(Error::app(format!("Tệp tải về không phải bản Côn Bằng TV {}.", rel.version)));
+        return Err(Error::app(format!("Tệp tải về không phải bản MTV {}.", rel.version)));
     }
     check_deb_fields(&String::from_utf8_lossy(&out.stdout), &rel.version)?;
     Ok(file)
 }
 
-/// Kiểm thông tin gói (`dpkg-deb -f <tệp> Package Version Architecture`): đúng gói conbangtv, đúng số bản, đúng kiến trúc.
+/// Kiểm thông tin gói (`dpkg-deb -f <tệp> Package Version Architecture`): đúng gói mtv, đúng số bản, đúng kiến trúc.
 pub fn check_deb_fields(output: &str, version: &str) -> Result<()> {
     let field = |name: &str| -> String {
         output
@@ -319,7 +319,7 @@ pub fn check_deb_fields(output: &str, version: &str) -> Result<()> {
     };
     let (pkg, ver, arch) = (field("Package"), field("Version"), field("Architecture"));
     if pkg != PACKAGE || ver.is_empty() || is_newer(&ver, Some(version)) || is_newer(version, Some(&ver)) {
-        return Err(Error::app(format!("Tệp tải về không phải bản Côn Bằng TV {version}.")));
+        return Err(Error::app(format!("Tệp tải về không phải bản MTV {version}.")));
     }
     if !arch.is_empty() && arch != "all" && arch != deb_arch() {
         return Err(Error::app(format!("Tệp tải về dành cho máy {arch}, không cài được trên máy này ({}).", deb_arch())));
@@ -392,7 +392,7 @@ pub fn relaunch() -> Result<()> {
 
 /// App cài bằng gói .deb (tự cập nhật được); chạy từ thư mục dựng / AppImage… thì mở trang Releases để tải tay.
 pub fn can_self_update() -> bool {
-    Path::new("/var/lib/dpkg/info/conbangtv.list").exists() && Path::new(INSTALLED_BIN).exists() && which("pkexec")
+    Path::new("/var/lib/dpkg/info/mtv.list").exists() && Path::new(INSTALLED_BIN).exists() && which("pkexec")
 }
 
 fn which(prog: &str) -> bool {
@@ -419,20 +419,20 @@ mod tests {
     fn picks_only_linux_releases_with_deb() {
         let json = format!(
             "[{},{},{},{},{},{},{},{}]",
-            rel("v2.17", &asset("ConBangTV.apk"), ""),
-            rel("win-v1.15", &asset("ConBangTV-Windows-1.15.exe"), ""),
-            rel("ios-v1.17", &asset("ConBangTV-iPad-1.17.ipa"), ""),
-            rel("mac-v1.17", &asset("ConBangTV-Mac-1.17.zip"), ""),
-            rel("linux-v1.2", &asset("ConBangTV-Linux-1.2.deb"), ""),
-            rel("linux-v1.10", &asset("ConBangTV-Linux-1.10.deb"), ""),
+            rel("v2.17", &asset("MTV.apk"), ""),
+            rel("win-v1.15", &asset("MTV-Windows-1.15.exe"), ""),
+            rel("ios-v1.17", &asset("MTV-iPad-1.17.ipa"), ""),
+            rel("mac-v1.17", &asset("MTV-Mac-1.17.zip"), ""),
+            rel("linux-v1.2", &asset("MTV-Linux-1.2.deb"), ""),
+            rel("linux-v1.10", &asset("MTV-Linux-1.10.deb"), ""),
             // không có .deb, bản nháp, bản thử: bỏ
-            rel("linux-v9.0", &asset("ConBangTV-Linux-9.0.tar.gz"), ""),
-            rel("linux-v8.0", &asset("ConBangTV-Linux-8.0.deb"), r#","draft":true"#).replace(r#""draft":false,"#, ""),
+            rel("linux-v9.0", &asset("MTV-Linux-9.0.tar.gz"), ""),
+            rel("linux-v8.0", &asset("MTV-Linux-8.0.deb"), r#","draft":true"#).replace(r#""draft":false,"#, ""),
         );
         let r = pick_latest(json.as_bytes()).unwrap();
         assert_eq!(r.version, "1.10");
         assert_eq!(r.tag, "linux-v1.10");
-        assert_eq!(r.deb_url, "https://github.com/x/y/releases/download/t/ConBangTV-Linux-1.10.deb");
+        assert_eq!(r.deb_url, "https://github.com/x/y/releases/download/t/MTV-Linux-1.10.deb");
         assert_eq!(r.sha256.as_deref(), Some("abcdef"));
         assert_eq!(r.size, 1234);
         assert_eq!(r.api_url.as_deref(), Some("https://api.github.com/repos/x/y/releases/assets/9"));
@@ -440,7 +440,7 @@ mod tests {
 
         let pre = format!("[{}]", rel("linux-v3.0", &asset("a.deb"), "").replace(r#""prerelease":false"#, r#""prerelease":true"#));
         assert_eq!(pick_latest(pre.as_bytes()), None);
-        let others = format!("[{},{}]", rel("v2.17", &asset("ConBangTV.apk"), ""), rel("win-v1.15", &asset("x.deb"), ""));
+        let others = format!("[{},{}]", rel("v2.17", &asset("MTV.apk"), ""), rel("win-v1.15", &asset("x.deb"), ""));
         assert_eq!(pick_latest(others.as_bytes()), None);
         assert_eq!(pick_latest(b"{\"message\":\"API rate limit\"}"), None);
         assert_eq!(pick_latest(b"<html>"), None);
@@ -449,7 +449,7 @@ mod tests {
     #[test]
     fn prefers_deb_for_this_arch() {
         let other = if deb_arch() == "arm64" { "amd64" } else { "arm64" };
-        let assets = format!("{},{}", asset(&format!("ConBangTV-Linux-1.0_{other}.deb")), asset(&format!("ConBangTV-Linux-1.0_{}.deb", deb_arch())));
+        let assets = format!("{},{}", asset(&format!("MTV-Linux-1.0_{other}.deb")), asset(&format!("MTV-Linux-1.0_{}.deb", deb_arch())));
         let r = pick_latest(format!("[{}]", rel("linux-v1.0", &assets, "")).as_bytes()).unwrap();
         assert!(r.deb_url.ends_with(&format!("_{}.deb", deb_arch())));
         // không có digest / url API
@@ -472,7 +472,7 @@ mod tests {
 
     #[test]
     fn summary_takes_whats_new_section() {
-        let notes = "# Côn Bằng TV cho Linux 1.1\r\n\r\n## Có gì mới\r\n- **Đồng bộ** trong nhà\r\n* Sửa `lỗi` phát\r\n![ảnh](x.png)\r\n| a | b |\r\nSHA-256: abc\r\n## Cài đặt\r\n- tải .deb";
+        let notes = "# MTV cho Linux 1.1\r\n\r\n## Có gì mới\r\n- **Đồng bộ** trong nhà\r\n* Sửa `lỗi` phát\r\n![ảnh](x.png)\r\n| a | b |\r\nSHA-256: abc\r\n## Cài đặt\r\n- tải .deb";
         assert_eq!(summary(notes), "Đồng bộ trong nhà\nSửa lỗi phát");
         assert_eq!(summary("- một\n- hai"), "một\nhai");
         assert_eq!(summary(&"á".repeat(700)).chars().count(), 600);
@@ -480,12 +480,12 @@ mod tests {
 
     #[test]
     fn deb_fields() {
-        let ok = format!("Package: conbangtv\nVersion: 1.1.0\nArchitecture: {}\n", deb_arch());
+        let ok = format!("Package: mtv\nVersion: 1.1.0\nArchitecture: {}\n", deb_arch());
         assert!(check_deb_fields(&ok, "1.1").is_ok());
-        assert!(check_deb_fields("Package: conbangtv\nVersion: 1.1\nArchitecture: all\n", "1.1").is_ok());
-        assert!(check_deb_fields("Package: conbangtv\nVersion: 1.0\n", "1.1").is_err());
+        assert!(check_deb_fields("Package: mtv\nVersion: 1.1\nArchitecture: all\n", "1.1").is_ok());
+        assert!(check_deb_fields("Package: mtv\nVersion: 1.0\n", "1.1").is_err());
         assert!(check_deb_fields("Package: khac\nVersion: 1.1\n", "1.1").is_err());
-        assert!(check_deb_fields("Package: conbangtv\nVersion: 1.1\nArchitecture: s390x\n", "1.1").is_err());
+        assert!(check_deb_fields("Package: mtv\nVersion: 1.1\nArchitecture: s390x\n", "1.1").is_err());
         assert!(check_deb_fields("", "1.1").is_err());
     }
 
@@ -500,9 +500,9 @@ mod tests {
             size: 0,
             api_url: None,
         };
-        assert_eq!(dialog_title(&r), "Có bản mới: Côn Bằng TV 1.1");
+        assert_eq!(dialog_title(&r), "Có bản mới: MTV 1.1");
         assert_eq!(dialog_text(&r), format!("Mới\n\nBản đang dùng: {}.", current_version()));
-        assert!(is_update_file("ConBangTV-Linux-1.1.deb"));
+        assert!(is_update_file("MTV-Linux-1.1.deb"));
         assert!(!is_update_file("anh.jpg"));
     }
 }

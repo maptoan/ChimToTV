@@ -47,7 +47,7 @@
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -70,7 +70,7 @@
                 android:id="@+id/btnSync"
                 style="@style/TvButton"
                 android:text="Đồng bộ với iPad / iPhone…" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:layout_width="match_parent"
@@ -84,7 +84,7 @@
             style="@style/SettingsLabel"
             android:text="Trang chủ" />
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -109,7 +109,7 @@
                 android:id="@+id/btnFeedRetry"
                 style="@style/TvButton"
                 android:visibility="gone" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:layout_width="match_parent"
@@ -146,7 +146,7 @@
             android:textColor="@color/text_dim"
             android:textSize="14sp" />
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp">
@@ -170,7 +170,7 @@
                 android:id="@+id/btnRemove"
                 style="@style/TvButton"
                 android:text="Xoá khỏi danh sách" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:id="@+id/testResult"
@@ -206,7 +206,7 @@
             style="@style/SettingsLabel"
             android:text="Proxy (SOCKS5 / Shadowsocks)" />
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -226,7 +226,7 @@
             <TextView
                 android:id="@+id/btnProxyScope"
                 style="@style/TvButton" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -274,7 +274,7 @@
                 android:inputType="textPassword" />
         </LinearLayout>
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp">
@@ -288,7 +288,7 @@
                 android:id="@+id/btnProxyTest"
                 style="@style/TvButton"
                 android:text="Kiểm tra proxy" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:id="@+id/proxyResult"
@@ -336,7 +336,7 @@
             style="@style/SettingsLabel"
             android:text="Phát video" />
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -360,7 +360,7 @@
             <TextView
                 android:id="@+id/btnNcBackup"
                 style="@style/TvButton" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:layout_width="match_parent"
@@ -391,7 +391,7 @@
             style="@style/SettingsLabel"
             android:text="Dữ liệu" />
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -405,9 +405,9 @@
                 android:id="@+id/btnClearCache"
                 style="@style/TvButton"
                 android:text="Xoá ảnh &amp; dữ liệu duyệt web" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -419,7 +419,7 @@
             <TextView
                 android:id="@+id/btnAutoClear"
                 style="@style/TvButton" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:layout_width="match_parent"
@@ -433,7 +433,7 @@
             style="@style/SettingsLabel"
             android:text="Cập nhật app" />
 
-        <vn.chimto.tv.FlowRow
+        <vn.mtv.tv.FlowRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
@@ -445,7 +445,7 @@
             <TextView
                 android:id="@+id/btnAutoUpdate"
                 style="@style/TvButton" />
-        </vn.chimto.tv.FlowRow>
+        </vn.mtv.tv.FlowRow>
 
         <TextView
             android:id="@+id/updateResult"
@@ -471,7 +471,7 @@
             android:id="@+id/btnContact"
             style="@style/TvButton"
             android:layout_marginTop="8dp"
-            android:text="Telegram: t.me/tivikit" />
+            android:text="Báo lỗi / góp ý: github.com/maptoan/MTV/issues" />
 
         <TextView
             android:id="@+id/btnDisclaimer"
@@ -483,7 +483,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Góp ý, báo lỗi, hỏi đáp: nhắn nhóm Telegram @tivikit (trên điện thoại mở t.me/tivikit)."
+            android:text="Góp ý, báo lỗi, hỏi đáp: mở trang github.com/maptoan/MTV/issues."
             android:textColor="@color/text_dim"
             android:textSize="14sp" />
 

@@ -1,4 +1,4 @@
-//! Côn Bằng TV cho Linux — GTK3 + WebKitGTK. Giao diện như bản TV / Windows: menu bên trái, thẻ phim, đi bằng phím mũi tên /
+//! MTV cho Linux — GTK3 + WebKitGTK. Giao diện như bản TV / Windows: menu bên trái, thẻ phim, đi bằng phím mũi tên /
 //! remote, trình phát dùng chung trang phát của bản Android (app/src/main/assets).
 
 mod app;
@@ -40,7 +40,7 @@ fn main() {
     });
     cbtv::prefs::load(None);
     cbtv::log::start();
-    cbtv::log::d("app", &format!("Côn Bằng TV {} (Linux) mở", cbtv::version()));
+    cbtv::log::d("app", &format!("MTV {} (Linux) mở", cbtv::version()));
     cbtv::prefs::apply_net_defaults();
     // Bản mới: thử lại ngay các nguồn trang chủ bản cũ lỗi liên tục (đang tạm nghỉ)
     if cbtv::feed::clear_rest_on_upgrade(cbtv::version()) {
@@ -48,11 +48,11 @@ fn main() {
     }
     cbtv::net::start_bridge();
     fonts::install();
-    glib::set_prgname(Some("conbangtv"));
-    glib::set_application_name("Côn Bằng TV");
+    glib::set_prgname(Some("mtv"));
+    glib::set_application_name("MTV");
 
     // Một cửa sổ cho cả máy: mở lần nữa thì đưa cửa sổ đang có lên trước
-    let gapp = gtk::Application::new(Some("vn.chimto.tv"), gio::ApplicationFlags::default());
+    let gapp = gtk::Application::new(Some("vn.mtv.tv"), gio::ApplicationFlags::default());
     gapp.connect_activate(|g| {
         if let Some(w) = g.windows().first() {
             w.present();

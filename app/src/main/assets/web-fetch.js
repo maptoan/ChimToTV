@@ -1,4 +1,4 @@
-// Côn Bằng TV — đọc hộ trang bật lớp chống bot của Cloudflare (lõi: web_fetch). App mở một WebView ẩn ở trang đó (trình
+// MTV — đọc hộ trang bật lớp chống bot của Cloudflare (lõi: web_fetch). App mở một WebView ẩn ở trang đó (trình
 // duyệt thật tự qua lớp chặn), rồi gọi window.__cbFetch(id, url, method, body, headers) ngay trong trang cùng gốc: fetch()
 // dùng cookie của trình duyệt. Kết quả {id, code, url, type, cf, b64} (hoặc {id, err}) — nội dung luôn là base64 (cả ảnh) —
 // trả về Promise và gửi qua window.__cbReply nếu bản app đặt hàm đó (WebView2: chrome.webview.postMessage; Android: giao

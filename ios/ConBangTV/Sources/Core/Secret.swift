@@ -7,7 +7,7 @@ import Security
 /// chỉ Apple), còn Keychain kiểu cũ gắn quyền đọc với chữ ký của app — mỗi lần app tự cập nhật macOS lại hỏi mật khẩu máy. Nên
 /// bản Mac cất vào tệp riêng quyền 0600 trong Application Support: chỉ tài khoản macOS này đọc được (như DPAPI của bản Windows).
 enum Secret {
-    private static let service = "vn.chimto.tv.secret"
+    private static let service = "vn.mtv.tv.secret"
 
     #if targetEnvironment(macCatalyst)
     private static let lock = NSLock()

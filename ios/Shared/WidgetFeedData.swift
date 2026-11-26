@@ -22,7 +22,7 @@ struct WidgetFeedData: Codable, Equatable {
     var updated: Double
 
     /// Mã nhóm App Group và lược đồ URL mở app (ghi trong Info.plist của cả app lẫn widget, theo bản thử / bản chính).
-    static var groupId: String { Bundle.main.object(forInfoDictionaryKey: "ConBangAppGroup") as? String ?? "group.vn.chimto.tv" }
+    static var groupId: String { Bundle.main.object(forInfoDictionaryKey: "ConBangAppGroup") as? String ?? "group.vn.mtv.tv" }
     static var scheme: String { Bundle.main.object(forInfoDictionaryKey: "ConBangURLScheme") as? String ?? "conbangtv" }
 
     static var folder: URL? {

@@ -1,4 +1,4 @@
-# Côn Bằng TV cho Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+): Rust + GTK3 + WebKitGTK 4.1.
+# MTV cho Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+): Rust + GTK3 + WebKitGTK 4.1.
 #   core/ — lõi không dính giao diện (đọc trang, trang chủ tổng hợp, cài đặt, mạng: cổng SOCKS nội bộ, DNS mã hoá, vượt chặn,
 #           proxy, đồng bộ). Cùng tên hàm với bản Android (app/), iPad (ios/), Windows (windows/) để sửa song song.
 #   app/  — giao diện GTK3 + trình phát WebKitGTK (dùng chung trang phát app/src/main/assets của bản Android).

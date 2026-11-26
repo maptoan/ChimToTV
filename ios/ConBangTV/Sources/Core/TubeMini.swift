@@ -8,7 +8,7 @@ import Foundation
 // Phát bằng chính trình phát phim (PlayerModel): danh sách video đang xem = các «tập» của một phim giả (tubemini://list/…), mỗi
 // video = tubemini://video/<id>, các mức chất lượng = «server» (1080p / 720p / 360p / Chỉ nghe) → có sẵn thanh nút, tua, video kế,
 // giới hạn giờ xem, màn xe CarPlay. Luôn phát bằng AVPlayer (NativeFilm). Theo dõi kênh và lịch sử nằm trên máy chủ (dùng chung với
-// app TubeMini, không chia theo người xem — anh chọn 25/11/2026), không ghi vào lịch sử phim của Côn Bằng.
+// app TubeMini, không chia theo người xem — anh chọn 25/11/2026), không ghi vào lịch sử phim của MTV.
 //
 // Máy chủ 0.7.0 (D39–D44 của TubeMini_Server, 25/11/2026): ra Internet qua Cloudflare, mỗi thiết bị một mã nằm trong địa chỉ
 // (`https://<tên miền>/u/<mã>`, bot Telegram @tube_mini_bot cấp; trong nhà không mã = chủ máy chủ), kênh theo dõi / lịch sử theo
@@ -93,7 +93,7 @@ enum TubeMini {
         "Bấm «Chat với bot» để mở thẳng khung chat @tube_mini_bot trong Telegram, rồi bấm «📝 Đăng ký».",
         "Bot gửi địa chỉ máy chủ riêng cho máy này, dạng tên-miền/u/k7pq-4xmz-9tbn. Chạm vào địa chỉ hoặc nút «📋 Chép địa chỉ» "
             + "để chép — tin tự xoá sau một lúc, nên chép ngay.",
-        "Quay lại Côn Bằng, dán vào ô địa chỉ máy chủ rồi bấm «Lưu». Không cần gõ https://, chữ hoa hay thường đều được.",
+        "Quay lại MTV, dán vào ô địa chỉ máy chủ rồi bấm «Lưu». Không cần gõ https://, chữ hoa hay thường đều được.",
     ]
 
     static let botNotes = [

@@ -622,8 +622,8 @@ impl Player {
     /// Tiêu đề cửa sổ đang hiện phim (cửa sổ nhỏ hoặc cửa sổ app).
     fn set_window_title(&self, t: &str) {
         match self.mini.borrow().as_ref() {
-            Some(m) => m.win.set_title(&format!("{t} · Côn Bằng TV")),
-            None => app().window.set_title(&format!("{t} · Côn Bằng TV")),
+            Some(m) => m.win.set_title(&format!("{t} · MTV")),
+            None => app().window.set_title(&format!("{t} · MTV")),
         }
     }
 
@@ -644,7 +644,7 @@ impl Player {
             a.set_fullscreen(false);
         }
         let win = gtk::Window::new(gtk::WindowType::Toplevel);
-        win.set_icon_name(Some("vn.chimto.tv"));
+        win.set_icon_name(Some("vn.mtv.tv"));
         let (w, h) = (px(480.0), px(270.0) + px(46.0));
         win.set_default_size(w, h);
         win.set_keep_above(true);
@@ -864,7 +864,7 @@ impl Player {
         }
         self.show_loading("Đang tải thông tin phim…");
         self.title.set_text("");
-        app().window.set_title("Côn Bằng TV");
+        app().window.set_title("MTV");
         let (fu, eu) = (film_url.to_string(), ep_url.to_string());
         let me = self.clone();
         ui::spawn(async move { cbtv::site::detail(&fu).await }, move |r| {
@@ -933,7 +933,7 @@ impl Player {
         self.exit_click_through();
         self.hide_panel();
         self.set_cursor(true);
-        app().window.set_title("Côn Bằng TV");
+        app().window.set_title("MTV");
         if notify {
             app().player_closed();
         }

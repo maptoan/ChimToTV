@@ -14,5 +14,5 @@ dependencyResolutionManagement {
         maven("https://maven.mozilla.org/maven2/") { content { includeGroup("org.mozilla.geckoview") } }
     }
 }
-rootProject.name = "ChimToTV"
+rootProject.name = "MTV"
 include(":app")

@@ -1,5 +1,4 @@
-# Dựng Côn Bằng TV -> dist\ConBangTV-<phiên bản>.apk (và cài lên tivi nếu có -Install). Bản 2.17 trở về trước tên
-# ChimToTV-<phiên bản>.apk (tên cũ của app).
+﻿# Dựng MTV -> dist\MTV-<phiên bản>.apk (và cài lên tivi nếu có -Install).
 # Cách dùng:  .\build.ps1                      (chỉ dựng)
 #             .\build.ps1 -Install <IP-tivi>    (dựng + cài qua adb rồi mở app, vd 192.168.1.50)
 param([string]$Install)
@@ -27,7 +26,7 @@ if ($LASTEXITCODE) { throw "Dựng APK thất bại" }
 
 $ver = (Select-String -Path app\build.gradle.kts -Pattern 'versionName = "(.+)"').Matches[0].Groups[1].Value
 New-Item -ItemType Directory -Force dist | Out-Null
-$apk = "dist\ConBangTV-$ver.apk"
+$apk = "dist\MTV-$ver.apk"
 Copy-Item app\build\outputs\apk\release\app-release.apk $apk -Force
 Write-Host "OK -> $apk" -ForegroundColor Green
 
@@ -36,5 +35,5 @@ if ($Install) {
     & $adb connect $dev | Out-Host
     & $adb -s $dev install -r $apk | Out-Host
     if ($LASTEXITCODE) { throw "Cài lên tivi thất bại" }
-    & $adb -s $dev shell am start -n vn.chimto.tv/.MainActivity | Out-Host
+    & $adb -s $dev shell am start -n vn.mtv.tv/.MainActivity | Out-Host
 }

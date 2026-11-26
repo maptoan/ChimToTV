@@ -11,11 +11,11 @@ public static class Disclaimer
     public static readonly (string Title, string Body)[] Sections =
     {
         ("1. App chỉ là trình xem",
-            "Côn Bằng TV là ứng dụng miễn phí giúp xem các trang phim công khai trên Internet bằng remote hoặc màn hình cảm ứng. App không " +
+            "MTV là ứng dụng miễn phí giúp xem các trang phim công khai trên Internet bằng remote hoặc màn hình cảm ứng. App không " +
             "lưu trữ, không tải lên, không sở hữu và không phát tán phim, hình ảnh hay phụ đề nào. Mọi nội dung do các trang web bên thứ ba " +
             "cung cấp và nằm trên máy chủ của họ."),
         ("2. Bản quyền thuộc chủ sở hữu",
-            "Tên phim, hình ảnh, video và nhãn hiệu thuộc về chủ sở hữu hợp pháp. Côn Bằng TV không liên kết với, không được tài trợ hay " +
+            "Tên phim, hình ảnh, video và nhãn hiệu thuộc về chủ sở hữu hợp pháp. MTV không liên kết với, không được tài trợ hay " +
             "bảo trợ bởi trang web, hãng phim hay nhà phát hành nào. Chủ sở hữu muốn app ngừng hỗ trợ một trang, xin liên hệ ở mục 9."),
         ("3. Người dùng tự chịu trách nhiệm",
             "Bạn tự chọn trang để xem và tự tuân thủ pháp luật về bản quyền, sử dụng Internet nơi bạn sinh sống. Khi có thể, hãy ủng hộ " +
@@ -38,7 +38,7 @@ public static class Disclaimer
         ("8. Trẻ em",
             "Hồ sơ trẻ em và giới hạn giờ xem chỉ hỗ trợ cha mẹ, không thay thế sự giám sát của người lớn. Nội dung từ trang bên thứ ba " +
             "có thể không phù hợp với trẻ."),
-        ("9. Liên hệ", "Góp ý, báo lỗi hoặc yêu cầu về bản quyền: Telegram t.me/tivikit."),
+        ("9. Liên hệ", "Góp ý, báo lỗi hoặc yêu cầu về bản quyền: https://github.com/maptoan/MTV/issues."),
     };
 
     public const string Consent = "Tiếp tục sử dụng app nghĩa là bạn đồng ý với các điều trên.";

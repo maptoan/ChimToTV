@@ -10,11 +10,11 @@ val kyFile = rootProject.file("keys/ky.properties")
 val ky = Properties().apply { if (kyFile.exists()) kyFile.inputStream().use { load(it) } }
 
 android {
-    namespace = "vn.chimto.tv"
+    namespace = "vn.mtv.tv"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "vn.chimto.tv"
+        applicationId = "vn.mtv.tv"
         // Android 5.0 trở lên: chạy được cả trên các TV box đời cũ.
         minSdk = 21
         targetSdk = 35
@@ -25,7 +25,7 @@ android {
         (findProperty("vn") as String?)?.let { versionName = it }
 
         // Nơi app hỏi bản phát hành mới nhất (GitHub Releases của repo)
-        buildConfigField("String", "UPDATE_URL", "\"https://api.github.com/repos/conbangtv/ChimToTV/releases/latest\"")
+        buildConfigField("String", "UPDATE_URL", "\"https://api.github.com/repos/maptoan/MTV/releases/latest\"")
 
         // Mã hồ sơ NextDNS của app (DNS mã hoá, xem Doh.kt): tệp keys/nextdns.txt — không đưa lên git. Không có tệp thì chuỗi
         // DNS mã hoá bắt đầu từ Cloudflare.
@@ -48,7 +48,7 @@ android {
     }
     buildFeatures { buildConfig = true }
     buildTypes {
-        // Bản gỡ lỗi cài song song với bản thật (vn.chimto.tv.debug), bật gỡ lỗi WebView để đo / soi qua DevTools
+        // Bản gỡ lỗi cài song song với bản thật (vn.mtv.tv.debug), bật gỡ lỗi WebView để đo / soi qua DevTools
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"

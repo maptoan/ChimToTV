@@ -65,7 +65,7 @@ impl SyncPage {
         b.clear();
         b.add(&ui::header("Đồng bộ trong nhà"));
         let n = ui::dim(
-            "Máy này, tivi (Côn Bằng TV 2.2+), iPad / iPhone (1.3+) và máy Windows cùng mạng Wi‑Fi đồng bộ với nhau: Xem tiếp / lịch \
+            "Máy này, tivi (MTV 2.2+), iPad / iPhone (1.3+) và máy Windows cùng mạng Wi‑Fi đồng bộ với nhau: Xem tiếp / lịch \
              sử, chỗ đang xem từng tập, phim theo dõi và danh sách trang phim. Xoá ở máy này thì máy kia cũng xoá.",
         );
         n.set_margin_bottom(px(14.0));
@@ -138,7 +138,7 @@ impl SyncPage {
             b.add(&ui::dim(if st.browsing {
                 "Đang tìm…"
             } else {
-                "Không thấy máy nào chưa ghép (máy kia phải đang mở Côn Bằng TV; khác lớp mạng thì nhập địa chỉ bên dưới)."
+                "Không thấy máy nào chưa ghép (máy kia phải đang mở MTV; khác lớp mạng thì nhập địa chỉ bên dưới)."
             }));
         }
         let mut items: Vec<gtk::Widget> = Vec::new();

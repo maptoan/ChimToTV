@@ -289,7 +289,7 @@ struct SettingsView: View {
                 #endif
 
                 Section {
-                    Text("Côn Bằng TV \(version) — xem phim từ trang web trên iPad / iPhone bằng chạm / bàn phím.")
+                    Text("MTV \(version) — xem phim từ trang web trên iPad / iPhone bằng chạm / bàn phím.")
                         .foregroundColor(Theme.dim)
                 }
                 } // !profilesOnly

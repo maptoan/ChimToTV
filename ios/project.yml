@@ -2,7 +2,7 @@
 # Cấu hình: Debug (dev), Beta (bản thử: tối ưu như Release + cổng gỡ lỗi trong mạng LAN, mã gói .debug), Release.
 name: ConBangTV
 options:
-  bundleIdPrefix: vn.chimto
+  bundleIdPrefix: vn.mtv
   deploymentTarget:
     iOS: "15.0"
     macOS: "12.0"
@@ -25,14 +25,14 @@ settings:
   # Nhóm App Group (app ghi dữ liệu cho widget) và lược đồ URL mở app — bản thử khác bản chính để cài song song
   configs:
     Debug:
-      APP_GROUP: group.vn.chimto.tv.debug
-      URL_SCHEME: conbangtv-thu
+      APP_GROUP: group.vn.mtv.tv.debug
+      URL_SCHEME: mtv-thu
     Beta:
-      APP_GROUP: group.vn.chimto.tv.debug
-      URL_SCHEME: conbangtv-thu
+      APP_GROUP: group.vn.mtv.tv.debug
+      URL_SCHEME: mtv-thu
     Release:
-      APP_GROUP: group.vn.chimto.tv
-      URL_SCHEME: conbangtv
+      APP_GROUP: group.vn.mtv.tv
+      URL_SCHEME: mtv
 packages:
   SwiftSoup:
     url: https://github.com/scinfu/SwiftSoup.git
@@ -60,7 +60,7 @@ targets:
       path: ConBangTV/Info.plist
       properties:
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
-        # Bản Mac lấy CFBundleName làm tên trên thanh menu / Dock («ConBangTV» → «Côn Bằng TV»); iPad dùng CFBundleDisplayName
+        # Bản Mac lấy CFBundleName làm tên trên thanh menu / Dock («ConBangTV» → «MTV»); iPad dùng CFBundleDisplayName
         CFBundleName: $(APP_DISPLAY_NAME)
         # Mã hồ sơ NextDNS của app (DNS mã hoá, Core/Doh.swift): secret NEXTDNS_ID của repo, CI truyền vào lúc dựng — không ghi
         # trong code; trống thì chuỗi DNS mã hoá bỏ NextDNS
@@ -98,14 +98,14 @@ targets:
           - audio
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
-        NSLocalNetworkUsageDescription: Đồng bộ trong nhà — tìm TV / iPad / iPhone có Côn Bằng TV trong mạng Wi‑Fi để đồng bộ lịch sử xem.
+        NSLocalNetworkUsageDescription: Đồng bộ trong nhà — tìm TV / iPad / iPhone có MTV trong mạng Wi‑Fi để đồng bộ lịch sử xem.
         NSBonjourServices:
           - _conbangtv._tcp
         LSApplicationQueriesSchemes:
           - apple-magnifier
-        # Widget «Xem tiếp» mở app bằng conbangtv://play?… (bản thử: conbangtv-thu://)
+        # Widget «Xem tiếp» mở app bằng mtv://play?… (bản thử: mtv-thu://)
         CFBundleURLTypes:
-          - CFBundleURLName: vn.chimto.tv.widget
+          - CFBundleURLName: vn.mtv.tv.widget
             CFBundleURLSchemes:
               - $(URL_SCHEME)
         ConBangAppGroup: $(APP_GROUP)
@@ -122,7 +122,7 @@ targets:
         PRODUCT_NAME: ConBangTV
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # Bản Mac = chính app iPad dựng bằng Mac Catalyst (giao diện iPad, macOS 12+ — ứng với iOS 15), Intel + Apple Silicon.
-        # Mã gói giữ nguyên vn.chimto.tv (bản thử: vn.chimto.tv.debug). Đóng gói: scripts/package-mac.sh
+        # Mã gói vn.mtv.tv (bản thử: vn.mtv.tv.debug). Đóng gói: scripts/package-mac.sh
         SUPPORTS_MACCATALYST: YES
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
         CODE_SIGN_STYLE: Manual
@@ -131,16 +131,16 @@ targets:
         CLANG_ENABLE_OBJC_ARC: YES
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.tv.debug
-          APP_DISPLAY_NAME: "Côn Bằng (thử)"
+          PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv.debug
+          APP_DISPLAY_NAME: "MTV (thử)"
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG DEVTOOLS
         Beta:
-          PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.tv.debug
-          APP_DISPLAY_NAME: "Côn Bằng (thử)"
+          PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv.debug
+          APP_DISPLAY_NAME: "MTV (thử)"
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEVTOOLS
         Release:
-          PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.tv
-          APP_DISPLAY_NAME: "Côn Bằng TV"
+          PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv
+          APP_DISPLAY_NAME: "MTV"
 
   # Widget «Xem tiếp» (WidgetKit): đọc feed.json + ảnh bìa app ghi trong App Group
   ConBangWidget:
@@ -154,7 +154,7 @@ targets:
     info:
       path: Widget/Info.plist
       properties:
-        CFBundleDisplayName: Côn Bằng TV
+        CFBundleDisplayName: MTV
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         ConBangAppGroup: $(APP_GROUP)
@@ -170,11 +170,11 @@ targets:
         APPLICATION_EXTENSION_API_ONLY: YES
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.tv.debug.widget
+          PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv.debug.widget
         Beta:
-          PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.tv.debug.widget
+          PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv.debug.widget
         Release:
-          PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.tv.widget
+          PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv.widget
 
   # Test phần lõi (đọc trang, chấm điểm server…) chạy thẳng trên macOS, không cần máy ảo iPad
   CoreTests:
@@ -188,7 +188,7 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: vn.chimto.coretests
+        PRODUCT_BUNDLE_IDENTIFIER: vn.mtv.tv.coretests
         CODE_SIGN_IDENTITY: "-"
         CODE_SIGN_STYLE: Manual
 

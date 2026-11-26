@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Côn Bằng TV cho Windows: WPF + WebView2 (nhân Chromium như WebView của bản Android). -->
+  <!-- MTV cho Windows: WPF + WebView2 (nhân Chromium như WebView của bản Android). -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -9,11 +9,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <RootNamespace>ConBangTV</RootNamespace>
-    <AssemblyName>ConBangTV</AssemblyName>
-    <Product>Côn Bằng TV</Product>
-    <Company>Côn Bằng TV</Company>
-    <Description>Côn Bằng TV</Description>
-    <Copyright>Côn Bằng TV</Copyright>
+    <AssemblyName>MTV</AssemblyName>
+    <Product>MTV</Product>
+    <Company>MTV</Company>
+    <Description>MTV</Description>
+    <Copyright>MTV</Copyright>
     <!-- Số hiệu bản Windows (tag win-v<bản>) -->
     <Version>1.22.0</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

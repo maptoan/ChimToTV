@@ -168,7 +168,7 @@ final class NativeFilm: NSObject {
     /// Màn hình khoá / «Đang phát» của CarPlay: tên phim, tập, thời gian.
     func nowPlaying(title: String, subtitle: String, duration: Double, elapsed: Double, playing: Bool) {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [
-            MPMediaItemPropertyTitle: title, MPMediaItemPropertyArtist: subtitle, MPMediaItemPropertyAlbumTitle: "Côn Bằng TV",
+            MPMediaItemPropertyTitle: title, MPMediaItemPropertyArtist: subtitle, MPMediaItemPropertyAlbumTitle: "MTV",
             MPMediaItemPropertyPlaybackDuration: duration, MPNowPlayingInfoPropertyElapsedPlaybackTime: elapsed,
             MPNowPlayingInfoPropertyPlaybackRate: playing ? Double(rate) : 0,
         ]

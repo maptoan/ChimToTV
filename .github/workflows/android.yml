@@ -1,4 +1,4 @@
-# Workflow dựng bản Android Release (APK) cho fork ChimToTV (Côn Bằng TV).
+# Workflow dựng bản Android Release (APK) cho MTV.
 #
 # Lưu ý vận hành & quy tắc đồng bộ 3 số hiệu OTA (Updater.kt:49, 59, 120, 191-195):
 # - App kiểm tra bản mới qua `isNewer(tag_name, BuildConfig.VERSION_NAME)`, sau đó `verify()`
@@ -9,8 +9,6 @@
 #     3. `versionCode` trong APK (mặc định đọc từ app/build.gradle.kts hoặc truyền input `vc`)
 # - Ghi chú: Nút "Sync fork" trên web GitHub chỉ đồng bộ nhánh `main`, không tự copy tags từ
 #   upstream; khi đó chạy `workflow_dispatch` (với `publish_release = true`) sẽ tự tạo Release.
-# - `app/build.gradle.kts` được giữ nguyên bản (zero-diff) trong Git; workflow chỉ thay tạm
-#   `UPDATE_URL` sang repo fork trên runner ngay trước khi chạy Gradle.
 
 name: Android
 
@@ -190,19 +188,22 @@ jobs:
             echo "Không khai báo NEXTDNS_ID — ứng dụng sẽ dùng DoH/DoT mặc định (Cloudflare / Google)."
           fi
 
-      - name: Chuyển UPDATE_URL sang repo fork trên runner (Zero-diff trong Git)
+      - name: Kiểm chứng UPDATE_URL và độ sạch mã nguồn (Verification Gate)
         env:
           REPO_SLUG: ${{ github.repository }}
         run: |
           set -euo pipefail
           TARGET_URL="https://api.github.com/repos/${REPO_SLUG}/releases/latest"
-          sed -i "s|https://api.github.com/repos/conbangtv/ChimToTV/releases/latest|${TARGET_URL}|g" app/build.gradle.kts
 
           if ! grep -qF "$TARGET_URL" app/build.gradle.kts; then
-            echo "::error::Không thể cập nhật UPDATE_URL thành '$TARGET_URL' trong app/build.gradle.kts"
+            echo "::error::UPDATE_URL trong app/build.gradle.kts chưa khớp '$TARGET_URL'"
             exit 1
           fi
-          echo "Đã cập nhật tạm UPDATE_URL trên runner -> $TARGET_URL"
+          if grep -rnE "conbangtv/ChimToTV|Circling5714|t\.me/tivikit|9192365|Côn Bằng TV" app/src/; then
+            echo "::error::Phát hiện chuỗi định danh cũ còn sót trong app/src/"
+            exit 1
+          fi
+          echo "Verification Gate đạt -> UPDATE_URL=$TARGET_URL"
 
       - name: Cấp quyền thực thi gradlew & chạy Unit Tests (Release)
         run: |
@@ -240,7 +241,7 @@ jobs:
           fi
 
           mkdir -p dist
-          APK_OUT="dist/ConBangTV-${VER_NAME}.apk"
+          APK_OUT="dist/MTV-${VER_NAME}.apk"
           cp "$APK_SRC" "$APK_OUT"
 
           # Tìm aapt2 và apksigner an toàn trong $ANDROID_HOME/build-tools
@@ -258,8 +259,8 @@ jobs:
             echo "::error::Không đọc được thông tin package từ aapt2 dump badging"
             exit 1
           fi
-          if ! printf '%s\n' "$PKG_LINE" | grep -qF "name='vn.chimto.tv'"; then
-            echo "::error::packageName không phải 'vn.chimto.tv' (nguy cơ build nhầm bản Debug)"
+          if ! printf '%s\n' "$PKG_LINE" | grep -qF "name='vn.mtv.tv'"; then
+            echo "::error::packageName không phải 'vn.mtv.tv' (nguy cơ build nhầm bản Debug)"
             exit 1
           fi
           if ! printf '%s\n' "$PKG_LINE" | grep -qF "versionCode='${VER_CODE}'"; then
@@ -313,7 +314,7 @@ jobs:
         id: summary
         run: |
           set -euo pipefail
-          APK_OUT="dist/ConBangTV-${VER_NAME}.apk"
+          APK_OUT="dist/MTV-${VER_NAME}.apk"
           APK_SHA256=$(sha256sum "$APK_OUT" | awk '{print $1}')
           APK_SIZE=$(stat -c%s "$APK_OUT")
 
@@ -321,12 +322,12 @@ jobs:
           echo "apk_size=$APK_SIZE" >> "$GITHUB_OUTPUT"
 
           {
-            echo "## Kết quả Build Côn Bằng TV (Android Release)"
+            echo "## Kết quả Build MTV (Android Release)"
             echo ""
             echo "| Thông số | Giá trị |"
             echo "| :--- | :--- |"
-            echo "| Tệp APK | \`ConBangTV-${VER_NAME}.apk\` |"
-            echo "| Package | \`vn.chimto.tv\` |"
+            echo "| Tệp APK | \`MTV-${VER_NAME}.apk\` |"
+            echo "| Package | \`vn.mtv.tv\` |"
             echo "| Phiên bản (\`versionName\`) | \`${VER_NAME}\` |"
             echo "| Mã bản (\`versionCode\`) | \`${VER_CODE}\` |"
             echo "| Commit | \`${COMMIT_SHORT}\` |"
@@ -340,8 +341,8 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ConBangTV-${{ steps.meta.outputs.ver_name }}-apk
-          path: dist/ConBangTV-*.apk
+          name: MTV-${{ steps.meta.outputs.ver_name }}-apk
+          path: dist/MTV-*.apk
           retention-days: 14
           if-no-files-found: error
 
@@ -365,7 +366,7 @@ jobs:
       - name: Tải APK Artifact từ job build
         uses: actions/download-artifact@v4
         with:
-          name: ConBangTV-${{ needs.build.outputs.ver_name }}-apk
+          name: MTV-${{ needs.build.outputs.ver_name }}-apk
           path: dist
 
       - name: Chuẩn bị tệp phát hành & ghi chú Release (chuẩn OTA)
@@ -381,8 +382,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          APK_VER="dist/ConBangTV-${VER_NAME}.apk"
-          APK_FIXED="dist/ConBangTV.apk"
+          APK_VER="dist/MTV-${VER_NAME}.apk"
+          APK_FIXED="dist/MTV.apk"
           if [[ ! -f "$APK_VER" ]]; then
             echo "::error::Không tìm thấy $APK_VER sau khi tải artifact"
             exit 1
@@ -410,7 +411,7 @@ jobs:
             ' CHANGELOG.md | sed '/./,$!d')
           fi
           if [[ -z "$WHAT_NEW" ]]; then
-            WHAT_NEW="- Bản dựng tự động Côn Bằng TV ${VER_NAME} (versionCode ${VER_CODE}, commit ${COMMIT_SHORT})."
+            WHAT_NEW="- Bản dựng tự động MTV ${VER_NAME} (versionCode ${VER_CODE}, commit ${COMMIT_SHORT})."
           fi
 
           {
@@ -422,7 +423,7 @@ jobs:
             echo ""
             echo "| Tệp | Giá trị |"
             echo "| :--- | :--- |"
-            echo "| Tên tệp | \`ConBangTV-${VER_NAME}.apk\` / \`ConBangTV.apk\` |"
+            echo "| Tên tệp | \`MTV-${VER_NAME}.apk\` / \`MTV.apk\` |"
             echo "| Phiên bản | \`${VER_NAME}\` (\`versionCode ${VER_CODE}\`) |"
             echo "| Commit | \`${COMMIT_SHORT}\` |"
             echo "| Kích thước (byte) | \`${APK_SIZE}\` |"
@@ -437,16 +438,16 @@ jobs:
           TARGET_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          APK_VER="dist/ConBangTV-${VER_NAME}.apk"
-          APK_FIXED="dist/ConBangTV.apk"
+          APK_VER="dist/MTV-${VER_NAME}.apk"
+          APK_FIXED="dist/MTV.apk"
 
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             gh release upload "$TAG_NAME" "$APK_VER" "$APK_FIXED" --clobber
-            gh release edit "$TAG_NAME" --latest --title "Côn Bằng TV ${VER_NAME}" --notes-file release_notes.md
+            gh release edit "$TAG_NAME" --latest --title "MTV ${VER_NAME}" --notes-file release_notes.md
           else
             gh release create "$TAG_NAME" "$APK_VER" "$APK_FIXED" \
               --target "$TARGET_SHA" \
               --latest \
-              --title "Côn Bằng TV ${VER_NAME}" \
+              --title "MTV ${VER_NAME}" \
               --notes-file release_notes.md
           fi

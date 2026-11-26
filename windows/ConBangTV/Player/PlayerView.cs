@@ -432,7 +432,7 @@ public sealed class PlayerView : UserControl
         }
         ShowLoading("Đang tải thông tin phim…");
         _ov.TitleText.Text = "";
-        _main.Title = "Côn Bằng TV";
+        _main.Title = "MTV";
         _ = LoadDetail(t, filmUrl, epUrl);
     }
 
@@ -492,7 +492,7 @@ public sealed class PlayerView : UserControl
         ExitClickThrough();
         HidePanel();
         _ov.Hide();
-        _main.Title = "Côn Bằng TV";
+        _main.Title = "MTV";
         if (notify) _main.PlayerClosed();
     }
 
@@ -552,7 +552,7 @@ public sealed class PlayerView : UserControl
         _source = null;
         var groupName = d.Groups.Count > 1 ? $" ({_group?.Name})" : "";
         _ov.TitleText.Text = $"{d.Title} — {ep.Title}{groupName}";
-        _main.Title = $"{d.Title} — {ep.Title} · Côn Bằng TV";
+        _main.Title = $"{d.Title} — {ep.Title} · MTV";
         _resumeAt = Prefs.PositionOf(ep.Url);
         _introDone = false;
         Prefs.AddHistory(new HistoryItem

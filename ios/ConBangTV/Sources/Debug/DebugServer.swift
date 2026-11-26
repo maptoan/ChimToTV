@@ -245,7 +245,7 @@ enum DebugRoutes {
             if let t = typed { o["typed"] = t }
             return .json(o)
         case "/", "/help":
-            return .text("Cổng gỡ lỗi Côn Bằng TV (bản thử). Xem chú thích trong ios/ConBangTV/Sources/Debug/DebugServer.swift")
+            return .text("Cổng gỡ lỗi MTV (bản thử). Xem chú thích trong ios/ConBangTV/Sources/Debug/DebugServer.swift")
         case "/ping":
             let s = UIScreen.main.bounds
             return .json([

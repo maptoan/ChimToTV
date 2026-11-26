@@ -17,7 +17,7 @@ struct InviteView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Cài Côn Bằng TV lên tivi")
+            Text("Cài MTV lên tivi")
                 .appFont(26, .bold)
                 .foregroundColor(Theme.text)
             Text("Tivi / box Android nào cũng cài được bằng app Downloader — không cần USB hay máy tính.")

@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 import WidgetKit
 
-/// Widget «Xem tiếp» của Côn Bằng TV: các phim đang xem dở của người xem đang dùng (app ghi sẵn trong App Group —
+/// Widget «Xem tiếp» của MTV: các phim đang xem dở của người xem đang dùng (app ghi sẵn trong App Group —
 /// WidgetFeedData). Chạm một phim: mở app phát tiếp đúng chỗ. Cỡ nhỏ: 1 phim; vừa: 3 phim; lớn: 6 phim.
 @main
 struct ConBangWidget: Widget {
@@ -92,7 +92,7 @@ struct FeedView: View {
     private var empty: some View {
         VStack(spacing: 8) {
             Image(systemName: "play.rectangle.on.rectangle").font(.system(size: 26)).foregroundColor(C.brand)
-            Text(entry.feed?.note ?? "Mở Côn Bằng TV để xem phim.")
+            Text(entry.feed?.note ?? "Mở MTV để xem phim.")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(C.text)
                 .multilineTextAlignment(.center)

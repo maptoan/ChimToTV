@@ -1,6 +1,6 @@
 [package]
 name = "conbang-core"
-description = "Lõi Côn Bằng TV (không dính giao diện): đọc trang phim, trang chủ tổng hợp, cài đặt, mạng"
+description = "Lõi MTV (không dính giao diện): đọc trang phim, trang chủ tổng hợp, cài đặt, mạng"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

@@ -80,7 +80,7 @@ public sealed class SyncPage : Page
     {
         Body.Children.Clear();
         Body.Children.Add(Ui.Header("Đồng bộ trong nhà"));
-        Body.Children.Add(Ui.Dim("Máy tính này, tivi (Côn Bằng TV 2.2+) và iPad / iPhone (1.3+) cùng mạng Wi‑Fi đồng bộ với nhau: Xem tiếp / " +
+        Body.Children.Add(Ui.Dim("Máy tính này, tivi (MTV 2.2+) và iPad / iPhone (1.3+) cùng mạng Wi‑Fi đồng bộ với nhau: Xem tiếp / " +
                                  "lịch sử, chỗ đang xem từng tập, phim theo dõi và danh sách trang phim. Xoá ở máy này thì máy kia cũng xoá.",
             14, new Thickness(0, 0, 0, 14)));
 
@@ -99,7 +99,7 @@ public sealed class SyncPage : Page
                                      "máy đó) rồi gõ mã 4 số đang hiện trên màn Đồng bộ của máy đó. Làm ngược lại cũng được: trên tivi vào " +
                                      "Cài đặt → Đồng bộ với iPad / iPhone… → chọn máy này → nhập mã ở trên. Mã đổi sau mỗi lần ghép.",
                 13.5, new Thickness(0, 0, 0, 6)));
-            Body.Children.Add(Ui.Dim("Windows hỏi cho phép Côn Bằng TV dùng mạng thì chọn Cho phép (mạng riêng / Private). Không cho phép " +
+            Body.Children.Add(Ui.Dim("Windows hỏi cho phép MTV dùng mạng thì chọn Cho phép (mạng riêng / Private). Không cho phép " +
                                      "(hoặc Windows không hỏi) vẫn đồng bộ được: máy tính này tự hỏi các máy đã ghép vài phút một lần, chỉ là " +
                                      "tivi không gửi sang ngay được và không tự ghép vào máy này được.", 13.5, new Thickness(0, 0, 0, 10)));
         }
@@ -143,7 +143,7 @@ public sealed class SyncPage : Page
         Body.Children.Add(Ui.Text("Máy trong mạng", 17, weight: FontWeights.SemiBold, margin: new Thickness(0, 12, 0, 6)));
         var found = SyncService.Found.Where(f => peers.All(p => p.Id != f.Id)).ToList();
         if (found.Count == 0)
-            Body.Children.Add(Ui.Dim(_browsing ? "Đang tìm…" : "Không thấy máy nào chưa ghép (máy kia phải đang mở Côn Bằng TV; khác lớp mạng thì nhập địa chỉ bên dưới).",
+            Body.Children.Add(Ui.Dim(_browsing ? "Đang tìm…" : "Không thấy máy nào chưa ghép (máy kia phải đang mở MTV; khác lớp mạng thì nhập địa chỉ bên dưới).",
                 15, new Thickness(0, 0, 0, 6)));
         var frow = new WrapPanel();
         foreach (var f in found) frow.Children.Add(Ui.Pill($"{Icon(f.Platform)}  Ghép với {f.Name}", () => _ = AskCode(f.Host, f.Port, f.Name)));

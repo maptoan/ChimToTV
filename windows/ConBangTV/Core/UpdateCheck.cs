@@ -10,8 +10,8 @@ namespace ConBangTV.Core;
 /// tag win-v* có tệp .exe. Cài: tải tệp mới, đổi tên tệp đang chạy thành .old, đặt tệp mới vào chỗ cũ rồi mở lại app.
 public static class UpdateCheck
 {
-    public const string ReleasesApi = "https://api.github.com/repos/conbangtv/ChimToTV/releases?per_page=100";
-    public const string ReleasesPage = "https://github.com/conbangtv/ChimToTV/releases";
+    public const string ReleasesApi = "https://api.github.com/repos/maptoan/MTV/releases?per_page=100";
+    public const string ReleasesPage = "https://github.com/maptoan/MTV/releases";
     public const string Prefix = "win-v";
     public const long CheckEvery = 2 * 60 * 60 * 1000L;
     public const long Snooze = 24 * 60 * 60 * 1000L;
@@ -91,7 +91,7 @@ public static class UpdateCheck
         var dir = Path.Combine(Prefs.DataDir, "update");
         Directory.CreateDirectory(dir);
         foreach (var f in Directory.GetFiles(dir)) TryDelete(f);
-        var file = Path.Combine(dir, $"ConBangTV-{rel.Version}.exe");
+        var file = Path.Combine(dir, $"MTV-{rel.Version}.exe");
         // Link github.com lỗi (11/2026: máy chủ GitHub vùng Đông Nam Á trả 504 hàng giờ liền trong khi API vẫn chạy) → tải cùng
         // tệp qua API (Http.Download gửi Accept: application/octet-stream). Tệp từ đường nào cũng phải khớp cỡ + SHA-256 + số bản.
         var sources = new[] { rel.ExeUrl, rel.ApiUrl }.OfType<string>().ToArray();
@@ -126,8 +126,8 @@ public static class UpdateCheck
         }
         var v = FileVersionInfo.GetVersionInfo(file);
         var pv = v.ProductVersion ?? "";
-        if (v.ProductName != "Côn Bằng TV" || IsNewer(pv, rel.Version) || IsNewer(rel.Version, pv))
-            throw new AppError("Tệp tải về không phải bản Côn Bằng TV " + rel.Version + ".");
+        if (v.ProductName != "MTV" || IsNewer(pv, rel.Version) || IsNewer(rel.Version, pv))
+            throw new AppError("Tệp tải về không phải bản MTV " + rel.Version + ".");
         return file;
     }
 

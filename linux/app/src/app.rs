@@ -59,7 +59,7 @@ pub fn app() -> Rc<App> {
 impl App {
     pub fn build(gapp: &gtk::Application) -> Rc<App> {
         let window = gtk::ApplicationWindow::new(gapp);
-        window.set_title("Côn Bằng TV");
+        window.set_title("MTV");
         window.set_size_request(720, 480);
         let (w, h, max) = match prefs::window_bounds() {
             Some(b) if b.len() == 3 => (b[0] as i32, b[1] as i32, b[2] > 0.0),
@@ -85,7 +85,7 @@ impl App {
         }
         let names = ui::vbox(0.0);
         names.set_valign(gtk::Align::Center);
-        names.pack_start(&ui::label("Côn Bằng TV", &["app-name"], false), false, false, 0);
+        names.pack_start(&ui::label("MTV", &["app-name"], false), false, false, 0);
         let site_name = ui::label("", &["site-name"], false);
         site_name.set_max_width_chars(20);
         names.pack_start(&site_name, false, false, 0);
@@ -519,7 +519,7 @@ impl App {
     /// Phim vừa ra cửa sổ nhỏ: cửa sổ app trở lại trang đang mở (phim vẫn chạy).
     pub fn player_minimized(&self) {
         self.stack.set_visible_child_name("shell");
-        self.window.set_title("Côn Bằng TV");
+        self.window.set_title("MTV");
         if let Some(p) = self.current() {
             restore_focus(p);
         }
@@ -603,7 +603,7 @@ impl App {
     /// Trình phát truyền hình đã đóng: về trang trước.
     pub fn live_closed(&self) {
         self.stack.set_visible_child_name("shell");
-        self.window.set_title("Côn Bằng TV");
+        self.window.set_title("MTV");
         if let Some(p) = self.current() {
             p.clone().returned();
             restore_focus(p);
@@ -640,7 +640,7 @@ impl App {
     pub fn player_closed(&self) {
         crate::startup::sync_soon(1);
         self.stack.set_visible_child_name("shell");
-        self.window.set_title("Côn Bằng TV");
+        self.window.set_title("MTV");
         if let Some(p) = self.current() {
             p.clone().returned();
             restore_focus(p);

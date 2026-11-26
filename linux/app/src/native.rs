@@ -114,7 +114,7 @@ impl Native {
             ("idle", "yes"),
             // Hết phim: đứng ở khung cuối (eof-reached = true) để app tự chuyển tập — như <video> ended
             ("keep-open", "yes"),
-            ("audio-client-name", "Côn Bằng TV"),
+            ("audio-client-name", "MTV"),
             ("sub-auto", "no"),
             ("osd-level", "0"),
             // Bộ đệm ~2 phút như hls.html (BUFFER = 120) — mặc định của mpv giữ tới 150 MB

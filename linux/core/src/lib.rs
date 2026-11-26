@@ -1,4 +1,4 @@
-//! Lõi Côn Bằng TV cho Linux — cùng tên hàm với bản Windows (windows/ConBangTV/Core) / Android / iPad, để sửa song song.
+//! Lõi MTV cho Linux — cùng tên hàm với bản Windows (windows/ConBangTV/Core) / Android / iPad, để sửa song song.
 //! Không dính giao diện: app GTK (linux/app) gọi vào đây; việc mạng chạy trên `rt()` (tokio).
 
 pub mod util;

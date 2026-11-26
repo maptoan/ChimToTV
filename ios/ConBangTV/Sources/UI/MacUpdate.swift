@@ -21,7 +21,7 @@ enum MacUpdate {
     /// nil = tự thay được; ngược lại là lý do không thay được.
     static var blocker: String? {
         if translocated {
-            return "App đang chạy từ chỗ tạm của macOS — kéo Côn Bằng TV vào thư mục Applications (Ứng dụng) rồi mở lại để tự cập nhật."
+            return "App đang chạy từ chỗ tạm của macOS — kéo MTV vào thư mục Applications (Ứng dụng) rồi mở lại để tự cập nhật."
         }
         let parent = appURL.deletingLastPathComponent().path
         if !FileManager.default.isWritableFile(atPath: parent) { return "Không có quyền ghi vào thư mục \(parent)." }
@@ -46,7 +46,7 @@ enum MacUpdate {
         let info = Bundle(url: newApp)?.infoDictionary ?? [:]
         let newId = info["CFBundleIdentifier"] as? String
         let newVersion = (info["CFBundleShortVersionString"] as? String) ?? "?"
-        guard newId == Bundle.main.bundleIdentifier else { throw Failure("Tệp tải về không phải Côn Bằng TV cho Mac (\(newId ?? "?")).") }
+        guard newId == Bundle.main.bundleIdentifier else { throw Failure("Tệp tải về không phải MTV cho Mac (\(newId ?? "?")).") }
         guard newVersion == rel.version, UpdateCheck.isNewer(newVersion) else {
             throw Failure("Tệp tải về là bản \(newVersion), không phải bản \(rel.version).")
         }

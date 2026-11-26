@@ -136,7 +136,7 @@ public sealed class NativeVideo : IDisposable
                 ("terminal", "no"), ("idle", "yes"),
                 // Hết phim: đứng ở khung cuối (eof-reached) để app tự chuyển tập — như <video> ended
                 ("keep-open", "yes"),
-                ("audio-client-name", "Côn Bằng TV"), ("sub-auto", "no"), ("osd-level", "0"),
+                ("audio-client-name", "MTV"), ("sub-auto", "no"), ("osd-level", "0"),
                 // Bộ đệm ~2 phút như hls.html (BUFFER = 120)
                 ("cache", "yes"), ("cache-secs", "120"), ("demuxer-max-bytes", "48MiB"), ("demuxer-max-back-bytes", "16MiB"),
                 ("network-timeout", "30"),

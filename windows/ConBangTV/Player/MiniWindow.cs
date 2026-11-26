@@ -18,7 +18,7 @@ public sealed class MiniWindow : Window
 
     public MiniWindow(Action toggle, Action expand, Action close)
     {
-        Title = "Côn Bằng TV — phim thu nhỏ";
+        Title = "MTV — phim thu nhỏ";
         WindowStyle = WindowStyle.None;
         ResizeMode = ResizeMode.CanResizeWithGrip;
         Topmost = true;

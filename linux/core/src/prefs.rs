@@ -100,7 +100,7 @@ fn default_dir() -> PathBuf {
     if let Some(d) = std::env::var_os("CONBANG_DATA_DIR") {
         return PathBuf::from(d);
     }
-    dirs::data_dir().unwrap_or_else(|| PathBuf::from(".")).join("conbangtv")
+    dirs::data_dir().unwrap_or_else(|| PathBuf::from(".")).join("mtv")
 }
 
 /// Thư mục dữ liệu của app (prefs.json, log.txt, bộ nhớ đệm trang chủ…).

@@ -295,13 +295,13 @@ impl SettingsPage {
         let h = ui::header("Giới thiệu");
         h.set_margin_top(px(26.0));
         b.add(&h);
-        b.add(&ui::dim(&format!("Côn Bằng TV cho Linux — bản {}", cbtv::update_check::current_version())));
+        b.add(&ui::dim(&format!("MTV cho Linux — bản {}", cbtv::update_check::current_version())));
         b.add(&ui::row(&[ui::pill(&format!("Cài lên tivi / mời bạn bè — mã Downloader {}", cbtv::invite::CODE), || {
             app().push(super::invite::new())
         })
         .upcast()]));
         b.add(&ui::row(&[
-            ui::pill("Liên hệ: t.me/tivikit", || ui::open_browser("https://t.me/tivikit")).upcast(),
+            ui::pill("Báo lỗi / góp ý: github.com/maptoan/MTV/issues", || ui::open_browser("https://github.com/maptoan/MTV/issues")).upcast(),
             ui::pill("Miễn trừ trách nhiệm & quyền riêng tư", || {
                 ui::local(async {
                     crate::startup::show_disclaimer(false).await;

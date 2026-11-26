@@ -1,12 +1,12 @@
 [package]
-name = "conbangtv"
-description = "Côn Bằng TV — xem phim bằng bàn phím / remote / chuột"
+name = "mtv"
+description = "MTV — xem phim bằng bàn phím / remote / chuột"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "conbangtv"
+name = "mtv"
 path = "src/main.rs"
 
 [dependencies]

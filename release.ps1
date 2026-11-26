@@ -1,43 +1,35 @@
 ﻿# Đăng một bản ĐÃ DỰNG lên GitHub Releases. Cờ "Latest" đặt sẵn theo nền tảng — không phải nhớ tay:
 #
-#   tv       tag v<bản>       ConBangTV-<bản>.apk + ConBangTV.apk + ChimToTV.apk (hai bản sao giống hệt,   LUÔN là Latest
-#                             tên cố định)
-#   windows  tag win-v<bản>   ConBangTV-Windows-<bản>.exe                                         KHÔNG BAO GIỜ là Latest
-#   ipad     tag ios-v<bản>   ConBangTV-iPad-<bản>.ipa                                            KHÔNG BAO GIỜ là Latest
-#   mac      tag mac-v<bản>   ConBangTV-Mac-<bản>.zip (Mac Catalyst, cùng số bản với iPad)         KHÔNG BAO GIỜ là Latest
-#   linux    tag linux-v<bản> ConBangTV-Linux-<bản>.deb (dist\linux, dựng trong Ubuntu 22.04)          KHÔNG BAO GIỜ là Latest
+#   tv       tag v<bản>       MTV-<bản>.apk + MTV.apk (bản sao tên cố định)                        LUÔN là Latest
+#   windows  tag win-v<bản>   MTV-Windows-<bản>.exe                                               KHÔNG BAO GIỜ là Latest
+#   ipad     tag ios-v<bản>   MTV-iPad-<bản>.ipa                                                  KHÔNG BAO GIỜ là Latest
+#   mac      tag mac-v<bản>   MTV-Mac-<bản>.zip (Mac Catalyst, cùng số bản với iPad)               KHÔNG BAO GIỜ là Latest
+#   linux    tag linux-v<bản> MTV-Linux-<bản>.deb (dist\linux, dựng trong Ubuntu 22.04)           KHÔNG BAO GIỜ là Latest
 #
 # Vì sao phải đúng — hai thứ đi theo bản đang là Latest:
 #   1. app TV tự cập nhật: Updater.kt hỏi .../releases/latest rồi lấy tệp .apk đầu tiên (tên nào cũng được — từ bản 1.3);
 #   2. link tải cố định cho app Downloader trên Android TV (chỉ tải đúng một địa chỉ, không đọc được API):
-#        https://github.com/conbangtv/ChimToTV/releases/latest/download/ConBangTV.apk      (tên mới, từ 13/11/2026)
-#        https://github.com/conbangtv/ChimToTV/releases/latest/download/ChimToTV.apk       (tên cũ — vẫn phải có)
-#      Hai link này cần tệp tên ConBangTV.apk / ChimToTV.apk có trong MỌI bản TV — nên bản TV đính kèm ba tệp. ĐỪNG bỏ tệp tên
-#      cũ: mã Downloader 9192365 (aftv.news) trỏ vào link cũ, và màn «Cài lên tivi» của TV 2.16–2.17 / iPad 1.16–1.17 /
-#      Windows 1.14–1.15 đã cài in link cũ. Ghi chú của bản TV được thêm mục "## Cài mới trên Android TV" ghi mã Downloader.
+#        https://github.com/maptoan/MTV/releases/latest/download/MTV.apk
+#      Link này cần tệp tên MTV.apk có trong MỌI bản TV — nên bản TV đính kèm hai tệp (MTV-<bản>.apk và MTV.apk).
+#      Mã Downloader 1806154 (aftv.news) trỏ vào link này. Ghi chú của bản TV được thêm mục "## Cài mới trên Android TV" ghi mã Downloader.
 #
-# Repo đã chuyển từ Circling5714/ChimToTV sang tổ chức conbangtv ngày 15/11/2026. App đã cài và mã Downloader vẫn gọi đường dẫn
-# cũ github.com/Circling5714/ChimToTV/… — GitHub chuyển hướng 301 sang chỗ mới (đã thử OTA thật TV 2.16.1 → 2.18 sau khi chuyển).
-# Chuyển hướng chỉ còn khi: KHÔNG tạo / fork repo tên ChimToTV vào tài khoản Circling5714, KHÔNG đổi tên / xoá tài khoản đó,
-# KHÔNG đổi tên repo. Mất chuyển hướng = mọi app đã cài hết tự cập nhật.
-# Bản Windows / iPad / Mac / Linux mà thành Latest thì mọi TV hết thấy bản mới và hai link trên trả 404.
+# Bản Windows / iPad / Mac / Linux mà thành Latest thì mọi TV hết thấy bản mới và link trên trả 404.
 #
 # Link tải cố định của bản Windows / iPad / Mac / Linux (luôn là bản mới nhất, như link APK ở trên) — mỗi nền tảng một release "cuốn chiếu"
 # với tag không bao giờ đổi và tệp tên cố định; mỗi lần đăng bản mới script chép đè tệp vào đó:
-#   https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_windows/ConBangTV-Windows.exe
-#   https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_ios/ConBangTV-iPad.ipa
-#   https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_macos/ConBangTV-Mac.zip   (tạo ở lần đăng bản Mac đầu)
-#   https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_linux/ConBangTV-Linux.deb (tạo ở lần đăng bản Linux đầu)
-#   (link cũ Circling5714/… đã gửi đi vẫn chạy nhờ chuyển hướng — xem trên)
+#   https://github.com/maptoan/MTV/releases/download/mtv_windows/MTV-Windows.exe
+#   https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa
+#   https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip   (tạo ở lần đăng bản Mac đầu)
+#   https://github.com/maptoan/MTV/releases/download/mtv_linux/MTV-Linux.deb (tạo ở lần đăng bản Linux đầu)
 # ĐỪNG đổi các tag / tên tệp này: link đã gửi cho người dùng và nằm trên trang giới thiệu. Các bộ tự cập nhật không nhìn
 # thấy các release này (TV đọc releases/latest; Windows / iPad / Mac / Linux chỉ nhận tag win-v… / ios-v… / mac-v… / linux-v…).
 #
 # Cách dùng (sau khi đã dựng tệp và đã git push):
 #   .\release.ps1 tv      -Notes ghi-chu.md
 #   .\release.ps1 windows -Notes ghi-chu.md
-#   .\release.ps1 ipad    -Notes ghi-chu.md [-File đường\dẫn\ConBangTV-iPad-<bản>.ipa]
-#   .\release.ps1 mac     -Notes ghi-chu.md [-File đường\dẫn\ConBangTV-Mac-<bản>.zip]   (artifact `mac` của ios.yml)
-#   .\release.ps1 linux   -Notes ghi-chu.md [-File đường\dẫn\ConBangTV-Linux-<bản>.deb] (mặc định dist\linux\…)
+#   .\release.ps1 ipad    -Notes ghi-chu.md [-File đường\dẫn\MTV-iPad-<bản>.ipa]
+#   .\release.ps1 mac     -Notes ghi-chu.md [-File đường\dẫn\MTV-Mac-<bản>.zip]   (artifact `mac` của ios.yml)
+#   .\release.ps1 linux   -Notes ghi-chu.md [-File đường\dẫn\MTV-Linux-<bản>.deb] (mặc định dist\linux\…)
 #   Thêm -DryRun: kiểm tệp, in lệnh sẽ chạy, không đăng gì.
 #   .\release.ps1 tv -Verify      (windows / ipad / mac / linux cũng vậy): chỉ kiểm lại bản đã đăng, không đăng, không sửa gì.
 #   .\release.ps1 windows -FixedOnly   (ipad / mac / linux cũng vậy): không đăng bản mới — chỉ chép tệp của bản ĐÃ đăng vào link cố
@@ -45,7 +37,7 @@
 # Số bản đọc từ app\build.gradle.kts (tv), windows\ConBangTV\ConBangTV.csproj (windows), ios\project.yml (ipad, mac), linux\Cargo.toml (linux).
 #
 # Kiểm sau khi đăng (và khi -Verify): Latest là bản TV — lúc đăng mà lệch thì script tự trả về bản TV mới nhất; tệp trên
-# GitHub khớp SHA-256 với tệp trong máy; bản TV: tải thử qua hai link cố định (tên mới, tên cũ) và so SHA-256; bản Windows /
+# GitHub khớp SHA-256 với tệp trong máy; bản TV: tải thử qua link cố định (MTV.apk) và so SHA-256; bản Windows /
 # iPad mới nhất: tệp ở link cố định khớp SHA-256 và link tải được.
 param(
     [Parameter(Mandatory = $true, Position = 0)][ValidateSet("tv", "windows", "ipad", "mac", "linux")][string]$Platform,
@@ -69,39 +61,37 @@ if ($File) {
 }
 Set-Location $PSScriptRoot
 
-$repo = "conbangtv/ChimToTV"   # trước 15/11/2026: Circling5714/ChimToTV (vẫn chuyển hướng tới đây)
-# Tên cố định của APK bản TV: tên mới (link chính) và tên cũ (giữ cho mã Downloader + app đã cài — xem đầu tệp)
-$fixedName = "ConBangTV.apk"
-$legacyName = "ChimToTV.apk"
+$repo = "maptoan/MTV"
+# Tên cố định của APK bản TV (cho mã Downloader + app đã cài)
+$fixedName = "MTV.apk"
 $fixedLink = "https://github.com/$repo/releases/latest/download/$fixedName"
-$legacyLink = "https://github.com/$repo/releases/latest/download/$legacyName"
-# Mã của app Downloader (aftv.news, trỏ vào $legacyLink — tạo trước khi đổi tên tệp) và trang hướng dẫn — cùng giá trị với
+# Mã của app Downloader (aftv.news, trỏ vào $fixedLink) và trang hướng dẫn — cùng giá trị với
 # Invite.kt (TV), Invite.swift (iPad), Invite.cs (Windows) và README
-$downloaderCode = "9192365"
+$downloaderCode = "1806154"
 $guideUrl = "https://github.com/$repo/blob/main/README.md#downloader"
-$certSha256 = "949ef2b52f3cf895d7fe5ff9db495f273e6fd35d02b23b4a521df43957a0177b"
+$certSha256 = "5e8b3fdf3b9adefad9b9ad573b7f56048555bdffc586dd346718331864f441d2"
 # Release "cuốn chiếu" giữ link tải cố định của bản Windows / iPad / Mac (xem đầu tệp). Prefix: tag của các bản có số.
 $rolling = @{
     windows = @{
-        Tag = "conbangtv_windows"; Name = "ConBangTV-Windows.exe"; Prefix = "win-v"; What = "Windows"
-        Title = "Côn Bằng TV cho Windows — link cố định (luôn là bản mới nhất)"
+        Tag = "mtv_windows"; Name = "MTV-Windows.exe"; Prefix = "win-v"; What = "Windows"
+        Title = "MTV cho Windows — link cố định (luôn là bản mới nhất)"
         How = "Tải về, để vào thư mục nào cũng được rồi mở (Windows 10 / 11). Đã cài rồi thì không cần tải lại: app tự cập nhật."
     }
     ipad = @{
-        Tag = "conbangtv_ios"; Name = "ConBangTV-iPad.ipa"; Prefix = "ios-v"; What = "iPad / iPhone"
-        Title = "Côn Bằng TV cho iPad / iPhone — link cố định (luôn là bản mới nhất)"
+        Tag = "mtv_ios"; Name = "MTV-iPad.ipa"; Prefix = "ios-v"; What = "iPad / iPhone"
+        Title = "MTV cho iPad / iPhone — link cố định (luôn là bản mới nhất)"
         How = "Cài bằng TrollStore (iOS / iPadOS 15 trở lên): mở tệp bằng TrollStore rồi chọn Install. Đã cài rồi thì không cần tải lại: app tự cập nhật."
     }
     linux = @{
-        Tag = "conbangtv_linux"; Name = "ConBangTV-Linux.deb"; Prefix = "linux-v"; What = "Linux"
-        Title = "Côn Bằng TV cho Linux — link cố định (luôn là bản mới nhất)"
+        Tag = "mtv_linux"; Name = "MTV-Linux.deb"; Prefix = "linux-v"; What = "Linux"
+        Title = "MTV cho Linux — link cố định (luôn là bản mới nhất)"
         How = "Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+ (máy 64-bit): mở tệp bằng App Center / Software Install, hoặc chạy " +
-              "«sudo apt install ./ConBangTV-Linux.deb». Đã cài rồi thì không cần tải lại: app tự cập nhật."
+              "«sudo apt install ./MTV-Linux.deb». Đã cài rồi thì không cần tải lại: app tự cập nhật."
     }
     mac = @{
-        Tag = "conbangtv_macos"; Name = "ConBangTV-Mac.zip"; Prefix = "mac-v"; What = "Mac"
-        Title = "Côn Bằng TV cho Mac — link cố định (luôn là bản mới nhất)"
-        How = "Giải nén, kéo ConBangTV vào thư mục Applications (Ứng dụng) rồi mở (macOS 12 trở lên, máy Intel hoặc chip Apple). " +
+        Tag = "mtv_macos"; Name = "MTV-Mac.zip"; Prefix = "mac-v"; What = "Mac"
+        Title = "MTV cho Mac — link cố định (luôn là bản mới nhất)"
+        How = "Giải nén, kéo MTV vào thư mục Applications (Ứng dụng) rồi mở (macOS 12 trở lên, máy Intel hoặc chip Apple). " +
               "Lần đầu macOS chặn vì app không mua chứng chỉ của Apple: vào Cài đặt hệ thống → Quyền riêng tư & Bảo mật → «Vẫn mở». " +
               "Đã cài rồi thì không cần tải lại: app tự cập nhật."
     }
@@ -133,25 +123,25 @@ function LatestTag { ("" + (Gh api "repos/$repo/releases/latest" --jq ".tag_name
 switch ($Platform) {
     "tv" {
         $ver = (Select-String -Path app\build.gradle.kts -Pattern 'versionName = "(.+)"').Matches[0].Groups[1].Value
-        $tag = "v$ver"; $title = "Côn Bằng TV $ver"; $latest = $true; $name = "ConBangTV-$ver.apk"
+        $tag = "v$ver"; $title = "MTV $ver"; $latest = $true; $name = "MTV-$ver.apk"
     }
     "windows" {
         $full = ([xml](Get-Content windows\ConBangTV\ConBangTV.csproj)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
         $ver = $full -replace '\.0$', ''
-        $tag = "win-v$ver"; $title = "Côn Bằng TV cho Windows $ver"; $latest = $false; $name = "ConBangTV-Windows-$ver.exe"
+        $tag = "win-v$ver"; $title = "MTV cho Windows $ver"; $latest = $false; $name = "MTV-Windows-$ver.exe"
     }
     "ipad" {
         $ver = (Select-String -Path ios\project.yml -Pattern 'MARKETING_VERSION:\s*"?([0-9.]+)"?').Matches[0].Groups[1].Value
-        $tag = "ios-v$ver"; $title = "Côn Bằng TV cho iPad $ver"; $latest = $false; $name = "ConBangTV-iPad-$ver.ipa"
+        $tag = "ios-v$ver"; $title = "MTV cho iPad $ver"; $latest = $false; $name = "MTV-iPad-$ver.ipa"
     }
     "linux" {
         $full = (Select-String -Path linux\Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
         $ver = $full -replace '\.0$', ''
-        $tag = "linux-v$ver"; $title = "Côn Bằng TV cho Linux $ver"; $latest = $false; $name = "ConBangTV-Linux-$ver.deb"
+        $tag = "linux-v$ver"; $title = "MTV cho Linux $ver"; $latest = $false; $name = "MTV-Linux-$ver.deb"
     }
     "mac" {
         $ver = (Select-String -Path ios\project.yml -Pattern 'MARKETING_VERSION:\s*"?([0-9.]+)"?').Matches[0].Groups[1].Value
-        $tag = "mac-v$ver"; $title = "Côn Bằng TV cho Mac $ver"; $latest = $false; $name = "ConBangTV-Mac-$ver.zip"
+        $tag = "mac-v$ver"; $title = "MTV cho Mac $ver"; $latest = $false; $name = "MTV-Mac-$ver.zip"
     }
 }
 if (-not $File) {
@@ -159,9 +149,9 @@ if (-not $File) {
     if (-not (Test-Path $File)) { throw "Không thấy $File — dựng bản $ver trước (tv: .\build.ps1 · windows: .\windows\build.ps1 · ipad / mac: tải artifact rồi dùng -File)" }
 }
 if ((Split-Path $File -Leaf) -ne $name) { throw "Tệp phải tên $name (bản $ver đọc từ mã nguồn), đang là $(Split-Path $File -Leaf)" }
-# Tên các tệp của bản này trên GitHub — bản TV có thêm hai bản sao tên cố định (tên mới, tên cũ)
+# Tên các tệp của bản này trên GitHub — bản TV có thêm bản sao tên cố định
 $assetNames = @($name)
-if ($Platform -eq "tv") { $assetNames += $fixedName, $legacyName }
+if ($Platform -eq "tv") { $assetNames += $fixedName }
 
 $tags = @(Gh api "repos/$repo/releases?per_page=100" --jq '.[].tag_name')
 $tmp = Join-Path ([IO.Path]::GetTempPath()) ("chimto-release-" + [Guid]::NewGuid().ToString("N"))
@@ -191,9 +181,9 @@ function Test-Published([bool]$heal) {
         Write-Host ("{0}: {1:N0} byte, {2}" -f $leaf, $up.size, $up.digest)
     }
 
-    # 3. Bản TV đang là Latest: hai link cố định (tên mới; tên cũ của mã Downloader) phải tải về đúng tệp này
+    # 3. Bản TV đang là Latest: link cố định (tên cố định của mã Downloader) phải tải về đúng tệp này
     if ($Platform -eq "tv" -and $now -eq $tag) {
-        foreach ($link in $fixedLink, $legacyLink) {
+        foreach ($link in @($fixedLink)) {
             $got = Join-Path $tmp "tai-ve.apk"
             $ok = $false
             foreach ($wait in 0, 5, 15) {
@@ -288,7 +278,7 @@ try {
     # ---- Chỉ chép tệp của bản đã đăng vào link cố định (lần đầu tạo link / sửa link lệch) ----
     if ($FixedOnly) {
         $r = $rolling[$Platform]
-        if (-not $r) { throw "Bản TV không cần -FixedOnly: hai link cố định của bản TV đi theo Latest ($fixedLink, $legacyLink)" }
+        if (-not $r) { throw "Bản TV không cần -FixedOnly: link cố định của bản TV đi theo Latest ($fixedLink)" }
         if ($tags -notcontains $tag) { throw "Chưa có release $tag trên GitHub — đăng bản $ver trước" }
         $pub = ((Gh api "repos/$repo/releases/tags/$tag") -join "`n") | ConvertFrom-Json
         $up = $pub.assets | Where-Object { $_.name -eq $name }
@@ -311,8 +301,8 @@ try {
         if ($tools) {
             if (-not $env:JAVA_HOME) { $env:JAVA_HOME = "$env:USERPROFILE\.jdks\jdk-17.0.20.1+1" }
             $badging = "" + (& "$($tools.FullName)\aapt2.exe" dump badging $File | Select-String -Pattern "^package:" | Select-Object -First 1)
-            if ($badging -notmatch "name='vn\.chimto\.tv'" -or $badging -notmatch "versionName='$([regex]::Escape($ver))'") {
-                throw "APK không đúng gói vn.chimto.tv / bản ${ver}: $badging"
+            if ($badging -notmatch "name='vn\.mtv\.tv'" -or $badging -notmatch "versionName='$([regex]::Escape($ver))'") {
+                throw "APK không đúng gói vn.mtv.tv / bản ${ver}: $badging"
             }
             $certs = & "$($tools.FullName)\apksigner.bat" verify --print-certs $File
             if ($LASTEXITCODE -ne 0 -or -not ($certs -match $certSha256)) {
@@ -334,10 +324,10 @@ try {
     }
     if ($tags -contains $tag) { Stop-OrWarn "Release $tag đã có trên GitHub — tăng số bản trước khi đăng" }
 
-    # ---- Tệp đính kèm: bản TV thêm hai bản sao tên cố định ----
+    # ---- Tệp đính kèm: bản TV thêm bản sao tên cố định ----
     $assets = @($File)
     if ($Platform -eq "tv") {
-        foreach ($fixed in $fixedName, $legacyName) {
+        foreach ($fixed in @($fixedName)) {
             $copy = Join-Path $tmp $fixed
             Copy-Item $File $copy
             if ((Sha256 $copy) -ne (Sha256 $File)) { throw "Bản sao $fixed không giống tệp gốc" }

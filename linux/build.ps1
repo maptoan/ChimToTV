@@ -3,7 +3,7 @@
 #   .\linux\build.ps1                 gửi mã nguồn đang sửa sang máy Ubuntu, dựng bản thử (debug)
 #   .\linux\build.ps1 -Test           + chạy test của lõi (cargo test)
 #   .\linux\build.ps1 -Run            + mở app trên màn hình máy Ubuntu (tắt bản đang chạy trước)
-#   .\linux\build.ps1 -Release -Deb   dựng bản chính + đóng gói dist\linux\ConBangTV-Linux-<bản>-thu.deb (bản phát hành thật
+#   .\linux\build.ps1 -Release -Deb   dựng bản chính + đóng gói dist\linux\MTV-Linux-<bản>-thu.deb (bản phát hành thật
 #                                     dựng trong Ubuntu 22.04 để chạy được trên máy cũ — xem README «Bản Linux»)
 #   .\linux\build.ps1 -SyncOnly       chỉ gửi mã nguồn
 #   .\linux\build.ps1 -CoreOnly -Test chỉ dựng + test phần lõi (linux/core, không cần GTK) — nhanh
@@ -53,7 +53,7 @@ if ($Test) {
 }
 
 if ($Deb) {
-    $d = Ub-Ssh "cd ~/$work/src/linux && bash packaging/make-deb.sh ~/$work/target/$profile/conbangtv ~/$work/dist thu"
+    $d = Ub-Ssh "cd ~/$work/src/linux && bash packaging/make-deb.sh ~/$work/target/$profile/mtv ~/$work/dist thu"
     $d
     # Không đặt tên biến $deb: PowerShell không phân biệt hoa thường — trùng tham số [switch]$Deb
     $debFile = ($d | Where-Object { $_ -match '^DEB=' } | Select-Object -Last 1) -replace '^DEB=', ''
@@ -65,5 +65,5 @@ if ($Deb) {
 }
 
 if ($Run) {
-    Ub-Ssh "pkill -x conbangtv; sleep 0.5; systemd-run --user --collect --quiet --unit=conbangtv-thu-`$RANDOM -E CONBANG_DEBUG=1 -E RUST_BACKTRACE=1 ~/$work/target/$profile/conbangtv && echo 'Đã mở app trên màn hình máy Ubuntu'"
+    Ub-Ssh "pkill -x mtv; sleep 0.5; systemd-run --user --collect --quiet --unit=conbangtv-thu-`$RANDOM -E CONBANG_DEBUG=1 -E RUST_BACKTRACE=1 ~/$work/target/$profile/mtv && echo 'Đã mở app trên màn hình máy Ubuntu'"
 }

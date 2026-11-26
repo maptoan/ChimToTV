@@ -37,7 +37,7 @@ public static class Prefs
     private const int MaxPositions = 400;
 
     public static string DataDir { get; private set; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ConBangTV");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MTV");
 
     private static readonly object Lock = new();
 

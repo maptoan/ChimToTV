@@ -155,7 +155,7 @@ struct Sidebar: View {
                     .frame(width: 46, height: 46)
                     .clipShape(RoundedRectangle(cornerRadius: 11))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Côn Bằng TV").appFont(21, .bold).foregroundColor(Theme.text)
+                    Text("MTV").appFont(21, .bold).foregroundColor(Theme.text)
                     Text(app.siteLabel).appFont(13).foregroundColor(Theme.dim).lineLimit(1)
                 }
             }

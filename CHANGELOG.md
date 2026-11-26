@@ -1,13 +1,19 @@
 # Nhật ký phiên bản
 
-Côn Bằng TV — từ 1.0 đến 1.4 tên là ChimTo TV. Tải bản mới nhất ở [GitHub Releases](https://github.com/conbangtv/ChimToTV/releases/latest). Bản mới nhất ở trên cùng.
-Mọi bản ký cùng một khoá (chứng chỉ SHA-256 `949ef2b52f3cf895d7fe5ff9db495f273e6fd35d02b23b4a521df43957a0177b`), cài đè
+MTV — phát triển từ mã nguồn mở Côn Bằng TV (GPL-3.0). Tải bản mới nhất ở [GitHub Releases](https://github.com/maptoan/MTV/releases/latest). Bản mới nhất ở trên cùng.
+Mọi bản ký cùng một khoá (chứng chỉ SHA-256 `5e8b3fdf3b9adefad9b9ad573b7f56048555bdffc586dd346718331864f441d2`), cài đè
 được lên nhau và giữ nguyên lịch sử xem.
 
-Bản iPad / iPhone (iOS / iPadOS 15+, cài bằng TrollStore; có bản iPhone từ 1.3) ghi riêng với tiêu đề "iPad …", tag `ios-v…`.
+Bản iPad / iPhone (iOS / iPadOS 15+, cài bằng TrollStore) ghi riêng với tiêu đề "iPad …", tag `ios-v…`.
 Bản Windows (Windows 10 / 11, một tệp `.exe`) ghi riêng với tiêu đề "Windows …", tag `win-v…`.
-Bản Mac (macOS 12+, từ 13/11/2026, cùng mã nguồn và số bản với bản iPad) ghi riêng với tiêu đề "Mac …", tag `mac-v…`.
-Bản Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, từ 13/11/2026, tệp `.deb`) ghi riêng với tiêu đề "Linux …", tag `linux-v…`.
+Bản Mac (macOS 12+) ghi riêng với tiêu đề "Mac …", tag `mac-v…`.
+Bản Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, tệp `.deb`) ghi riêng với tiêu đề "Linux …", tag `linux-v…`.
+
+## 2.24 — 27/11/2026 (Phát hành MTV đầu tiên)
+
+- Chuyển định danh chính thức của fork sang **MTV** (`vn.mtv.tv`, repo `maptoan/MTV`).
+- Cập nhật luồng tự cập nhật OTA (`UPDATE_URL`), màn «Mời bạn bè cài app» (mã Downloader `1806154`, mã QR hướng dẫn mới), thông tin miễn trừ trách nhiệm và liên hệ (`github.com/maptoan/MTV/issues`).
+- Phát hành tệp `MTV-2.24.apk` và `MTV.apk` (`versionCode = 48`, `versionName = "2.24"`).
 
 ## 2.24 — 26/11/2026 (biểu tượng mới như bản Côn Bằng TV Legacy)
 

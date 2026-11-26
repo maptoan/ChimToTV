@@ -16,6 +16,6 @@ podman run --rm \
   -v "$CACHE/cargo-registry:/root/.cargo/registry:Z" \
   -e CARGO_TARGET_DIR=/target \
   conbangtv-build \
-  bash -c 'cargo build --release --color never 2>&1 | grep -vE "^\s+(Compiling|Downloaded|Downloading)" | tail -20; test -x /target/release/conbangtv'
-echo "glibc cần: $(objdump -T "$CACHE/target/release/conbangtv" | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -1)"
-bash "$SRC/linux/packaging/make-deb.sh" "$CACHE/target/release/conbangtv" "$OUT"
+  bash -c 'cargo build --release --color never 2>&1 | grep -vE "^\s+(Compiling|Downloaded|Downloading)" | tail -20; test -x /target/release/mtv'
+echo "glibc cần: $(objdump -T "$CACHE/target/release/mtv" | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -1)"
+bash "$SRC/linux/packaging/make-deb.sh" "$CACHE/target/release/mtv" "$OUT"

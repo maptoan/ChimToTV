@@ -5,7 +5,7 @@ import Foundation
 /// tag của nền tảng đang chạy. iPad / iPhone cài bằng TrollStore (apple-magnifier://install?url=<link .ipa>); Mac tự thay
 /// chính nó (MacUpdate.swift).
 enum UpdateCheck {
-    static let releasesApi = "https://api.github.com/repos/conbangtv/ChimToTV/releases?per_page=100"
+    static let releasesApi = "https://api.github.com/repos/maptoan/MTV/releases?per_page=100"
     static let checkEvery: Int64 = 2 * 60 * 60 * 1000
     static let snooze: Int64 = 24 * 60 * 60 * 1000
 

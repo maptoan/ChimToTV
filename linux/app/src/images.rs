@@ -1,4 +1,4 @@
-//! Tải ảnh bìa: bộ nhớ (400 ảnh gần nhất) → ổ đĩa (~/.cache/conbangtv/img, giữ 14 ngày) → mạng (6 ảnh cùng lúc, qua cổng
+//! Tải ảnh bìa: bộ nhớ (400 ảnh gần nhất) → ổ đĩa (~/.cache/mtv/img, giữ 14 ngày) → mạng (6 ảnh cùng lúc, qua cổng
 //! nội bộ như mọi kết nối). Giải mã bằng crate image trên luồng nền (WebP cũng được), thu về đúng cỡ hiện để đỡ tốn RAM.
 //! Bản Windows: UI/ImageLoader.cs.
 
@@ -28,7 +28,7 @@ pub fn dirs_cache() -> PathBuf {
         .map(PathBuf::from)
         .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".cache")))
         .unwrap_or_else(|| PathBuf::from("/tmp"))
-        .join("conbangtv")
+        .join("mtv")
 }
 
 fn gate() -> &'static tokio::sync::Semaphore {

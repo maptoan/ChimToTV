@@ -465,7 +465,7 @@ private struct CarIdleView: View {
                 .resizable()
                 .frame(width: 80, height: 80)
                 .clipShape(RoundedRectangle(cornerRadius: 18))
-            Text("Côn Bằng TV đang dùng trên điện thoại")
+            Text("MTV đang dùng trên điện thoại")
                 .appFont(20, .bold)
                 .foregroundColor(Theme.text)
                 .multilineTextAlignment(.center)
@@ -660,7 +660,7 @@ private struct CarPhonePanel: View {
                         note("Xe đang chạy: màn xe chỉ phát tiếng, không hiện hình.", icon: "car.fill")
                     }
                     if car.locationDenied {
-                        note("Chưa cho phép vị trí nên app không biết xe đang chạy hay dừng. Vào Cài đặt → Côn Bằng TV → Vị trí → "
+                        note("Chưa cho phép vị trí nên app không biết xe đang chạy hay dừng. Vào Cài đặt → MTV → Vị trí → "
                              + "«Khi dùng app».", icon: "location.slash")
                     }
                     card { CarNowPlaying(big: false) }

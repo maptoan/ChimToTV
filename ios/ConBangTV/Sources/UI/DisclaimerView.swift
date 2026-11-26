@@ -13,8 +13,8 @@ struct DisclaimerView: View {
             Text(gate ? "Trước khi bắt đầu" : Disclaimer.title)
                 .appFont(26, .bold)
                 .foregroundColor(Theme.text)
-            Text(gate ? "Côn Bằng TV — \(Disclaimer.title). Đọc hết rồi chọn «Đồng ý» để vào app."
-                 : "Côn Bằng TV · bản \(Disclaimer.version) – \(Disclaimer.date)")
+            Text(gate ? "MTV — \(Disclaimer.title). Đọc hết rồi chọn «Đồng ý» để vào app."
+                 : "MTV · bản \(Disclaimer.version) – \(Disclaimer.date)")
                 .appFont(15)
                 .foregroundColor(Theme.dim)
             ScrollView {

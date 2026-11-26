@@ -1,42 +1,39 @@
-# Côn Bằng TV
+# MTV
 
-![Côn Bằng TV](design/banner-1280.png)
+![MTV](design/banner-1280.png)
 
-**Trang giới thiệu:** <https://conbangtv.github.io> — cách cài nhanh, tính năng, link tải cho Android TV / iPad / Windows / Mac / Linux
-(mã nguồn của trang ở repo [conbangtv/conbangtv.github.io](https://github.com/conbangtv/conbangtv.github.io)).
+> **Ghi nhận nguồn gốc & bản quyền (GNU GPL-3.0):** Dự án [`maptoan/MTV`](https://github.com/maptoan/MTV) được fork và phát triển tiếp từ mã nguồn mở gốc [`conbangtv/ChimToTV`](https://github.com/conbangtv/ChimToTV) của tác giả **Circling5714** theo giấy phép GNU GPL-3.0. Toàn bộ liên kết tải, tài liệu hướng dẫn và luồng tự cập nhật trong bản dựng này thuộc về **`maptoan/MTV`**.
 
-App Android TV xem phim hoạt hình 3D (và phim bộ / phim lẻ ở phimmois.fun) từ trang web bằng remote hoặc bàn phím
-(trước đây tên là ChimTo TV — vẫn cùng một app, cài đè và tự cập nhật bình thường). Từ 2.4 dùng tốt cả trên điện thoại
-Android, cầm dọc hay ngang — xem [Điện thoại Android](#điện-thoại-android-từ-24).
+App Android TV xem phim hoạt hình 3D (và phim bộ / phim lẻ ở phimmois.fun) từ trang web bằng remote hoặc bàn phím. Từ 2.4 dùng tốt cả trên điện thoại Android, cầm dọc hay ngang — xem [Điện thoại Android](#điện-thoại-android-từ-24).
 Dữ liệu (danh sách phim, tập, server) đọc trực tiếp từ trang, nên trang đổi tên miền chỉ cần sửa link trong **Cài đặt**.
 Từ 2.20 (iPad / iPhone / Mac 1.20, Windows 1.18, Linux 1.4) có thêm mục **Truyền hình · Radio** — xem kênh / nghe đài từ danh sách
 M3U bạn tự thêm, xem [Truyền hình · Radio](#truyền-hình--radio-từ-220--ipad--iphone--mac-120--windows-118--linux-14).
 
-**Bản mới nhất:** [tải APK trên GitHub Releases](https://github.com/conbangtv/ChimToTV/releases/latest) ·
+**Bản mới nhất:** [tải APK trên GitHub Releases](https://github.com/maptoan/MTV/releases/latest) ·
 [nhật ký phiên bản](CHANGELOG.md). Từ bản 1.3 app tự cập nhật.
 
-**Cài nhanh trên Android TV:** mở app **Downloader** (AFTVnews) trên tivi, nhập mã **`9192365`** — xem
+**Cài nhanh trên Android TV:** mở app **Downloader** (AFTVnews) trên tivi, nhập mã **`1806154`** — xem
 [Cài trên Android TV bằng Downloader](#cài-trên-android-tv-bằng-downloader).
 
-**Bản iPad / iPhone** (iOS / iPadOS 15+, cài bằng TrollStore): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_ios/ConBangTV-iPad.ipa)
-(link cố định) · [release `ios-v1.28`](https://github.com/conbangtv/ChimToTV/releases/tag/ios-v1.28)
+**Bản iPad / iPhone** (iOS / iPadOS 15+, cài bằng TrollStore): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa)
+(link cố định) · [release `ios-v1.28`](https://github.com/maptoan/MTV/releases/tag/ios-v1.28)
 — xem mục [Bản iPad](#bản-ipad). TV và iPad / iPhone đồng bộ được với nhau — xem [Đồng bộ trong nhà](#đồng-bộ-trong-nhà-từ-22).
 
-**Bản Windows** (Windows 10 / 11, một tệp `.exe` chạy ngay): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_windows/ConBangTV-Windows.exe)
-(link cố định) · [release `win-v1.22`](https://github.com/conbangtv/ChimToTV/releases/tag/win-v1.22)
+**Bản Windows** (Windows 10 / 11, một tệp `.exe` chạy ngay): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_windows/MTV-Windows.exe)
+(link cố định) · [release `win-v1.22`](https://github.com/maptoan/MTV/releases/tag/win-v1.22)
 — xem mục [Bản Windows](#bản-windows). Đồng bộ được với TV và iPad / iPhone.
 
-**Bản Mac** (macOS 12+, máy Intel và chip Apple): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_macos/ConBangTV-Mac.zip)
-(link cố định) · [release `mac-v1.28`](https://github.com/conbangtv/ChimToTV/releases/tag/mac-v1.28)
+**Bản Mac** (macOS 12+, máy Intel và chip Apple): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip)
+(link cố định) · [release `mac-v1.28`](https://github.com/maptoan/MTV/releases/tag/mac-v1.28)
 — xem mục [Bản Mac](#bản-mac) (lần đầu mở: Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở).
 
-**Bản Linux** (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, máy 64-bit, tệp `.deb`): [tải bản mới nhất](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_linux/ConBangTV-Linux.deb)
-(link cố định) · [release `linux-v1.8`](https://github.com/conbangtv/ChimToTV/releases/tag/linux-v1.8)
+**Bản Linux** (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, máy 64-bit, tệp `.deb`): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_linux/MTV-Linux.deb)
+(link cố định) · [release `linux-v1.8`](https://github.com/maptoan/MTV/releases/tag/linux-v1.8)
 — xem mục [Bản Linux](#bản-linux). Đồng bộ được với TV, iPad / iPhone, Windows và Mac.
 
 **Mã nguồn mở:** giấy phép GPL-3.0 — xem [Giấy phép](#giấy-phép).
 
-**Liên hệ** (góp ý, báo lỗi, hỏi đáp): nhóm Telegram [t.me/tivikit](https://t.me/tivikit) — trong app: **Cài đặt** →
+**Liên hệ** (góp ý, báo lỗi, hỏi đáp): [github.com/maptoan/MTV/issues](https://github.com/maptoan/MTV/issues) — trong app: **Cài đặt** →
 **Liên hệ**.
 
 **Dùng app nghĩa là bạn đồng ý với [Miễn trừ trách nhiệm & quyền riêng tư](#miễn-trừ-trách-nhiệm--quyền-riêng-tư)** — app
@@ -47,10 +44,10 @@ không lưu trữ hay phát tán phim; mọi nội dung thuộc các trang web b
 *Bản 1 – 11/2026. Cùng nội dung hiện trong app: lần đầu mở app (từ TV 2.14 / iPad 1.14 / Windows 1.11, kể cả máy cập nhật từ
 bản cũ) phải chọn «Đồng ý» mới vào, «Thoát» là đóng app; xem lại ở **Cài đặt → Liên hệ → Miễn trừ trách nhiệm & quyền riêng tư**.*
 
-1. **App chỉ là trình xem.** Côn Bằng TV là ứng dụng miễn phí giúp xem các trang phim công khai trên Internet bằng remote hoặc
+1. **App chỉ là trình xem.** MTV là ứng dụng miễn phí giúp xem các trang phim công khai trên Internet bằng remote hoặc
    màn hình cảm ứng. App không lưu trữ, không tải lên, không sở hữu và không phát tán phim, hình ảnh hay phụ đề nào. Mọi nội
    dung do các trang web bên thứ ba cung cấp và nằm trên máy chủ của họ.
-2. **Bản quyền thuộc chủ sở hữu.** Tên phim, hình ảnh, video và nhãn hiệu thuộc về chủ sở hữu hợp pháp. Côn Bằng TV không
+2. **Bản quyền thuộc chủ sở hữu.** Tên phim, hình ảnh, video và nhãn hiệu thuộc về chủ sở hữu hợp pháp. MTV không
    liên kết với, không được tài trợ hay bảo trợ bởi trang web, hãng phim hay nhà phát hành nào. Chủ sở hữu muốn app ngừng hỗ
    trợ một trang, xin liên hệ ở mục 9.
 3. **Người dùng tự chịu trách nhiệm.** Bạn tự chọn trang để xem và tự tuân thủ pháp luật về bản quyền, sử dụng Internet nơi
@@ -70,7 +67,7 @@ bản cũ) phải chọn «Đồng ý» mới vào, «Thoát» là đóng app; x
    sinh từ việc dùng app.
 8. **Trẻ em.** Hồ sơ trẻ em và giới hạn giờ xem chỉ hỗ trợ cha mẹ, không thay thế sự giám sát của người lớn. Nội dung từ trang
    bên thứ ba có thể không phù hợp với trẻ.
-9. **Liên hệ.** Góp ý, báo lỗi hoặc yêu cầu về bản quyền: Telegram [t.me/tivikit](https://t.me/tivikit).
+9. **Liên hệ.** Góp ý, báo lỗi hoặc yêu cầu về bản quyền: [github.com/maptoan/MTV/issues](https://github.com/maptoan/MTV/issues).
 
 *Tiếp tục sử dụng app nghĩa là bạn đồng ý với các điều trên.*
 
@@ -329,10 +326,9 @@ loại trên menu của trang, và **Thể loại…** / **Quốc gia…** (từ
 
 ## Cài lên tivi
 
-- Tải `ConBangTV-<phiên bản>.apk` ở [Releases](https://github.com/conbangtv/ChimToTV/releases/latest) (hoặc thẳng
-  [`ConBangTV.apk`](https://github.com/conbangtv/ChimToTV/releases/latest/download/ConBangTV.apk) — luôn là bản mới nhất),
-  chép vào USB / dùng app "Send Files to TV" rồi mở bằng trình quản lý file trên tivi. Bản 2.17 trở về trước tên
-  `ChimToTV-<phiên bản>.apk` (tên cũ của app) — cùng một app, cài đè lên nhau được.
+- Tải `MTV-<phiên bản>.apk` ở [Releases](https://github.com/maptoan/MTV/releases/latest) (hoặc thẳng
+  [`MTV.apk`](https://github.com/maptoan/MTV/releases/latest/download/MTV.apk) — luôn là bản mới nhất),
+  chép vào USB / dùng app "Send Files to TV" rồi mở bằng trình quản lý file trên tivi.
 - Qua mạng (tivi/box bật gỡ lỗi ADB): `.\build.ps1 -Install <IP-tivi>` (dựng từ mã nguồn rồi cài).
 - Đã có bản 1.3 trở lên thì không cần cài tay nữa: app tự tìm bản mới và hỏi cài.
 
@@ -340,10 +336,10 @@ loại trên menu của trang, và **Thể loại…** / **Quốc gia…** (từ
 
 ## Cài trên Android TV bằng Downloader
 
-Cách nhanh nhất để cài Côn Bằng TV lên tivi / box Android — không cần USB hay máy tính:
+Cách nhanh nhất để cài MTV lên tivi / box Android — không cần USB hay máy tính:
 
 1. Trên tivi, mở **CH Play** và cài app **Downloader** (của AFTVnews).
-2. Mở Downloader, nhập mã **`9192365`** rồi bấm **Go**.
+2. Mở Downloader, nhập mã **`1806154`** rồi bấm **Go**.
 3. Tải xong chọn **Install**. Lần đầu tivi hỏi cho phép Downloader cài ứng dụng thì cho phép.
 
 Cài xong, các bản sau app tự cập nhật.
@@ -352,17 +348,10 @@ Cài xong, các bản sau app tự cập nhật.
 mở đúng mục hướng dẫn này — khách chụp bằng điện thoại là có đủ cách cài mang về. Bản iPad / iPhone (từ 1.16) và bản Windows
 (từ 1.14) cũng có: Cài đặt → **Cài lên tivi / mời bạn bè** — mã to, ba bước, nút gửi / chép sẵn tin nhắn hướng dẫn.
 
-- Trên trình duyệt: `aftv.news/9192365` (tải cùng tệp; trang thông tin của mã: `aftv.news/9192365+`).
-- **Link cố định:** `https://github.com/conbangtv/ChimToTV/releases/latest/download/ConBangTV.apk`
-- Link cố định tên cũ (mã Downloader trên trỏ vào đây, vẫn dùng được mãi):
-  `https://github.com/conbangtv/ChimToTV/releases/latest/download/ChimToTV.apk` — mã được tạo khi repo còn ở tài khoản cũ nên
-  thực ra trỏ vào `github.com/Circling5714/ChimToTV/…/ChimToTV.apk`; GitHub chuyển hướng sang đây (xem
-  [Repo đã chuyển sang tổ chức conbangtv](#repo-đã-chuyển-sang-tổ-chức-conbangtv-15112026)).
+- Trên trình duyệt: `aftv.news/1806154` (tải cùng tệp; trang thông tin của mã: `aftv.news/1806154+`).
+- **Link cố định:** `https://github.com/maptoan/MTV/releases/latest/download/MTV.apk`
 
-Hai link này luôn tải thẳng APK của bản TV mới nhất — cùng một tệp: `ConBangTV.apk` và `ChimToTV.apk` là bản sao giống hệt
-`ConBangTV-<phiên bản>.apk`. Mọi release TV có `ChimToTV.apk` từ 2.15 và có thêm `ConBangTV.apk` từ 2.17 (13/11/2026 đổi sang tên
-mới; tệp tên cũ giữ lại vì mã Downloader và màn «Cài lên tivi» của các bản đã cài trỏ vào nó). Cài xong, các bản sau app tự cập
-nhật. Link đi theo release đang được đánh dấu **Latest** nên bản TV luôn là
+Link này luôn tải thẳng APK của bản TV mới nhất — `MTV.apk` là bản sao giống hệt `MTV-<phiên bản>.apk`. Link đi theo release đang được đánh dấu **Latest** nên bản TV luôn là
 Latest, bản Windows / iPad thì không — xem [Phát hành bản mới](#phát-hành-bản-mới-app-tự-cập-nhật). GitHub đôi lúc lỗi tải tệp (đã gặp
 11/2026): thử lại sau, hoặc cài theo mục trên.
 
@@ -372,13 +361,13 @@ Cùng app cho iPad và iPhone (iOS / iPadOS 15 trở lên, cài bằng TrollStor
 `ios/`), đủ các tính năng chính của bản TV, điều khiển bằng chạm:
 
 - **Cài:** cần TrollStore. Tải bản mới nhất qua
-  [link cố định](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_ios/ConBangTV-iPad.ipa) (hoặc
-  `ConBangTV-iPad-<bản>.ipa` ở release `ios-v<bản>`; một tệp cho cả iPad và iPhone) → mở bằng TrollStore → Install. Bản sau app tự tìm trên GitHub (release `ios-v…`) và mở TrollStore để cài đè, giữ lịch sử xem:
+  [link cố định](https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa) (hoặc
+  `MTV-iPad-<bản>.ipa` ở release `ios-v<bản>`; một tệp cho cả iPad và iPhone) → mở bằng TrollStore → Install. Bản sau app tự tìm trên GitHub (release `ios-v…`) và mở TrollStore để cài đè, giữ lịch sử xem:
   hộp thoại «Có bản mới» → **Cài đặt ngay** → TrollStore tự tải rồi hỏi Install (cả iOS / iPadOS 15 từ 1.8.2; bản 1.8.1 trở
   về trước trên iOS 15 bấm «Kiểm tra cập nhật» trong Cài đặt không hiện hộp thoại — tải tay một lần lên 1.8.2).
 - **iPhone** (từ 1.3): màn chính dọc hoặc ngang (menu ẩn vào nút ☰), trình phát luôn xem ngang, thanh nút gọn (chạm đúp hai
   bên để lùi / tới 10 giây).
-- **Widget «Xem tiếp»** (từ 1.3): giữ ngón tay trên màn hình chính → **＋** → Côn Bằng TV; cỡ nhỏ / vừa / lớn = 1 / 3 / 6
+- **Widget «Xem tiếp»** (từ 1.3): giữ ngón tay trên màn hình chính → **＋** → MTV; cỡ nhỏ / vừa / lớn = 1 / 3 / 6
   phim đang xem dở của người xem đang dùng; chạm một phim là mở app phát tiếp đúng chỗ.
 - **Cỡ chữ** (từ 1.3): Cài đặt → Cỡ chữ (Nhỏ / Vừa / Lớn / Rất lớn / Cực lớn), dùng chung cả máy.
 - **Màn chính:** menu bên trái (iPad dọc / chia đôi màn hình thì ẩn vào nút ☰), lưới phim, hàng **Có tập mới** và
@@ -407,7 +396,7 @@ Cùng app cho iPad và iPhone (iOS / iPadOS 15 trở lên, cài bằng TrollStor
   hình; nút thu nhỏ cạnh nút Menu của trình phát → phim chạy tiếp ở cửa sổ nổi của iPad (cửa sổ có nút phóng to / đóng);
   vuốt về màn hình chính lúc đang xem là tự thu nhỏ (Cài đặt → Phát video).
 - **DNS mã hoá** (từ 1.11, bật sẵn): như bản TV — xem [DNS mã hoá](#dns-mã-hoá-doh--dot-bật-sẵn-từ-211).
-- **Cài lên tivi / mời bạn bè** (từ 1.16): Cài đặt → Liên hệ → «Cài lên tivi / mời bạn bè — mã Downloader 9192365» hiện mã
+- **Cài lên tivi / mời bạn bè** (từ 1.16): Cài đặt → Liên hệ → «Cài lên tivi / mời bạn bè — mã Downloader 1806154» hiện mã
   Downloader thật to và ba bước cài bản TV; «Gửi hướng dẫn…» mở bảng chia sẻ của máy (Zalo, Tin nhắn, AirDrop…) với sẵn tin nhắn
   hướng dẫn, «Chép» chép tin nhắn đó — xem [Cài trên Android TV bằng Downloader](#cài-trên-android-tv-bằng-downloader).
 - **Khác bản TV:** không có con trỏ ảo (chạm thẳng vào trang web). Lúc bật proxy / vượt chặn / DNS mã hoá, trên iPadOS 15–16
@@ -420,7 +409,7 @@ Apple chỉ cho app lên CarPlay bằng giao diện mẫu và không cho phát v
 iPad / Mac giữ một cửa sổ) — cách của [CarTube](https://github.com/Avangelista/CarTube). Mã: `ios/ConBangTV/Sources/UI/CarScreen.swift`,
 `UI/CarInput.m`, `Player/NativeFilm.swift`.
 
-- **Dùng:** cắm iPhone vào xe / màn CarPlay (màn cảm ứng) → chạm biểu tượng Côn Bằng TV trên CarPlay. Màn xe hiện **nguyên giao diện app**
+- **Dùng:** cắm iPhone vào xe / màn CarPlay (màn cảm ứng) → chạm biểu tượng MTV trên CarPlay. Màn xe hiện **nguyên giao diện app**
   (chạm trên màn xe); điện thoại thành **bảng điều khiển**: phim / kênh đang phát và nút điều khiển, ô tìm phim (kết quả hiện trên màn
   xe), «Tắt sáng màn điện thoại», «Dùng trên điện thoại» (giao diện về điện thoại; đang xem thì phim đóng ở màn xe và mở lại đúng chỗ ở
   điện thoại — và ngược lại). Rút dây thì phim đóng (lưu chỗ xem), không tự phát tiếp trên điện thoại.
@@ -442,22 +431,20 @@ Chính app iPad dựng thành app Mac bằng **Mac Catalyst** (cùng mã nguồn
 máy Intel và máy chip Apple (M1…), giao diện và tính năng như bản iPad, dùng chuột / bàn di chuột / bàn phím (phím tắt như
 mục «Bàn phím rời» của [Bản iPad](#bản-ipad)).
 
-- **Cài:** tải bản mới nhất qua [link cố định](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_macos/ConBangTV-Mac.zip)
-  (hoặc `ConBangTV-Mac-<bản>.zip` ở release `mac-v<bản>`; bản đầu: 1.17, 13/11/2026), mở tệp .zip, kéo **ConBangTV** vào thư mục
-  **Applications** (Ứng dụng) rồi mở. App không mua chứng chỉ của Apple (ký ad-hoc) nên lần đầu macOS chặn — đã thử đúng các bước
-  này trên macOS 14 (13/11/2026, tệp mang cờ «Safari đã tải về»): hộp «Không thể mở "ConBangTV" vì ứng dụng này đến từ một nhà phát
-  triển chưa được xác định» → **OK** → **Cài đặt hệ thống → Quyền riêng tư & Bảo mật**, kéo xuống mục Bảo mật → «"ConBangTV" đã bị
-  chặn…» → **Vẫn mở** → nhập mật khẩu máy → hộp «Bạn có chắc chắn muốn mở không?» → **Mở**. Chỉ làm một lần; các bản sau app tự cập
-  nhật. Hoặc trong Terminal: `xattr -dr com.apple.quarantine /Applications/ConBangTV.app`.
+- **Cài:** tải bản mới nhất qua [link cố định](https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip)
+  (hoặc `MTV-Mac-<bản>.zip` ở release `mac-v<bản>`), mở tệp .zip, kéo **MTV** vào thư mục
+  **Applications** (Ứng dụng) rồi mở. App không mua chứng chỉ của Apple (ký ad-hoc) nên lần đầu macOS chặn — mở hộp thoại:
+  «Không thể mở "MTV" vì ứng dụng này đến từ một nhà phát triển chưa được xác định» → **OK** → **Cài đặt hệ thống → Quyền riêng tư & Bảo mật**, kéo xuống mục Bảo mật → «"MTV" đã bị chặn…» → **Vẫn mở** → nhập mật khẩu máy → **Mở**. Chỉ làm một lần; các bản sau app tự cập
+  nhật. Hoặc trong Terminal: `xattr -dr com.apple.quarantine /Applications/MTV.app`.
 - **Tự cập nhật:** app tìm bản mới (release `mac-v…`, tệp `.zip`) như bản iPad; bấm **Cài đặt ngay** thì app tự tải, kiểm
   (đúng mã gói, đúng số bản, chữ ký còn nguyên), thay chính nó rồi mở lại — không hỏi Gatekeeper nữa. Chỉ tự thay được khi app
   nằm ở chỗ ghi được (Applications); chạy thẳng từ Downloads thì macOS chạy bản sao tạm chỉ đọc → app báo và mở link tải.
 - **Khác bản iPad:** không có widget, không cần TrollStore; mật khẩu proxy cất trong tệp riêng của tài khoản macOS
-  (`~/Library/Application Support/vn.chimto.tv/secret.json`, quyền 0600) thay cho Keychain — app ký ad-hoc không dùng
+  (`~/Library/Application Support/vn.mtv.tv/secret.json`, quyền 0600) thay cho Keychain — app ký ad-hoc không dùng
   được Keychain kiểu iOS, còn Keychain kiểu cũ hỏi lại mật khẩu máy sau mỗi lần app tự cập nhật. Cửa sổ nhỏ nhất 900 × 600.
 - **Dựng:** CI (`.github/workflows/ios.yml`, job «Bản Mac») dựng Intel + Apple Silicon, `ios/scripts/package-mac.sh` ký ad-hoc và
   nén `.zip` (artifact `mac`); trên Mac trong nhà: `.\ios\scripts\mac-build.ps1 -Mac [-Release] [-Run]`. Phát hành:
-  `.\release.ps1 mac -Notes <ghi chú> -File ConBangTV-Mac-<bản>.zip` (tag `mac-v…`, không bao giờ là Latest).
+  `.\release.ps1 mac -Notes <ghi chú> -File MTV-Mac-<bản>.zip` (tag `mac-v…`, không bao giờ là Latest).
 - Biểu tượng: `node design/render.mjs mac c` (các cỡ macOS 16–1024, bo góc theo lưới icon của macOS, cùng bộ AppIcon).
 
 ## Bản Windows
@@ -467,10 +454,10 @@ App cho máy tính và mini PC cắm tivi chạy Windows 10 / 11 (thư mục `wi
 `conbang_core.dll` qua `linux/ffi`; giao diện WPF giữ nguyên), dùng được cả chuột lẫn bàn phím / remote:
 
 - **Cài:** tải bản mới nhất qua
-  [link cố định](https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_windows/ConBangTV-Windows.exe) (hoặc
-  `ConBangTV-Windows-<bản>.exe` ở release `win-v<bản>`), để vào thư mục nào cũng được rồi mở — không cần cài .NET. Lần đầu Windows báo «Windows protected your PC» (app chưa có chữ ký số): **More info → Run anyway**. Cần Microsoft
+  [link cố định](https://github.com/maptoan/MTV/releases/download/mtv_windows/MTV-Windows.exe) (hoặc
+  `MTV-Windows-<bản>.exe` ở release `win-v<bản>`), để vào thư mục nào cũng được rồi mở — không cần cài .NET. Lần đầu Windows báo «Windows protected your PC» (app chưa có chữ ký số): **More info → Run anyway**. Cần Microsoft
   Edge WebView2 Runtime (Windows 10 / 11 cập nhật thường có sẵn; máy chưa có thì app báo và mở trang tải). Dữ liệu ở
-  `%LOCALAPPDATA%\ConBangTV`. Bản sau tự cập nhật (Cài đặt → **Kiểm tra cập nhật**; tự hỏi tối đa 2 giờ một lần). Từ 1.16 tệp
+  `%LOCALAPPDATA%\MTV`. Bản sau tự cập nhật (Cài đặt → **Kiểm tra cập nhật**; tự hỏi tối đa 2 giờ một lần). Từ 1.16 tệp
   khoảng 114 MB vì kèm trình phát mpv.
 - **Trình phát native (từ 1.16; Cài đặt → «Trình phát (thử nghiệm)»: Native (mpv) / Web (WebView2), mặc định Native):** luồng
   `.m3u8` / tệp video trực tiếp (KKPhim, VSMOV, CLB Phim Xưa, server dự phòng KKPhim…) phát bằng **libmpv** vẽ thẳng vào cửa sổ app
@@ -515,7 +502,7 @@ App cho máy tính và mini PC cắm tivi chạy Windows 10 / 11 (thư mục `wi
   là hai chiều, nên không cho phép (hoặc Windows không hỏi) thì thay đổi trên TV vẫn sang máy tính chậm nhất 3 phút; nên ghép từ
   phía máy tính (gõ mã đang hiện trên TV).
 - **DNS mã hoá** (từ 1.8, bật sẵn): như bản TV — xem [DNS mã hoá](#dns-mã-hoá-doh--dot-bật-sẵn-từ-211).
-- **Cài lên tivi / mời bạn bè** (từ 1.14): Cài đặt → Giới thiệu → «Cài lên tivi / mời bạn bè — mã Downloader 9192365» hiện mã
+- **Cài lên tivi / mời bạn bè** (từ 1.14): Cài đặt → Giới thiệu → «Cài lên tivi / mời bạn bè — mã Downloader 1806154» hiện mã
   Downloader thật to và ba bước cài bản TV; nút «Chép hướng dẫn để gửi bạn bè» (dán vào Zalo, tin nhắn), «Chép mã», «Mở trang
   hướng dẫn» — xem [Cài trên Android TV bằng Downloader](#cài-trên-android-tv-bằng-downloader).
 - **Chưa có:** xem riêng, chấm điểm server.
@@ -525,11 +512,11 @@ App cho máy tính và mini PC cắm tivi chạy Windows 10 / 11 (thư mục `wi
 App cho máy tính / mini PC chạy **Ubuntu 22.04+, Linux Mint 21+, Debian 12+** (64-bit x86; thư mục `linux/`, Rust + GTK3 +
 WebKitGTK 4.1), dùng được cả chuột lẫn bàn phím / remote — giao diện, phím và tính năng như [Bản Windows](#bản-windows):
 
-- **Cài:** tải tệp `.deb` rồi mở bằng App Center / «Software Install», hoặc `sudo apt install ./ConBangTV-Linux-<bản>.deb` (apt tự
-  cài GTK / WebKitGTK / GStreamer còn thiếu, và libmpv — gói gợi ý từ 1.1). App hiện trong danh sách ứng dụng với tên «Côn Bằng TV». Tệp `.deb` chỉ vài MB vì
-  dùng thư viện có sẵn của hệ thống. Dữ liệu ở `~/.local/share/conbangtv` (mật khẩu proxy / khoá Shadowsocks trong
+- **Cài:** tải tệp `.deb` rồi mở bằng App Center / «Software Install», hoặc `sudo apt install ./MTV-Linux-<bản>.deb` (apt tự
+  cài GTK / WebKitGTK / GStreamer còn thiếu, và libmpv — gói gợi ý từ 1.1). App hiện trong danh sách ứng dụng với tên «MTV». Tệp `.deb` chỉ vài MB vì
+  dùng thư viện có sẵn của hệ thống. Dữ liệu ở `~/.local/share/mtv` (mật khẩu proxy / khoá Shadowsocks trong
   `secret.json`, quyền 600 — không dùng kho khoá GNOME vì máy tự đăng nhập thì kho khoá bị khoá), ảnh bìa ở
-  `~/.cache/conbangtv/img`.
+  `~/.cache/mtv/img`.
 - **Trình phát:** WebKitGTK dùng chung trang phát của bản Android (`player.html` / `hls.html` / `player-agent.js`); trang bọc
   nạp tại địa chỉ trang tập (`load_alternate_html`), hls.js gắn thẳng vào trang. Mọi kết nối của app và trình phát đi qua cổng
   SOCKS5 nội bộ 127.0.0.1 (DNS mã hoá, vượt chặn, proxy) — tên miền quảng cáo / theo dõi bị từ chối ngay ở cổng này. JW Player
@@ -556,7 +543,7 @@ WebKitGTK 4.1), dùng được cả chuột lẫn bàn phím / remote — giao d
   phát / dừng, bấm đúp hoặc Enter: phóng to, Esc: tắt). Trên X11 cửa sổ nhỏ luôn nổi ở góc dưới phải; GNOME Wayland không cho app
   tự đặt chỗ / tự nổi trên cùng — muốn thì Alt+Space → «Luôn ở trên».
 - **Font chữ:** Inter (gần giống San Francisco của iOS nhất trong các font mở, đủ dấu tiếng Việt; tiêu đề lớn dùng Inter Display) —
-  nhúng sẵn trong app, giấy phép SIL OFL ở `/usr/share/doc/conbangtv/Inter-OFL.txt`.
+  nhúng sẵn trong app, giấy phép SIL OFL ở `/usr/share/doc/mtv/Inter-OFL.txt`.
 - **Máy không có card đồ hoạ** (máy ảo…): app tự tắt dựng hình bằng OpenGL giả lập của WebKit (đo trên máy ảo: phim 1080p từ 240%
   còn 72% CPU, không rơi khung). Ép bằng biến môi trường `CONBANG_HWACCEL=never|always|ondemand`.
 - **Chưa có:** xem riêng, chấm điểm server.
@@ -831,7 +818,7 @@ vòng ăn CPU. Bản thử: `/proxy?break=1` giả ổ cắm bị thu hồi.
 - Trang phim thấy app như một trình duyệt Chromium trên Android: app gửi chung một User-Agent rút gọn
   (`Android 10; K … Chrome/<bản chính>.0.0.0`), không có tên mẫu TV hay số bản build Android; client hints ghi
   "Chromium" thay vì "Android WebView". Khi app tự tải trang hộ trình phát thì không gửi tên gói app. Riêng các yêu cầu
-  do WebView tự gửi, WebView 138 trên TV thử vẫn kèm `X-Requested-With: vn.chimto.tv` (app đã tắt tính năng này nhưng
+  do WebView tự gửi, WebView 138 trên TV thử vẫn kèm `X-Requested-With: vn.mtv.tv` (app đã tắt tính năng này nhưng
   bản WebView đó chưa làm theo).
 
 ## Dựng lại
@@ -845,16 +832,16 @@ Cần JDK 17 (`%USERPROFILE%\.jdks\jdk-17.0.20.1+1`) và Android SDK (`%LOCALAPP
 Thư mục `keys\` chứa khoá ký app — **giữ lại**, mất khoá thì bản mới không cài đè lên bản cũ được. Cũng trong `keys\`: `nextdns.txt` — mã hồ sơ NextDNS của app (một dòng; TV / Windows đóng vào bản dựng, không có thì
 DNS mã hoá bỏ NextDNS; bản iPad lấy mã từ secret `NEXTDNS_ID` của repo).
 
-**Bản gỡ lỗi Android** (`gradlew assembleDebug` → `app-debug.apk`): mã gói `vn.chimto.tv.debug`, tên "Côn Bằng Debug",
+**Bản gỡ lỗi Android** (`gradlew assembleDebug` → `app-debug.apk`): mã gói `vn.mtv.tv.debug`, tên "MTV Debug",
 cài song song bản thật (ký bằng khoá debug của máy dựng). Có **cổng gỡ lỗi 8790** trong mạng LAN (`app/src/debug/` —
 bản phát hành không có) để thử trên điện thoại khi không có adb: `GET /info` (màn, hướng, cỡ dp, khoảng chừa tai thỏ),
 `/shot?scale=0.5` (ảnh PNG, PixelCopy), `/views` (chữ + toạ độ), `/tap?x=&y=`, `/tapText?t=…`, `/swipe?x1=&y1=&x2=&y2=`,
 `/key?k=BACK`, `/orient?o=portrait|landscape|auto`, `/open?s=settings`, `/js?c=…` (chạy JS ở khung trên cùng của WebView —
 vd `JSON.stringify(__chimtoState.box)`: cỡ khung trang + khung video, kiểu co giãn, đã ghim chưa). Thử giao diện điện thoại trên TV box: tạo tệp
-`files/force_phone` (+ `force_portrait` / `force_landscape`) bằng `adb shell run-as vn.chimto.tv.debug touch …`.
+`files/force_phone` (+ `force_portrait` / `force_landscape`) bằng `adb shell run-as vn.mtv.tv.debug touch …`.
 
 **Bản Windows:** `.\windows\build.ps1` → chạy test (`windows/ConBangTV.Tests`, cùng ca với test của TV / iPad) rồi đóng
-gói một tệp tự chạy `dist\ConBangTV-Windows-<bản>.exe` (~70 MB, kèm .NET, nén). Cần .NET 8 SDK (đã cài riêng cho người
+gói một tệp tự chạy `dist\MTV-Windows-<bản>.exe` (~70 MB, kèm .NET, nén). Cần .NET 8 SDK (đã cài riêng cho người
 dùng ở `%LOCALAPPDATA%\Microsoft\dotnet` — script tự đặt `DOTNET_ROOT`). Số bản: `<Version>` trong
 `windows/ConBangTV/ConBangTV.csproj`. Bản Debug (`dotnet build windows\ConBangTV\ConBangTV.csproj`) có **cổng gỡ lỗi**
 `http://localhost:8790` (chỉ máy này): `/info`, `/shot` (ảnh PNG cửa sổ), `/key?k=Down,Enter`, `/click?text=…` (bấm nút
@@ -866,9 +853,9 @@ trường để thử: `CONBANG_MUTE=1` (tắt tiếng trình phát, chỉ bản
 cần Mac:
 
 - Đẩy nhánh `ios` (đổi gì trong `ios/` hoặc các tệp JS dùng chung ở `app/src/main/assets/`) → test phần lõi trên macOS
-  (`CoreTests`) + IPA bản thử (cấu hình Beta: mã gói `vn.chimto.tv.debug`, tên "Côn Bằng (thử)", có cổng gỡ lỗi trong
+  (`CoreTests`) + IPA bản thử (cấu hình Beta: mã gói `vn.mtv.tv.debug`, tên "MTV (thử)", có cổng gỡ lỗi trong
   mạng LAN, cổng 8790). Tải IPA ở artifact `ipa` của lượt chạy (`gh run download <id> -n ipa`).
-- Chạy tay `gh workflow run ios.yml --ref main -f release=true` → thêm IPA bản chính (`vn.chimto.tv`, "Côn Bằng TV").
+- Chạy tay `gh workflow run ios.yml --ref main -f release=true` → thêm IPA bản chính (`vn.mtv.tv`, "MTV").
 - Project Xcode sinh bằng XcodeGen từ `ios/project.yml`; đọc HTML bằng SwiftSoup. IPA ký giả bằng `ldid` (không cần
   tài khoản Apple) → chỉ cài được bằng TrollStore.
 - Icon: `node design/render.mjs ios c` (icon 1024 + logo trong app, không đụng ảnh của bản Android).
@@ -884,78 +871,57 @@ cần Mac:
 
 App (từ bản 1.3) tự hỏi GitHub Releases khi mở / quay lại màn hình chính (tối đa 2 giờ một lần). Có bản mới thì
 tải APK ngầm, kiểm tra cùng gói + cùng chữ ký + số hiệu lớn hơn, rồi hỏi **Cài đặt ngay**.
-Lần đầu Android hỏi cho phép Côn Bằng TV "cài ứng dụng không rõ nguồn" (app tự mở đúng trang cài đặt).
+Lần đầu Android hỏi cho phép MTV "cài ứng dụng không rõ nguồn" (app tự mở đúng trang cài đặt).
 Android luôn yêu cầu bấm xác nhận cài; riêng Android 12+ thì từ lần thứ hai trở đi cập nhật hoàn toàn tự động.
 
-### Repo đã chuyển sang tổ chức conbangtv (15/11/2026)
+### Repo `maptoan/MTV`
 
-Repo chuyển từ tài khoản `Circling5714/ChimToTV` sang tổ chức **`conbangtv/ChimToTV`** (cùng chủ trang giới thiệu
-`conbangtv.github.io`). Release, tag, tệp, secret của Actions đi theo repo; tên repo, tên tệp và các tag cố định giữ nguyên.
-
-- **App đã cài vẫn tự cập nhật:** mã của TV ≤ 2.18, iPad / iPhone / Mac ≤ 1.18, Windows ≤ 1.16, Linux ≤ 1.2 còn ghi đường dẫn
-  cũ `api.github.com/repos/Circling5714/ChimToTV/…`. GitHub trả 301 sang `api.github.com/repositories/1442486526/…` và bộ cập
-  nhật của cả năm nền tảng đều đi theo chuyển hướng. Link tải trong kết quả API đã là `conbangtv/…`, mã Downloader 9192365
-  và link cũ đã gửi đi cũng được chuyển hướng. Đã thử ngay sau khi chuyển: OTA thật TV 2.16.1 → 2.18 trên TX3, tải qua sáu link
-  cũ (hai link APK + bốn link cố định) đúng SHA-256, `release.ps1 <nền tảng> -Verify` đạt cả năm nền tảng.
-- **Chuyển hướng chỉ còn khi:** không bao giờ tạo hay **fork** một repo tên `ChimToTV` vào tài khoản `Circling5714`, không đổi
-  tên / xoá tài khoản đó, không đổi tên repo. Làm một trong ba là mọi app đã cài hết tự cập nhật.
-- ~~Việc còn lại: đổi đường dẫn trong mã sang `conbangtv/ChimToTV`~~ — **xong cả năm nền tảng** ở TV 2.19, iPad / iPhone / Mac
-  1.19, Windows 1.17, Linux 1.3 (15/11/2026): `UPDATE_URL` trong `app/build.gradle.kts`, `releasesApi` trong
-  `ios/ConBangTV/Sources/Core/UpdateCheck.swift`, `ReleasesApi` / `ReleasesPage` trong `windows/ConBangTV/Core/UpdateCheck.cs`,
-  `RELEASES_API` / `RELEASES_PAGE` trong `linux/core/src/update_check.rs`, link mời bạn bè trong `Invite.kt` / `Invite.swift` /
-  `Invite.cs` / `invite.rs` + test. Bản cũ (đi đường chuyển hướng) đã tự cập nhật thật lên các bản này: TV 2.18 → 2.19 (TX3), Mac
-  1.18 → 1.19, Windows 1.16 → 1.17, Linux 1.2 → 1.3.
+Repo **`maptoan/MTV`** được fork từ `conbangtv/ChimToTV` (tác giả `Circling5714`), sử dụng định danh gói `vn.mtv.tv`, tên hiển thị `MTV` và mã Downloader **`1806154`** (`aftv.news/1806154`). Toàn bộ URL tự cập nhật (`UPDATE_URL` trong `app/build.gradle.kts`, `releasesApi` trong `ios/ConBangTV/Sources/Core/UpdateCheck.swift`, `ReleasesApi` / `ReleasesPage` trong `windows/ConBangTV/Core/UpdateCheck.cs`, `RELEASES_API` / `RELEASES_PAGE` trong `linux/core/src/update_check.rs`) và link mời bạn bè (`Invite.kt` / `Invite.swift` / `Invite.cs` / `invite.rs` + test) đều trỏ thẳng về `maptoan/MTV`.
 
 1. Tăng `versionCode` / `versionName` trong `app/build.gradle.kts`.
-2. `.\build.ps1` → `dist\ConBangTV-<phiên bản>.apk` (ký bằng `keys\` — phải cùng khoá thì app mới nhận; bản 2.17 trở về
-   trước: `ChimToTV-<phiên bản>.apk`).
-3. `git push`, rồi `.\release.ps1 tv -Notes ghi-chu.md` — tạo release tag `v<phiên bản>`, **đánh dấu Latest**, đính kèm ba
-   tệp giống hệt nhau: `ConBangTV-<phiên bản>.apk`, `ConBangTV.apk` và `ChimToTV.apk` (hai tên cố định, cho
-   [link Downloader](#cài-trên-android-tv-bằng-downloader) — **đừng bỏ tên cũ** `ChimToTV.apk`: mã 9192365 trỏ vào nó). Bộ tự
+2. `.\build.ps1` → `dist\MTV-<phiên bản>.apk` (ký bằng `keys\` — phải cùng khoá thì app mới nhận).
+3. `git push`, rồi `.\release.ps1 tv -Notes ghi-chu.md` — tạo release tag `v<phiên bản>`, **đánh dấu Latest**, đính kèm hai
+   tệp giống hệt nhau: `MTV-<phiên bản>.apk` và `MTV.apk` (link cố định cho [link Downloader](#cài-trên-android-tv-bằng-downloader), mã `1806154`). Bộ tự
    cập nhật lấy tệp `.apk` đầu tiên, tên nào cũng được. Mục `## Có gì mới` trong ghi chú được hiện trong hộp thoại cập
    nhật trên TV.
 
-**`release.ps1` (từ 12/11/2026) — không gọi `gh release create` tay nữa.** Ba nền tảng dùng chung một trang Releases, và hai
-thứ đi theo release đang là **Latest**: app TV tự cập nhật (hỏi `releases/latest` rồi lấy tệp `.apk`) và hai link cố định
-`…/releases/latest/download/ConBangTV.apk` / `…/ChimToTV.apk`. Script đặt sẵn cờ theo nền tảng: `tv` luôn `--latest`, `windows` / `ipad` luôn
+**`release.ps1` — không gọi `gh release create` tay nữa.** Các nền tảng dùng chung một trang Releases, và hai
+thứ đi theo release đang là **Latest**: app TV tự cập nhật (hỏi `releases/latest` rồi lấy tệp `.apk`) và link cố định
+`…/releases/latest/download/MTV.apk`. Script đặt sẵn cờ theo nền tảng: `tv` luôn `--latest`, `windows` / `ipad` / `mac` / `linux` luôn
 `--latest=false`. Trước khi đăng nó kiểm: ghi chú có `## Có gì mới`, tên tệp đúng số bản trong mã nguồn, code đã đẩy, tag chưa
 có; riêng APK: đúng gói, đúng số bản, đúng chứng chỉ ký. Sau khi đăng: Latest phải là bản TV mới nhất (lệch thì tự trả về), tệp
-trên GitHub khớp SHA-256 với tệp trong máy, bản TV thì tải thử qua hai link cố định. `-DryRun` chỉ in lệnh; `.\release.ps1
-<tv|windows|ipad|mac> -Verify` kiểm lại một bản đã đăng, không sửa gì.
+trên GitHub khớp SHA-256 với tệp trong máy, bản TV thì tải thử qua link cố định. `-DryRun` chỉ in lệnh; `.\release.ps1
+<tv|windows|ipad|mac|linux> -Verify` kiểm lại một bản đã đăng, không sửa gì.
 
-**Link tải cố định của bản Windows / iPad / Mac / Linux (từ 13/11/2026)** — luôn là bản mới nhất, như link APK:
+**Link tải cố định của bản Windows / iPad / Mac / Linux** — luôn là bản mới nhất, như link APK:
 
-- `https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_windows/ConBangTV-Windows.exe`
-- `https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_ios/ConBangTV-iPad.ipa`
-- `https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_macos/ConBangTV-Mac.zip` (từ bản Mac 1.17)
-- `https://github.com/conbangtv/ChimToTV/releases/download/conbangtv_linux/ConBangTV-Linux.deb` (từ bản Linux 1.0)
+- `https://github.com/maptoan/MTV/releases/download/mtv_windows/MTV-Windows.exe`
+- `https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa`
+- `https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip`
+- `https://github.com/maptoan/MTV/releases/download/mtv_linux/MTV-Linux.deb`
 
-Các link `github.com/Circling5714/ChimToTV/…` đã gửi đi trước 15/11/2026 vẫn tải được nhờ chuyển hướng của GitHub.
-
-Bản Windows / iPad / Mac không bao giờ là Latest nên không dùng được `…/releases/latest/download/…`; thay vào đó mỗi nền tảng có một
-release «cuốn chiếu» với tag không đổi (`conbangtv_windows`, `conbangtv_ios`, `conbangtv_macos`) và tệp tên cố định. `.\release.ps1 windows|ipad|mac`
+Bản Windows / iPad / Mac / Linux không bao giờ là Latest nên không dùng được `…/releases/latest/download/…`; thay vào đó mỗi nền tảng có một
+release «cuốn chiếu» với tag không đổi (`mtv_windows`, `mtv_ios`, `mtv_macos`, `mtv_linux`) và tệp tên cố định. `.\release.ps1 windows|ipad|mac|linux`
 đăng bản có số xong thì tự chép tệp vào đó (tải lên dưới tên tạm rồi đổi tên — link chỉ gián đoạn chừng một giây), ghi vào ghi chú
-của release đang là bản nào, rồi kiểm SHA-256 và tải thử link. `.\release.ps1 windows -FixedOnly` (hoặc `ipad`, `mac`) chỉ chép tệp của
-bản đã đăng vào link cố định — dùng khi link lệch. **Đừng đổi các tag / tên tệp này và đừng xoá các release đó** (link đã gửi
-cho người dùng và nằm trên trang giới thiệu). Bộ tự cập nhật không nhìn thấy chúng: TV đọc `releases/latest`, Windows / iPad / Mac chỉ
-nhận tag `win-v…` / `ios-v…` / `mac-v…`.
+của release đang là bản nào, rồi kiểm SHA-256 và tải thử link. `.\release.ps1 windows -FixedOnly` (hoặc `ipad`, `mac`, `linux`) chỉ chép tệp của
+bản đã đăng vào link cố định — dùng khi link lệch. **Đừng đổi các tag / tên tệp này và đừng xoá các release đó**. Bộ tự cập nhật không nhìn thấy chúng: TV đọc `releases/latest`, Windows / iPad / Mac / Linux chỉ
+nhận tag `win-v…` / `ios-v…` / `mac-v…` / `linux-v…`.
 
-**Mã Downloader `9192365`** (aftv.news, trỏ vào link cố định) nằm ở năm chỗ — đổi mã thì sửa cả năm: `Invite.kt` (TV: màn «Mời
-bạn bè cài app», từ 2.16), `Invite.swift` (iPad / iPhone, từ 1.16) và `Invite.cs` (Windows, từ 1.14) — Cài đặt → «Cài lên tivi / mời bạn bè»: mã to,
+**Mã Downloader `1806154`** (aftv.news, trỏ vào link cố định) nằm ở năm chỗ — đổi mã thì sửa cả năm: `Invite.kt` (TV: màn «Mời
+bạn bè cài app»), `Invite.swift` (iPad / iPhone) và `Invite.cs` (Windows) — Cài đặt → «Cài lên tivi / mời bạn bè»: mã to,
 ba bước, nút gửi / chép hướng dẫn, không có mã QR —, `release.ps1` (mục «Cài mới trên Android TV» script tự thêm vào cuối ghi chú
 mỗi bản TV; hộp cập nhật chỉ lấy «Có gì mới» nên không dài ra) và README. Tin nhắn gửi người quen (`MESSAGE` / `message`) giống
-hệt nhau ở ba bản — mỗi bản có test so đúng từng chữ. Mã QR của màn đó vẽ sẵn trong `Invite.QR` (không thêm thư viện vào app), mở
+hệt nhau ở các bản — mỗi bản có test so đúng từng chữ. Mã QR của màn đó vẽ sẵn trong `Invite.QR` (không thêm thư viện vào app), mở
 `…/blob/main/README.md#downloader` — neo `<a id="downloader">` ngay trên mục Downloader, đừng xoá. Đổi `Invite.GUIDE_URL` thì chạy
 `InviteTest`: test dựng lại mã bằng ZXing (chỉ là phụ thuộc của test), báo lệch và in các hàng mới để dán vào; test thứ hai đọc
 lại mã như điện thoại. Bản gỡ lỗi mở thẳng màn bằng `/open?s=invite`. Điện thoại / máy tính bảng có thêm nút «Gửi hướng dẫn…»
 (`Invite.MESSAGE`, `ACTION_SEND`) — TV thì ẩn.
 
-Release TV có hai tệp `.apk` không ảnh hưởng app: `Updater.kt` (mọi bản từ 1.3) lấy tệp `.apk` đầu tiên, lưu bằng tên tự đặt,
-chỉ kiểm mã gói + chữ ký + `versionCode` — không dựa vào tên tệp, cỡ hay hash. Thử thật 12/11/2026: TV box 2.14 → 2.15 với
-release hai tệp.
+Release TV có hai tệp `.apk` không ảnh hưởng app: `Updater.kt` lấy tệp `.apk` đầu tiên, lưu bằng tên tự đặt,
+chỉ kiểm mã gói + chữ ký + `versionCode` — không dựa vào tên tệp, cỡ hay hash.
 
 **Bản iPad / iPhone** phát hành bằng tag riêng `ios-v<bản>` (vd `ios-v1.0`) và **không bao giờ đánh dấu "latest"**
-(`.\release.ps1 ipad -Notes … -File ConBangTV-iPad-<bản>.ipa`): app TV hỏi `releases/latest` rồi lấy tệp `.apk`,
+(`.\release.ps1 ipad -Notes … -File MTV-iPad-<bản>.ipa`): app TV hỏi `releases/latest` rồi lấy tệp `.apk`,
 release iPad mà thành latest thì mọi TV hết thấy bản mới. Bản iPad duyệt danh sách release, lấy tag `ios-v*` có tệp
 `.ipa` (bỏ bản nháp / thử nghiệm) và mở `apple-magnifier://install?url=<link .ipa>` để TrollStore cài. Số bản ở
 `MARKETING_VERSION` trong `ios/project.yml`; ghi chú phát hành cũng cần mục `## Có gì mới`.
@@ -977,7 +943,7 @@ hay cắt giữa chừng.
 
 ## Giấy phép
 
-Mã nguồn của Côn Bằng TV là phần mềm tự do theo **GNU GPL phiên bản 3** (từ 15/11/2026, anh chọn) — văn bản đầy đủ ở
+Mã nguồn của MTV là phần mềm tự do theo **GNU GPL phiên bản 3** — văn bản đầy đủ ở
 [LICENSE](LICENSE); SPDX `GPL-3.0-only`, cũng ghi trong `linux/Cargo.toml` và metainfo của gói Linux. Ai sửa và phát hành lại app
 (hay một phần mã) thì phải phát hành kèm mã nguồn theo cùng giấy phép GPL-3.0. Thành phần bên thứ ba giữ giấy phép riêng: hls.js
 (`app/src/main/assets/hls*.min.js`, Apache 2.0), phông Inter (`linux/app/fonts/`, SIL OFL 1.1), GeckoView (MPL 2.0) và libmpv
@@ -1005,10 +971,7 @@ iPadOS / iOS tô đen phần trong suốt của icon trên màn hình chính (v�
 thiệu trên iPhone) đặt ô kính phủ cả khung trên nền nâu tối của banner; Mac (ô kính theo lưới icon macOS, bóng đổ ngoài ô), Android
 (ô kính trong vùng an toàn 66dp của icon thích ứng), Windows, Linux giữ nền trong suốt.
 
-Đổi tên app chỉ là đổi **tên hiển thị** (`app_name`), logo và banner. Mã gói `vn.chimto.tv`, khoá ký và tên repo
-`ChimToTV` phải giữ nguyên — đổi một trong ba thì các TV đã cài không nhận bản cập nhật nữa. Repo đã chuyển sang
-`conbangtv/ChimToTV` ngày 15/11/2026; đường dẫn cũ `Circling5714/ChimToTV` vẫn được chuyển hướng — xem
-[Repo đã chuyển sang tổ chức conbangtv](#repo-đã-chuyển-sang-tổ-chức-conbangtv-15112026).
+Đổi tên app không chỉ là đổi **tên hiển thị** (`app_name`), logo và banner mà còn đổi định danh gói `vn.mtv.tv` và repo `maptoan/MTV`.
 
 ## Cách phát video (cho người sửa code)
 
@@ -1034,7 +997,7 @@ bộ đệm 120 s. hls.js bỏ khối quảng cáo ~30 s chèn giữa phim (kh�
 (WebVTT ngụy trang ảnh PNG) được bóc phần ảnh rồi gắn `<track>`. NguonC chỉ có trình phát nhúng (có Cloudflare
 Turnstile — cố ý không gỡ để lấy link) → chạy qua iframe như các trang khác; agent tự bỏ qua quảng cáo JW
 (`.jw-flag-ads`, nút bỏ qua) và chọn "Xem lại từ đầu" ở hộp thoại xem tiếp của trình phát (app tự tua tới chỗ cũ).
-Test: `.\gradlew.bat :app:testDebugUnitTest --tests vn.chimto.tv.NextSiteTest`.
+Test: `.\gradlew.bat :app:testDebugUnitTest --tests vn.mtv.tv.NextSiteTest`.
 
 Proxy (từ 1.8.0 — `AppProxy.kt`, `Socks5.kt`): WebView (Chromium) không đăng nhập được SOCKS5 có mật khẩu và luôn
 để proxy phân giải tên miền, nên app mở cổng SOCKS5 nội bộ `Socks5Bridge` (chỉ nghe 127.0.0.1, không mật khẩu). WebView
@@ -1042,7 +1005,7 @@ Proxy (từ 1.8.0 — `AppProxy.kt`, `Socks5.kt`): WebView (Chromium) không đ�
 bộ đăng nhập proxy thật (RFC 1929), gửi tên miền (DNS của proxy) hoặc tự phân giải rồi gửi IP (DNS của thiết bị), ở chế
 độ "chỉ trang phim" cho đích khác đi thẳng. Đổi cài đặt → mở cổng mới, đóng kết nối cũ (kết nối keep-alive không giữ
 cài đặt cũ). Điểm server khi video đi qua proxy chấm riêng (`<trang>·proxy`). Test:
-`.\gradlew.bat :app:testDebugUnitTest --tests vn.chimto.tv.Socks5BridgeTest` (proxy SOCKS5 giả trong test).
+`.\gradlew.bat :app:testDebugUnitTest --tests vn.mtv.tv.Socks5BridgeTest` (proxy SOCKS5 giả trong test).
 
 Điểm IMDb (từ 2.15 — `ImdbTop.kt` / `.swift` / `.cs`): `Imdb.of` đọc `imdb.vote_average` / `vote_count` của KKPhim (≥ 100
 lượt), `Film.imdb` / `FeedItem.imdb` (bộ nhớ đệm trang chủ: "is" / "iv"); `ImdbTop.page` (nhóm: đường dẫn API kiểu KKPhim,
@@ -1087,7 +1050,7 @@ rồi trả bản đã gộp (cũng ký), máy gửi gộp nốt. Mọi yêu c�
 mạng mDNS không qua được); địa chỉ IPv6 cục bộ giữ `%en0`. Gộp: lịch sử theo lúc xem, chỗ xem theo lúc lưu (`pos_time` /
 `Position.t`), theo dõi lấy số tập lớn hơn; "bia mộ" `hist_del`, `follow_del` (riêng người xem), `sites_add` / `sites_del`
 (cả máy), tối đa 300. Máy đã ghép: `sync_peers`; mã máy `device_id`. Test: `.\gradlew.bat :app:testDebugUnitTest --tests
-vn.chimto.tv.SyncTest` (cùng ca với iPad `SyncMergeTests`).
+vn.mtv.tv.SyncTest` (cùng ca với iPad `SyncMergeTests`).
 
 hoathinh3d.pw (11/2026): các trang Phim Lẻ / Đang Chiếu / Hoàn Thành / Đánh Giá Cao chỉ có khung trống, phim nạp bằng
 `/wp-json/halim/v1/{movies|ongoing|completed|top-rated}?page=N&per_page=20` (Phim Lẻ thêm `sortby`); Lịch Chiếu
@@ -1099,14 +1062,14 @@ Giới hạn giờ xem (từ 2.1 — `WatchLimit.kt` / `WatchLimit.swift`, giao 
 `unblock_until`; mã phụ huynh `parent_pin` (băm SHA-256). Trình phát gọi `WatchLimit.tick` mỗi lần đọc trạng thái (phim
 chạy, không chờ tải; bỏ khoảng hở > 3 s), ghi xuống mỗi 30 s và khi rời trình phát / đổi người. Cho xem thêm: hết phút →
 cộng `watch_extra`; giờ đi ngủ → `unblock_until`. Test: `.\gradlew.bat :app:testDebugUnitTest --tests
-vn.chimto.tv.WatchLimitTest`, iPad `WatchLimitTests`.
+vn.mtv.tv.WatchLimitTest`, iPad `WatchLimitTests`.
 
 Riêng tư (từ 1.8.1 — `Privacy.kt`, `BrowsingData.kt`): User-Agent rút gọn lấy số bản chính Chrome từ UA của WebView
 (lưu ở `Prefs.userAgent` để `Http.kt` dùng ngay khi mở app), áp cho mọi WebView kèm `UserAgentMetadata` (brand
 "Chromium", model rỗng) và danh sách origin trống cho `X-Requested-With`; `PlayerActivity.fetchWithAgent` bỏ header đó
 khi giá trị là tên gói. `BrowsingData.clear` gom `WebStorage.deleteAllData`, xoá cache qua một WebView tạm,
 `WebViewDatabase.clearHttpAuthUsernamePassword` và `CookieManager.removeAllCookies` (`Http.kt` không có kho cookie
-riêng). Test: `.\gradlew.bat :app:testDebugUnitTest --tests vn.chimto.tv.PrivacyTest`.
+riêng). Test: `.\gradlew.bat :app:testDebugUnitTest --tests vn.mtv.tv.PrivacyTest`.
 
 Từ 1.8.2: `AutoClear.kt` đếm Activity đang hiện (ActivityLifecycleCallbacks) — về 0 là rời app → xoá nếu không còn
 `PlayerActivity` / `WebActivity` sống và `Prefs.webDirty` (WebView đã chạy từ lần xoá trước); tiến trình mới thì thử
@@ -1192,7 +1155,7 @@ Người xem (từ 2.0 — `Prefs.kt` / `Prefs.swift`, giao diện TV `ProfileUi
 `seek_step`, `auto_next`, `video_fill`, `server_type@<trang>`, `server_label@<trang>`). Danh sách người ở khoá `profiles`
 (JSON: id, tên, màu, mã băm SHA-256 của PIN), người đang dùng ở `profile`. Xoá người = xoá mọi khoá riêng của người đó.
 `AppUse` (TV) đếm màn hình đang hiện của cả app để biết quay lại sau ≥ 30 phút. Test:
-`.\gradlew.bat :app:testDebugUnitTest --tests vn.chimto.tv.ProfilesTest` (SharedPreferences giả), iPad `ProfilesTests`.
+`.\gradlew.bat :app:testDebugUnitTest --tests vn.mtv.tv.ProfilesTest` (SharedPreferences giả), iPad `ProfilesTests`.
 
 Thu nhỏ phim (từ 2.0): `PlayerActivity` là trình phát duy nhất (`singleTask`) chạy trong task riêng (`taskAffinity=".player"`)
 — thu nhỏ thì task chính của app hiện lại. `PlayerActivity.pipSupported` xét giống `ActivityManager.supportsMultiWindow`:
@@ -1277,7 +1240,7 @@ trên iPhone. Cỡ chữ: mọi chữ dùng `.appFont(cỡ, đậm)` (theo dõi 
 đang gõ ô nhập), di chuyển trên lưới chia nhóm `Core/KeyNav.swift` (test `KeyNavTests`); trình phát `UIKeyCommand` có tên
 (bảng phím tắt khi giữ ⌘), `UIHoverGestureRecognizer` / `UIPointerInteraction` / pan chỉ nhận sự kiện cuộn. Widget: phần
 mở rộng `Widget/` (WidgetKit, `ConBangWidget.appex`), dữ liệu dùng chung `Shared/WidgetFeedData.swift`; app ghi
-`Widget/feed.json` + `posters/*.jpg` trong App Group `group.vn.chimto.tv` (bản thử `.debug`) — `UI/WidgetFeed.swift` — rồi
+`Widget/feed.json` + `posters/*.jpg` trong App Group `group.vn.mtv.tv` (bản thử `.debug`) — `UI/WidgetFeed.swift` — rồi
 `WidgetCenter.reloadAllTimelines`; chạm mở `conbangtv://play?p=<người xem>&film=…&ep=…` (bản thử `conbangtv-thu://`).
 `ios/scripts/package.sh` ký app + widget bằng `ldid` kèm App Group và đúng các quyền TrollStore tự thêm cho app không khai
 báo quyền (`application-identifier` / `keychain-access-groups` `TROLLTROLL.*`) — thiếu thì mất mật khẩu proxy trong Keychain
@@ -1287,11 +1250,11 @@ Chấm điểm server (`PlayStats.kt`): agent báo thêm số khung hình rớt;
 phát mà trình phát chờ tải = giật; chờ tải ngay sau lệnh tua thì không tính), lưu 8 lần xem gần nhất theo trang + server
 trong `Prefs.playStats`. Cách chọn / gợi ý server (cùng ngôn ngữ, không nét hơn khi chưa thử; server quen mà "hay
 lỗi" thì lúc mở tập sang server cùng ngôn ngữ còn phát được) có test riêng:
-`.\gradlew.bat :app:testDebugUnitTest --tests vn.chimto.tv.PlayStatsTest`.
+`.\gradlew.bat :app:testDebugUnitTest --tests vn.mtv.tv.PlayStatsTest`.
 
 Bộ đọc trang nằm ở `Site.kt`. Kiểm tra nó trên HTML thật đã tải về (không cần TV):
 
 ```powershell
 $env:CHIMTO_FIXTURES = "<thư mục chứa fixtures.txt và các tệp .html>"
-.\gradlew.bat :app:testReleaseUnitTest --tests vn.chimto.tv.SiteProbeTest --rerun
+.\gradlew.bat :app:testReleaseUnitTest --tests vn.mtv.tv.SiteProbeTest --rerun
 ```

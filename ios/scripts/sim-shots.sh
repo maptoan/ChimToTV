@@ -36,7 +36,7 @@ echo "Máy ảo: $DEVICE ($udid), iOS $runtime"
 xcrun simctl boot "$udid" 2>/dev/null || true
 xcrun simctl bootstatus "$udid" -b
 xcrun simctl install "$udid" "$APP"
-xcrun simctl launch "$udid" vn.chimto.tv.debug
+xcrun simctl launch "$udid" vn.mtv.tv.debug
 
 ping1() { curl -sf -m 5 "$D/ping" > /dev/null; }
 # Hỏi lại tới ~50 giây: lúc mở trình phát trên máy ảo, luồng chính của app bận hơn 20 giây (WebKit khởi động trên máy chạy

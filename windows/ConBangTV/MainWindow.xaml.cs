@@ -123,8 +123,8 @@ public partial class MainWindow : Window
     public async Task<bool> ShowDisclaimer(bool gate)
     {
         var body = new StackPanel();
-        body.Children.Add(Ui.Dim(gate ? $"Côn Bằng TV — {Disclaimer.Title}. Đọc hết rồi chọn «Đồng ý» để vào app."
-            : $"Côn Bằng TV · bản {Disclaimer.Version} – {Disclaimer.Date}", 14, new Thickness(0, 0, 0, 10)));
+        body.Children.Add(Ui.Dim(gate ? $"MTV — {Disclaimer.Title}. Đọc hết rồi chọn «Đồng ý» để vào app."
+            : $"MTV · bản {Disclaimer.Version} – {Disclaimer.Date}", 14, new Thickness(0, 0, 0, 10)));
         var text = new StackPanel { Margin = new Thickness(0, 0, 14, 0) };
         foreach (var (title, para) in Disclaimer.Sections)
         {
@@ -900,7 +900,7 @@ public partial class MainWindow : Window
                 return;
             }
             var summary = UpdateCheck.Summary(rel.Notes);
-            var choice = await Ask($"Có bản mới: Côn Bằng TV {rel.Version}", (summary.Length > 0 ? summary + "\n\n" : "") +
+            var choice = await Ask($"Có bản mới: MTV {rel.Version}", (summary.Length > 0 ? summary + "\n\n" : "") +
                 $"Bản đang dùng: {UpdateCheck.CurrentVersion}.", new[] { "Cập nhật ngay", "Để sau" });
             if (choice != 0)
             {

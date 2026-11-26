@@ -15,7 +15,7 @@ public sealed class InvitePage : Page
     protected override Task Load()
     {
         Body.Children.Clear();
-        Body.Children.Add(Ui.Header("Cài Côn Bằng TV lên tivi"));
+        Body.Children.Add(Ui.Header("Cài MTV lên tivi"));
         Body.Children.Add(Ui.Dim("Tivi / box Android nào cũng cài được bằng app Downloader — không cần USB hay máy tính.",
             14, new Thickness(0, 0, 0, 16)));
         Body.Children.Add(Ui.Text("1.  Trên tivi, mở CH Play và cài app Downloader (của AFTVnews).", 17));
