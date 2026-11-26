@@ -19,7 +19,8 @@ const [mode = 'preview', arg] = process.argv.slice(2);
 const chrome = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const port = 9340;
 const profile = mkdtempSync(join(tmpdir(), 'chimto-logo-'));
-const proc = spawn(chrome, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
+// --no-sandbox: cần thiết khi chạy Chrome headless dưới quyền root trên Linux; vô hại trên Windows
+const proc = spawn(chrome, ['--headless=new', '--no-sandbox', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
   '--no-first-run', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
