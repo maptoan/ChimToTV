@@ -1,0 +1,449 @@
+# Workflow dựng bản Android Release (APK) cho fork ChimToTV (Côn Bằng TV).
+#
+# Lưu ý vận hành & quy tắc đồng bộ 3 số hiệu OTA (Updater.kt:49, 59, 120, 191-195):
+# - App kiểm tra bản mới qua `isNewer(tag_name, BuildConfig.VERSION_NAME)`, sau đó `verify()`
+#   kiểm tra `versionCode(archive) > versionCode(mine)` và chữ ký chứng chỉ phải trùng khớp.
+# - Vì vậy, mỗi khi phát hành bản mới để TV tự cập nhật OTA, CẢ 3 thông số sau phải CÙNG TĂNG:
+#     1. GitHub Release tag (`v<versionName>`, VD: v2.24.1)
+#     2. `versionName` trong APK (mặc định đọc từ app/build.gradle.kts hoặc truyền input `vn`)
+#     3. `versionCode` trong APK (mặc định đọc từ app/build.gradle.kts hoặc truyền input `vc`)
+# - Ghi chú: Nút "Sync fork" trên web GitHub chỉ đồng bộ nhánh `main`, không tự copy tags từ
+#   upstream; khi đó chạy `workflow_dispatch` (với `publish_release = true`) sẽ tự tạo Release.
+# - `app/build.gradle.kts` được giữ nguyên bản (zero-diff) trong Git; workflow chỉ thay tạm
+#   `UPDATE_URL` sang repo fork trên runner ngay trước khi chạy Gradle.
+
+name: Android
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      vc:
+        description: 'Ghi đè versionCode (tuỳ chọn, số nguyên dương, VD: 49)'
+        required: false
+        type: string
+        default: ''
+      vn:
+        description: 'Ghi đè versionName (tuỳ chọn, VD: 2.24.1)'
+        required: false
+        type: string
+        default: ''
+      publish_release:
+        description: 'Tạo/cập nhật GitHub Release (phục vụ OTA và link tải trực tiếp)'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Verify APK (Release)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      ver_code: ${{ steps.meta.outputs.ver_code }}
+      ver_name: ${{ steps.meta.outputs.ver_name }}
+      apk_sha256: ${{ steps.summary.outputs.apk_sha256 }}
+      apk_size: ${{ steps.summary.outputs.apk_size }}
+      cert_sha256: ${{ steps.verify.outputs.cert_sha256 }}
+      commit_short: ${{ steps.meta.outputs.commit_short }}
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Thiết lập JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Thiết lập Gradle & Cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Kiểm tra đầu vào & xác định phiên bản
+        id: meta
+        env:
+          INPUT_VC: ${{ inputs.vc }}
+          INPUT_VN: ${{ inputs.vn }}
+          GITHUB_SHA_VAL: ${{ github.sha }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "$INPUT_VC" ]]; then
+            if ! [[ "$INPUT_VC" =~ ^[0-9]+$ ]] || (( 10#$INPUT_VC <= 0 )); then
+              echo "::error::Input 'vc' phải là số nguyên dương (^[0-9]+$), nhận được: '$INPUT_VC'"
+              exit 1
+            fi
+            VER_CODE="$INPUT_VC"
+          else
+            VER_CODE=$(awk -F'=' '/^[[:space:]]*versionCode[[:space:]]*=/{gsub(/[^0-9]/,"",$2); print $2; exit}' app/build.gradle.kts)
+          fi
+
+          if [[ -n "$INPUT_VN" ]]; then
+            if ! [[ "$INPUT_VN" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+              echo "::error::Input 'vn' không đúng định dạng (^[0-9]+(\.[0-9]+)*$), nhận được: '$INPUT_VN'"
+              exit 1
+            fi
+            VER_NAME="$INPUT_VN"
+          else
+            VER_NAME=$(sed -nE 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' app/build.gradle.kts | head -n 1)
+          fi
+
+          if [[ -z "$VER_CODE" || -z "$VER_NAME" ]]; then
+            echo "::error::Không đọc được versionCode ('$VER_CODE') hoặc versionName ('$VER_NAME') từ app/build.gradle.kts"
+            exit 1
+          fi
+
+          if [[ "$REF_TYPE" == "tag" && "$REF_NAME" != "v${VER_NAME}" ]]; then
+            echo "::warning::Tag '$REF_NAME' khác với 'v${VER_NAME}' trong app/build.gradle.kts. Để OTA khớp, tag nên là v<versionName>."
+          fi
+
+          COMMIT_SHORT="${GITHUB_SHA_VAL:0:7}"
+
+          {
+            echo "VER_CODE=$VER_CODE"
+            echo "VER_NAME=$VER_NAME"
+            echo "COMMIT_SHORT=$COMMIT_SHORT"
+          } >> "$GITHUB_ENV"
+
+          {
+            echo "ver_code=$VER_CODE"
+            echo "ver_name=$VER_NAME"
+            echo "commit_short=$COMMIT_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Phiên bản build: versionName=$VER_NAME, versionCode=$VER_CODE, commit=$COMMIT_SHORT"
+
+      - name: Kiểm tra Secrets & chuẩn bị Keystore / NextDNS (Fail-Fast)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
+        run: |
+          set -euo pipefail
+
+          missing=0
+          for var_name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ -z "${!var_name:-}" ]]; then
+              echo "::error::Thiếu GitHub Secret bắt buộc: $var_name (chặn nguy cơ lùi về khóa debug CBTV-L03)"
+              missing=1
+            fi
+          done
+          if [[ "$missing" -ne 0 ]]; then
+            exit 1
+          fi
+
+          # Chặn ký tự làm lệch java.util.Properties.load() tại app/build.gradle.kts:10
+          for prop_var in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ "${!prop_var}" == *$'\n'* || "${!prop_var}" == *'\\'* ]]; then
+              echo "::error::Secret $prop_var chứa ký tự xuống dòng hoặc '\\' không tương thích với Properties.load()"
+              exit 1
+            fi
+          done
+
+          mkdir -p keys
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > keys/chimto.jks
+          if [[ ! -s keys/chimto.jks ]]; then
+            echo "::error::Giải mã keys/chimto.jks thất bại hoặc tệp rỗng"
+            exit 1
+          fi
+
+          # Fail-fast ngay trong 1 giây nếu keystore/mật khẩu/alias không hợp lệ
+          if ! keytool -list -keystore keys/chimto.jks -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1; then
+            echo "::error::Xác thực keystore bằng keytool -list thất bại (kiểm tra ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS)"
+            exit 1
+          fi
+
+          # Ghi keys/ky.properties (tuyệt đối không in nội dung ra log)
+          umask 077
+          {
+            printf 'storeFile=keys/chimto.jks\n'
+            printf 'storePassword=%s\n' "$ANDROID_KEYSTORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$ANDROID_KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$ANDROID_KEY_PASSWORD"
+          } > keys/ky.properties
+
+          # NEXTDNS_ID là tùy chọn: nếu có thì validate ^[a-z0-9]+$, nếu rỗng thì dùng mặc định Cloudflare/Google DoH/DoT
+          if [[ -n "${NEXTDNS_ID:-}" ]]; then
+            if ! [[ "$NEXTDNS_ID" =~ ^[a-z0-9]+$ ]]; then
+              echo "::error::Secret NEXTDNS_ID không hợp lệ (chỉ cho phép ^[a-z0-9]+$ theo app/build.gradle.kts:33)"
+              exit 1
+            fi
+            printf '%s' "$NEXTDNS_ID" > keys/nextdns.txt
+            echo "Đã cấu hình keys/nextdns.txt từ secret NEXTDNS_ID."
+          else
+            echo "Không khai báo NEXTDNS_ID — ứng dụng sẽ dùng DoH/DoT mặc định (Cloudflare / Google)."
+          fi
+
+      - name: Chuyển UPDATE_URL sang repo fork trên runner (Zero-diff trong Git)
+        env:
+          REPO_SLUG: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TARGET_URL="https://api.github.com/repos/${REPO_SLUG}/releases/latest"
+          sed -i "s|https://api.github.com/repos/conbangtv/ChimToTV/releases/latest|${TARGET_URL}|g" app/build.gradle.kts
+
+          if ! grep -qF "$TARGET_URL" app/build.gradle.kts; then
+            echo "::error::Không thể cập nhật UPDATE_URL thành '$TARGET_URL' trong app/build.gradle.kts"
+            exit 1
+          fi
+          echo "Đã cập nhật tạm UPDATE_URL trên runner -> $TARGET_URL"
+
+      - name: Cấp quyền thực thi gradlew & chạy Unit Tests (Release)
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew --console=plain :app:testReleaseUnitTest
+
+      - name: Biên dịch APK Release
+        env:
+          INPUT_VC: ${{ inputs.vc }}
+          INPUT_VN: ${{ inputs.vn }}
+        run: |
+          set -euo pipefail
+          GRADLE_ARGS=(--console=plain --no-daemon :app:assembleRelease)
+          if [[ -n "$INPUT_VC" ]]; then
+            GRADLE_ARGS+=("-Pvc=${INPUT_VC}")
+          fi
+          if [[ -n "$INPUT_VN" ]]; then
+            GRADLE_ARGS+=("-Pvn=${INPUT_VN}")
+          fi
+          ./gradlew "${GRADLE_ARGS[@]}"
+
+      - name: Đóng gói dist/ & kiểm chứng APK (aapt2 + apksigner 2 tầng)
+        id: verify
+        env:
+          VAR_CERT_SHA256: ${{ vars.ANDROID_CERT_SHA256 }}
+          SEC_CERT_SHA256: ${{ secrets.ANDROID_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+
+          APK_SRC="app/build/outputs/apk/release/app-release.apk"
+          if [[ ! -f "$APK_SRC" ]]; then
+            echo "::error::Không tìm thấy tệp APK đầu ra tại $APK_SRC"
+            exit 1
+          fi
+
+          mkdir -p dist
+          APK_OUT="dist/ConBangTV-${VER_NAME}.apk"
+          cp "$APK_SRC" "$APK_OUT"
+
+          # Tìm aapt2 và apksigner an toàn trong $ANDROID_HOME/build-tools
+          AAPT2_BIN=$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f -executable | sort -V | tail -n 1 || true)
+          APKSIGNER_BIN=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f -executable | sort -V | tail -n 1 || true)
+          if [[ -z "$AAPT2_BIN" || -z "$APKSIGNER_BIN" ]]; then
+            echo "::error::Không tìm thấy công cụ thực thi aapt2 hoặc apksigner trong \$ANDROID_HOME/build-tools ($ANDROID_HOME/build-tools)"
+            exit 1
+          fi
+
+          # Kiểm tra packageName, versionCode, versionName bằng aapt2
+          PKG_LINE=$("$AAPT2_BIN" dump badging "$APK_OUT" | grep -m 1 '^package:' || true)
+          echo "aapt2 badging: $PKG_LINE"
+          if [[ -z "$PKG_LINE" ]]; then
+            echo "::error::Không đọc được thông tin package từ aapt2 dump badging"
+            exit 1
+          fi
+          if ! printf '%s\n' "$PKG_LINE" | grep -qF "name='vn.chimto.tv'"; then
+            echo "::error::packageName không phải 'vn.chimto.tv' (nguy cơ build nhầm bản Debug)"
+            exit 1
+          fi
+          if ! printf '%s\n' "$PKG_LINE" | grep -qF "versionCode='${VER_CODE}'"; then
+            echo "::error::versionCode trong APK không khớp '${VER_CODE}'"
+            exit 1
+          fi
+          if ! printf '%s\n' "$PKG_LINE" | grep -qF "versionName='${VER_NAME}'"; then
+            echo "::error::versionName trong APK không khớp '${VER_NAME}'"
+            exit 1
+          fi
+
+          # Kiểm chứng chữ ký APK 2 tầng bằng apksigner
+          VERIFY_OUT=$("$APKSIGNER_BIN" verify --verbose --print-certs "$APK_OUT")
+          SIGNER_DN=$(printf '%s\n' "$VERIFY_OUT" | awk -F': ' '/Signer #1 certificate DN:/ {print $2; exit}')
+          CERT_SHA256=$(printf '%s\n' "$VERIFY_OUT" | awk -F': ' '/Signer #1 certificate SHA-256 digest:/ {print tolower($2); exit}' | tr -d '[:space:]')
+
+          if [[ -z "$SIGNER_DN" || -z "$CERT_SHA256" ]]; then
+            echo "::error::Không trích xuất được DN hoặc SHA-256 chứng chỉ từ apksigner"
+            exit 1
+          fi
+          if printf '%s\n' "$SIGNER_DN" | grep -qi "CN=Android Debug"; then
+            echo "::error::APK bị ký bằng chứng chỉ Android Debug ($SIGNER_DN) — chặn xuất bản (CBTV-L03)"
+            exit 1
+          fi
+          if ! [[ "$CERT_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "::error::SHA-256 chứng chỉ không hợp lệ: '$CERT_SHA256'"
+            exit 1
+          fi
+
+          # Tầng 2: Đối chiếu cứng với ANDROID_CERT_SHA256 (ưu tiên vars để không bị mask *** trên Summary)
+          EXPECTED_SHA256="${VAR_CERT_SHA256:-${SEC_CERT_SHA256:-}}"
+          EXPECTED_SHA256=$(printf '%s' "$EXPECTED_SHA256" | tr -d '[:space:]:' | tr 'A-F' 'a-f')
+          if [[ -n "$EXPECTED_SHA256" ]]; then
+            if [[ "$CERT_SHA256" != "$EXPECTED_SHA256" ]]; then
+              echo "::error::Chứng chỉ ký APK ($CERT_SHA256) KHÔNG khớp với ANDROID_CERT_SHA256 đã khai báo!"
+              exit 1
+            fi
+            echo "Chứng chỉ ký APK khớp chính xác với ANDROID_CERT_SHA256."
+          else
+            echo "::error::Chưa khai báo vars.ANDROID_CERT_SHA256 — bắt buộc cấu hình Repository Variable ANDROID_CERT_SHA256 để khóa cứng chuỗi tin cậy OTA."
+          exit 1
+          fi
+
+          echo "cert_sha256=$CERT_SHA256" >> "$GITHUB_OUTPUT"
+          echo "CERT_SHA256=$CERT_SHA256" >> "$GITHUB_ENV"
+
+      - name: Tính SHA-256, kích thước & ghi Step Summary
+        id: summary
+        run: |
+          set -euo pipefail
+          APK_OUT="dist/ConBangTV-${VER_NAME}.apk"
+          APK_SHA256=$(sha256sum "$APK_OUT" | awk '{print $1}')
+          APK_SIZE=$(stat -c%s "$APK_OUT")
+
+          echo "apk_sha256=$APK_SHA256" >> "$GITHUB_OUTPUT"
+          echo "apk_size=$APK_SIZE" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Kết quả Build Côn Bằng TV (Android Release)"
+            echo ""
+            echo "| Thông số | Giá trị |"
+            echo "| :--- | :--- |"
+            echo "| Tệp APK | \`ConBangTV-${VER_NAME}.apk\` |"
+            echo "| Package | \`vn.chimto.tv\` |"
+            echo "| Phiên bản (\`versionName\`) | \`${VER_NAME}\` |"
+            echo "| Mã bản (\`versionCode\`) | \`${VER_CODE}\` |"
+            echo "| Commit | \`${COMMIT_SHORT}\` |"
+            echo "| Kích thước (byte) | \`${APK_SIZE}\` |"
+            echo "| SHA-256 APK | \`${APK_SHA256}\` |"
+            echo "| SHA-256 Chứng chỉ ký | \`${CERT_SHA256}\` |"
+            echo ""
+            echo "> **Quy tắc đồng bộ 3 số hiệu OTA:** Để các thiết bị TV nhận cập nhật tự động qua OTA, **Tag Release (\`v<versionName>\`)**, **\`versionName\`**, và **\`versionCode\`** đều phải lớn hơn bản đang cài trên TV."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConBangTV-${{ steps.meta.outputs.ver_name }}-apk
+          path: dist/ConBangTV-*.apk
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Dọn dẹp thư mục keys/
+        if: always()
+        run: rm -rf keys/
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: ${{ github.event_name == 'push' || inputs.publish_release }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout mã nguồn (đọc CHANGELOG.md)
+        uses: actions/checkout@v4
+
+      - name: Tải APK Artifact từ job build
+        uses: actions/download-artifact@v4
+        with:
+          name: ConBangTV-${{ needs.build.outputs.ver_name }}-apk
+          path: dist
+
+      - name: Chuẩn bị tệp phát hành & ghi chú Release (chuẩn OTA)
+        env:
+          VER_NAME: ${{ needs.build.outputs.ver_name }}
+          VER_CODE: ${{ needs.build.outputs.ver_code }}
+          APK_SHA256: ${{ needs.build.outputs.apk_sha256 }}
+          APK_SIZE: ${{ needs.build.outputs.apk_size }}
+          CERT_SHA256: ${{ needs.build.outputs.cert_sha256 }}
+          COMMIT_SHORT: ${{ needs.build.outputs.commit_short }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          APK_VER="dist/ConBangTV-${VER_NAME}.apk"
+          APK_FIXED="dist/ConBangTV.apk"
+          if [[ ! -f "$APK_VER" ]]; then
+            echo "::error::Không tìm thấy $APK_VER sau khi tải artifact"
+            exit 1
+          fi
+          cp "$APK_VER" "$APK_FIXED"
+
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            TAG_NAME="$REF_NAME"
+          else
+            TAG_NAME="v${VER_NAME}"
+          fi
+          echo "TAG_NAME=$TAG_NAME" >> "$GITHUB_ENV"
+
+          # Trích xuất mục đầu tiên trong CHANGELOG.md để đưa vào mục "## Có gì mới"
+          # đứng trước bảng SHA-256 (tương thích bộ lọc Updater.summary() tại Updater.kt:252-263).
+          WHAT_NEW=""
+          if [[ -f CHANGELOG.md ]]; then
+            WHAT_NEW=$(awk '
+              /^## / {
+                if (in_sec) exit
+                in_sec = 1
+                next
+              }
+              in_sec { print }
+            ' CHANGELOG.md | sed '/./,$!d')
+          fi
+          if [[ -z "$WHAT_NEW" ]]; then
+            WHAT_NEW="- Bản dựng tự động Côn Bằng TV ${VER_NAME} (versionCode ${VER_CODE}, commit ${COMMIT_SHORT})."
+          fi
+
+          {
+            echo "## Có gì mới"
+            echo ""
+            printf '%s\n' "$WHAT_NEW"
+            echo ""
+            echo "## Thông tin kiểm chứng (SHA-256)"
+            echo ""
+            echo "| Tệp | Giá trị |"
+            echo "| :--- | :--- |"
+            echo "| Tên tệp | \`ConBangTV-${VER_NAME}.apk\` / \`ConBangTV.apk\` |"
+            echo "| Phiên bản | \`${VER_NAME}\` (\`versionCode ${VER_CODE}\`) |"
+            echo "| Commit | \`${COMMIT_SHORT}\` |"
+            echo "| Kích thước (byte) | \`${APK_SIZE}\` |"
+            echo "| SHA-256 APK | \`${APK_SHA256}\` |"
+            echo "| SHA-256 Chứng chỉ ký | \`${CERT_SHA256}\` |"
+          } > release_notes.md
+
+      - name: Tạo hoặc cập nhật GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER_NAME: ${{ needs.build.outputs.ver_name }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          APK_VER="dist/ConBangTV-${VER_NAME}.apk"
+          APK_FIXED="dist/ConBangTV.apk"
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "$APK_VER" "$APK_FIXED" --clobber
+            gh release edit "$TAG_NAME" --latest --title "Côn Bằng TV ${VER_NAME}" --notes-file release_notes.md
+          else
+            gh release create "$TAG_NAME" "$APK_VER" "$APK_FIXED" \
+              --target "$TARGET_SHA" \
+              --latest \
+              --title "Côn Bằng TV ${VER_NAME}" \
+              --notes-file release_notes.md
+          fi
