@@ -1,0 +1,742 @@
+# Workflow dựng và phát hành bản Windows (.exe) cho MTV.
+#
+# Lưu ý vận hành & quy tắc đồng bộ phiên bản OTA (UpdateCheck.cs:23-30, 127-130):
+# - App đọc phiên bản đang cài qua AssemblyVersion (`UpdateCheck.CurrentVersion`, tự bỏ `.0` cuối:
+#   `1.22.0` → `1.22`), và khi tải bản mới từ tag `win-v<ver>`, app kiểm tra `ProductName == "MTV"`
+#   cùng `ProductVersion` khớp với `<ver>` của tag.
+# - Vì vậy:
+#   1. Tag `win-v*` không được kết thúc bằng `.0` (VD: dùng `win-v1.22`, không dùng `win-v1.22.0`).
+#   2. Bản Windows KHÔNG BAO GIỜ đặt cờ `Latest` (`--latest=false` ở cả `win-v*` và `mtv_windows`)
+#      để `/releases/latest` luôn trỏ vào bản Android TV mới nhất.
+
+name: Windows
+
+on:
+  push:
+    tags:
+      - 'win-v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Ghi đè phiên bản Windows (tuỳ chọn, dạng X.Y hoặc X.Y.Z, VD: 1.22.0 hoặc 1.22)'
+        required: false
+        type: string
+        default: ''
+      publish_release:
+        description: 'Tạo/cập nhật GitHub Release (win-v* và link cuốn chiếu mtv_windows)'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Verify EXE (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    outputs:
+      exe_sha256: ${{ steps.verify.outputs.exe_sha256 }}
+      exe_size: ${{ steps.verify.outputs.exe_size }}
+      exe_name: ${{ steps.verify.outputs.exe_name }}
+      ver_short: ${{ steps.meta.outputs.ver_short }}
+      ver_full: ${{ steps.meta.outputs.ver_full }}
+      commit_short: ${{ steps.meta.outputs.commit_short }}
+
+    steps:
+      - name: Bước 1 — Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Bước 2 — Thiết lập .NET 8 & kiểm tra Toolchain
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Bước 2b — Kiểm tra cargo, rustc, dotnet, 7z
+        run: |
+          $ErrorActionPreference = "Stop"
+          dotnet --version
+
+          $cargo = Join-Path $env:USERPROFILE ".cargo\bin\cargo.exe"
+          if (-not (Test-Path $cargo)) {
+            Write-Host "::error::Không tìm thấy cargo.exe tại $cargo"
+            exit 1
+          }
+          & $cargo --version
+          rustc -vV
+
+          $7z = (Get-Command 7z -ErrorAction SilentlyContinue).Source
+          if (-not $7z) { $7z = "C:\Program Files\7-Zip\7z.exe" }
+          if (-not (Test-Path $7z)) {
+            Write-Host "::error::Không tìm thấy 7-Zip (7z.exe)"
+            exit 1
+          }
+          Write-Host "Toolchain sẵn sàng (7z: $7z)."
+
+      - name: Bước 3a — Cache Rust (Cargo & linux/target)
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "linux -> target"
+
+      - name: Bước 3b — Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('windows/**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Bước 3c — Cache tệp nén libmpv (.7z)
+        uses: actions/cache@v4
+        with:
+          path: windows/vendor/mpv/mpv-dev-lgpl-x86_64-20261112-git-fe753a7824.7z
+          key: mpv-7z-2026-11-12-fe753a7824
+
+      - name: Bước 4 — Xác định số hiệu phiên bản
+        id: meta
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          GITHUB_SHA_VAL: ${{ github.sha }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $csproj = "windows/ConBangTV/ConBangTV.csproj"
+          $csprojVer = ([xml](Get-Content $csproj)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if (-not $csprojVer) {
+            Write-Host "::error::Không đọc được <Version> từ $csproj"
+            exit 1
+          }
+          $csprojShort = $csprojVer -replace '\.0$', ''
+
+          if ($env:REF_TYPE -eq "tag") {
+            $tagVer = $env:REF_NAME -replace '^win-v', ''
+            if ($tagVer -notmatch '^[0-9]+\.[0-9]+(\.[1-9][0-9]*)?$') {
+              Write-Host "::error::Tag '$($env:REF_NAME)' không hợp lệ (phải khớp win-vX.Y hoặc win-vX.Y.Z với Z > 0, không kết thúc bằng .0)"
+              exit 1
+            }
+            $verShort = $tagVer
+            $parts = $tagVer.Split('.')
+            $verFull = if ($parts.Count -eq 2) { "$tagVer.0" } else { $tagVer }
+            if ($tagVer -ne $csprojShort) {
+              Write-Host "::warning::Tag '$($env:REF_NAME)' khác với <Version> '$csprojVer' trong .csproj — dùng phiên bản từ tag ($verFull / $verShort) để đồng bộ OTA."
+            }
+          } elseif (-not [string]::IsNullOrWhiteSpace($env:INPUT_VERSION)) {
+            $raw = $env:INPUT_VERSION.Trim()
+            if ($raw -notmatch '^[0-9]+\.[0-9]+(\.[0-9]+)?$') {
+              Write-Host "::error::Input 'version' không đúng định dạng (^[0-9]+\.[0-9]+(\.[0-9]+)?$), nhận được: '$raw'"
+              exit 1
+            }
+            $parts = $raw.Split('.')
+            $verFull = if ($parts.Count -eq 2) { "$raw.0" } else { $raw }
+            $verShort = $verFull -replace '\.0$', ''
+          } else {
+            $verFull = $csprojVer.Trim()
+            if ($verFull -notmatch '^[0-9]+\.[0-9]+(\.[0-9]+)?$') {
+              Write-Host "::error::<Version> trong $csproj không hợp lệ: '$verFull'"
+              exit 1
+            }
+            $parts = $verFull.Split('.')
+            if ($parts.Count -eq 2) { $verFull = "$verFull.0" }
+            $verShort = $verFull -replace '\.0$', ''
+          }
+
+          $commitShort = $env:GITHUB_SHA_VAL.Substring(0, 7)
+
+          Add-Content -Path $env:GITHUB_ENV -Value @(
+            "VER_FULL=$verFull"
+            "VER_SHORT=$verShort"
+            "COMMIT_SHORT=$commitShort"
+          )
+          Add-Content -Path $env:GITHUB_OUTPUT -Value @(
+            "ver_full=$verFull"
+            "ver_short=$verShort"
+            "commit_short=$commitShort"
+          )
+          Write-Host "Phiên bản build: VER_FULL=$verFull, VER_SHORT=$verShort, COMMIT=$commitShort"
+
+      - name: Bước 5 — Chuẩn bị keys/nextdns.txt & ép Cargo biên dịch lại lõi
+        env:
+          NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          if (-not [string]::IsNullOrWhiteSpace($env:NEXTDNS_ID)) {
+            $id = $env:NEXTDNS_ID.Trim()
+            if ($id -cnotmatch '^[a-z0-9]+$') {
+              Write-Host "::error::Secret NEXTDNS_ID không hợp lệ (chỉ cho phép ^[a-z0-9]+$ theo linux/core/build.rs:15)"
+              exit 1
+            }
+            New-Item -ItemType Directory -Force "keys" | Out-Null
+            $nextdnsPath = Join-Path (Get-Location) "keys/nextdns.txt"
+            [IO.File]::WriteAllText($nextdnsPath, $id, (New-Object System.Text.UTF8Encoding $false))
+            Write-Host "Đã cấu hình keys/nextdns.txt từ secret NEXTDNS_ID."
+          } else {
+            if (Test-Path "keys/nextdns.txt") { Remove-Item "keys/nextdns.txt" -Force }
+            Write-Host "Không khai báo NEXTDNS_ID — ứng dụng sẽ dùng DoH/DoT mặc định (Cloudflare / Google)."
+          }
+
+          # Ép Cargo chạy lại build.rs và biên dịch lại conbang-core + conbang-ffi (ĐK-W1-05)
+          $now = Get-Date
+          (Get-Item "linux/core/build.rs").LastWriteTime = $now
+          (Get-Item "linux/core/src/doh.rs").LastWriteTime = $now
+
+          $fpDir = "linux/target/release/.fingerprint"
+          if (Test-Path $fpDir) {
+            Get-ChildItem $fpDir -Directory -Filter "conbang-*" | Remove-Item -Recurse -Force
+          }
+          if (Test-Path "linux/target/release/conbang_core.dll") {
+            Remove-Item "linux/target/release/conbang_core.dll" -Force
+          }
+          if (Test-Path "linux/target/release/deps") {
+            Get-ChildItem "linux/target/release/deps" -Filter "*conbang*" | Remove-Item -Force
+          }
+
+      - name: Bước 6 — Verification Gate (kiểm chứng độ sạch mã nguồn)
+        run: |
+          $ErrorActionPreference = "Stop"
+          $updateFile = "windows/ConBangTV/Core/UpdateCheck.cs"
+          $hasApi = Select-String -Path $updateFile -SimpleMatch "https://api.github.com/repos/maptoan/MTV/releases?per_page=100" -Quiet
+          $hasPage = Select-String -Path $updateFile -SimpleMatch "https://github.com/maptoan/MTV/releases" -Quiet
+          if (-not $hasApi -or -not $hasPage) {
+            Write-Host "::error::URL tự cập nhật trong $updateFile chưa trỏ về maptoan/MTV"
+            exit 1
+          }
+
+          $hits = Get-ChildItem -Path "windows", "linux/core/src" -Recurse -File |
+            Select-String -Pattern "conbangtv/ChimToTV|9192365|Circling5714|t\.me/tivikit"
+          if ($hits) {
+            $hits | ForEach-Object { Write-Host "::error::$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
+            Write-Host "::error::Phát hiện chuỗi định danh cũ còn sót trong windows/ hoặc linux/core/src/"
+            exit 1
+          }
+          Write-Host "Verification Gate đạt -> maptoan/MTV (không còn chuỗi cũ trong windows/ và linux/core/src/)."
+
+      - name: Bước 6b — Tải trước & xác thực SHA-256 libmpv (retry 3 lần)
+        run: |
+          $ErrorActionPreference = "Stop"
+          $mpvTag = "2026-11-12-fe753a7824"
+          $mpvFile = "mpv-dev-lgpl-x86_64-20261112-git-fe753a7824.7z"
+          $mpvSha = "9b9f903e08a216d6636280042b98ee20b972a7321735ab3d1710c00881f47dcc"
+          $vendor = "windows/vendor/mpv"
+          $arc = Join-Path $vendor $mpvFile
+          $url = "https://github.com/zhongfly/mpv-winbuild/releases/download/$mpvTag/$mpvFile"
+
+          if (Test-Path $arc) {
+            $actual = (Get-FileHash $arc -Algorithm SHA256).Hash.ToLower()
+            if ($actual -ne $mpvSha) {
+              Write-Warning "Tệp cache $mpvFile sai SHA-256 ($actual) — xoá $vendor để tải lại."
+              Remove-Item $vendor -Recurse -Force
+            } else {
+              Write-Host "Cache hit $mpvFile — SHA-256 hợp lệ."
+            }
+          } elseif (Test-Path $vendor) {
+            Write-Warning "Thư mục $vendor thiếu tệp .7z — xoá để tải lại sạch."
+            Remove-Item $vendor -Recurse -Force
+          }
+
+          if (-not (Test-Path $arc)) {
+            New-Item -ItemType Directory -Force $vendor | Out-Null
+            $ok = $false
+            foreach ($wait in 0, 5, 15) {
+              if ($wait -gt 0) {
+                Write-Host "Đợi ${wait}s trước khi thử tải lại libmpv..."
+                Start-Sleep -Seconds $wait
+              }
+              try {
+                Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $arc
+                $actual = (Get-FileHash $arc -Algorithm SHA256).Hash.ToLower()
+                if ($actual -eq $mpvSha) {
+                  $ok = $true
+                  break
+                }
+                Write-Warning "Lần tải libmpv sai SHA-256 ($actual)."
+                Remove-Item $arc -Force -ErrorAction SilentlyContinue
+              } catch {
+                Write-Warning "Tải libmpv lỗi: $($_.Exception.Message)"
+                Remove-Item $arc -Force -ErrorAction SilentlyContinue
+              }
+            }
+            if (-not $ok) {
+              Write-Host "::error::Tải và xác thực SHA-256 libmpv thất bại sau 3 lần thử."
+              exit 1
+            }
+            Write-Host "Đã tải và xác thực SHA-256 thành công: $mpvFile"
+          }
+
+      - name: Bước 7 — Chạy windows/build.ps1 (Cargo test/build + libmpv + dotnet test/publish)
+        env:
+          CARGO_INCREMENTAL: '0'
+          CARGO_BUILD_JOBS: '2'
+        run: |
+          $ErrorActionPreference = "Stop"
+          .\windows\build.ps1 -Version $env:VER_FULL
+
+      - name: Bước 8 — 4 Chốt chặn kiểm chứng sau build
+        id: verify
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          function Find-SubBytes([byte[]]$haystack, [byte[]]$needle) {
+            $limit = $haystack.Length - $needle.Length
+            for ($i = 0; $i -le $limit; $i++) {
+              $matched = $true
+              for ($j = 0; $j -lt $needle.Length; $j++) {
+                if ($haystack[$i + $j] -ne $needle[$j]) {
+                  $matched = $false
+                  break
+                }
+              }
+              if ($matched) { return $i }
+            }
+            return -1
+          }
+
+          $exeName = "MTV-Windows-$($env:VER_SHORT).exe"
+          $exePath = Join-Path "dist" $exeName
+          if (-not (Test-Path $exePath)) {
+            Write-Host "::error::Không tìm thấy tệp đầu ra $exePath"
+            exit 1
+          }
+          $exeItem = Get-Item $exePath
+
+          # Chốt chặn 1: Kiểm tra 2 DLL nguồn và đối chiếu trực tiếp .NET Single-File Bundle Manifest
+          $coreDllPath = "linux/target/release/conbang_core.dll"
+          $mpvDllPath = "windows/vendor/mpv/x/libmpv-2.dll"
+          if (-not (Test-Path $coreDllPath)) {
+            Write-Host "::error::Thiếu $coreDllPath"
+            exit 1
+          }
+          if (-not (Test-Path $mpvDllPath)) {
+            Write-Host "::error::Thiếu $mpvDllPath"
+            exit 1
+          }
+          $coreItem = Get-Item $coreDllPath
+          $mpvItem = Get-Item $mpvDllPath
+          if ($coreItem.Length -le 1MB) {
+            Write-Host "::error::conbang_core.dll quá nhỏ ($($coreItem.Length) byte)"
+            exit 1
+          }
+          if ($mpvItem.Length -le 20MB) {
+            Write-Host "::error::libmpv-2.dll quá nhỏ ($($mpvItem.Length) byte)"
+            exit 1
+          }
+          if ($coreItem.LastWriteTime -gt $exeItem.LastWriteTime) {
+            Write-Host "::error::conbang_core.dll mới hơn tệp .exe (dấu hiệu .exe không chứa bản DLL mới)"
+            exit 1
+          }
+
+          # Đọc 256 KB cuối của .exe chứa Bundle Manifest; mỗi entry có layout:
+          # offset(8) + size(8) + compressedSize(8) + type(1) + pathLength(1) + path(UTF-8)
+          # → trường size bắt đầu 18 byte trước chuỗi path (tức lenIdx - 17).
+          $tailLen = [Math]::Min(262144L, $exeItem.Length)
+          $tail = New-Object byte[] $tailLen
+          $fs = [IO.File]::OpenRead($exeItem.FullName)
+          try {
+            $fs.Seek(-$tailLen, [IO.SeekOrigin]::End) | Out-Null
+            $readTotal = 0
+            while ($readTotal -lt $tailLen) {
+              $n = $fs.Read($tail, $readTotal, [int]($tailLen - $readTotal))
+              if ($n -le 0) { break }
+              $readTotal += $n
+            }
+          } finally {
+            $fs.Dispose()
+          }
+
+          foreach ($entry in @(
+            @{ Name = "conbang_core.dll"; ExpectedLen = $coreItem.Length; MinLen = 1MB },
+            @{ Name = "libmpv-2.dll";     ExpectedLen = $mpvItem.Length;  MinLen = 20MB }
+          )) {
+            $nameBytes = [Text.Encoding]::UTF8.GetBytes($entry.Name)
+            $pattern = New-Object byte[] (1 + $nameBytes.Length)
+            $pattern[0] = [byte]$nameBytes.Length
+            [Array]::Copy($nameBytes, 0, $pattern, 1, $nameBytes.Length)
+
+            $lenIdx = Find-SubBytes $tail $pattern
+            if ($lenIdx -lt 0) {
+              Write-Host "::error::Không tìm thấy '$($entry.Name)' trong Single-File Bundle Manifest của $exeName"
+              exit 1
+            }
+            $pathIdx = $lenIdx + 1
+            $sizeOffset = $pathIdx - 18
+            if ($sizeOffset -lt 0) {
+              Write-Host "::error::Vị trí entry '$($entry.Name)' trong Bundle Manifest không hợp lệ"
+              exit 1
+            }
+            $bundledSize = [BitConverter]::ToInt64($tail, $sizeOffset)
+            if ($bundledSize -le $entry.MinLen -or $bundledSize -ne $entry.ExpectedLen) {
+              Write-Host "::error::Kích thước '$($entry.Name)' trong Bundle Manifest ($bundledSize) không khớp tệp gốc ($($entry.ExpectedLen))"
+              exit 1
+            }
+            Write-Host "Bundle Manifest OK: $($entry.Name) ($bundledSize byte)"
+          }
+
+          # Chốt chặn 2: Xác thực tuyệt đối SHA-256 tệp .7z libmpv và tính SHA-256 của 2 DLL
+          $mpvArcPath = "windows/vendor/mpv/mpv-dev-lgpl-x86_64-20261112-git-fe753a7824.7z"
+          $expectedMpvArcSha = "9b9f903e08a216d6636280042b98ee20b972a7321735ab3d1710c00881f47dcc"
+          if (-not (Test-Path $mpvArcPath)) {
+            Write-Host "::error::Thiếu tệp nén $mpvArcPath để kiểm chứng SHA-256 (ĐK-W1-04)"
+            exit 1
+          }
+          $actualMpvArcSha = (Get-FileHash $mpvArcPath -Algorithm SHA256).Hash.ToLower()
+          if ($actualMpvArcSha -ne $expectedMpvArcSha) {
+            Write-Host "::error::SHA-256 của $mpvArcPath không khớp ($actualMpvArcSha != $expectedMpvArcSha)"
+            exit 1
+          }
+          $coreSha256 = (Get-FileHash $coreDllPath -Algorithm SHA256).Hash.ToLower()
+          $mpvSha256 = (Get-FileHash $mpvDllPath -Algorithm SHA256).Hash.ToLower()
+
+          # Chốt chặn 3: Kiểm tra PE VersionInfo khớp chuẩn UpdateCheck.cs:127-130 (ĐK-W1-02)
+          $verInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exeItem.FullName)
+          if ($verInfo.ProductName -ne "MTV") {
+            Write-Host "::error::ProductName phải là 'MTV', nhận được '$($verInfo.ProductName)'"
+            exit 1
+          }
+          $pvShort = (($verInfo.ProductVersion -replace '\+.*$', '') -replace '\.0$', '')
+          if ($pvShort -ne $env:VER_SHORT) {
+            Write-Host "::error::ProductVersion '$($verInfo.ProductVersion)' (rút gọn '$pvShort') không khớp VER_SHORT '$($env:VER_SHORT)'"
+            exit 1
+          }
+          if (-not ($verInfo.FileVersion -like "$($env:VER_FULL)*")) {
+            Write-Host "::error::FileVersion '$($verInfo.FileVersion)' không bắt đầu bằng VER_FULL '$($env:VER_FULL)'"
+            exit 1
+          }
+          Write-Host "PE VersionInfo OK: ProductName='$($verInfo.ProductName)', ProductVersion='$($verInfo.ProductVersion)', FileVersion='$($verInfo.FileVersion)'"
+
+          # Chốt chặn 4: Kích thước .exe > 80 MB & xuất SHA-256
+          if ($exeItem.Length -le 80MB) {
+            Write-Host "::error::Kích thước $exeName quá nhỏ ($($exeItem.Length) byte <= 80 MB)"
+            exit 1
+          }
+          $exeSha256 = (Get-FileHash $exeItem.FullName -Algorithm SHA256).Hash.ToLower()
+          $exeSize = $exeItem.Length
+
+          Add-Content -Path $env:GITHUB_OUTPUT -Value @(
+            "exe_sha256=$exeSha256"
+            "exe_size=$exeSize"
+            "exe_name=$exeName"
+            "core_sha256=$coreSha256"
+            "mpv_sha256=$mpvSha256"
+          )
+          Write-Host "Tất cả 4 chốt chặn đều ĐẠT: $exeName ($exeSize byte, SHA-256: $exeSha256)"
+
+      - name: Bước 9 — Ghi Step Summary
+        env:
+          EXE_NAME: ${{ steps.verify.outputs.exe_name }}
+          EXE_SIZE: ${{ steps.verify.outputs.exe_size }}
+          EXE_SHA256: ${{ steps.verify.outputs.exe_sha256 }}
+          CORE_SHA256: ${{ steps.verify.outputs.core_sha256 }}
+          MPV_SHA256: ${{ steps.verify.outputs.mpv_sha256 }}
+        run: |
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value @(
+            "## Kết quả Build MTV (Windows)"
+            ""
+            "| Thông số | Giá trị |"
+            "| :--- | :--- |"
+            "| Tên tệp | ``$($env:EXE_NAME)`` |"
+            "| Phiên bản | ``$($env:VER_SHORT)`` (``$($env:VER_FULL)``) |"
+            "| Commit | ``$($env:COMMIT_SHORT)`` |"
+            "| Kích thước (byte) | ``$($env:EXE_SIZE)`` |"
+            "| SHA-256 ``.exe`` | ``$($env:EXE_SHA256)`` |"
+            "| SHA-256 ``conbang_core.dll`` | ``$($env:CORE_SHA256)`` |"
+            "| SHA-256 ``libmpv-2.dll`` | ``$($env:MPV_SHA256)`` |"
+          )
+
+      - name: Bước 10 — Upload Artifact .exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: MTV-Windows-${{ steps.meta.outputs.ver_short }}-exe
+          path: dist/MTV-Windows-${{ steps.meta.outputs.ver_short }}.exe
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Bước 11 — Dọn dẹp thư mục keys/
+        if: always()
+        run: |
+          if (Test-Path "keys") {
+            Remove-Item "keys" -Recurse -Force
+          }
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: ${{ github.event_name == 'push' || inputs.publish_release }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Bước 1a — Checkout mã nguồn (đọc CHANGELOG.md)
+        uses: actions/checkout@v4
+
+      - name: Bước 1b — Tải Artifact từ job build
+        uses: actions/download-artifact@v4
+        with:
+          name: MTV-Windows-${{ needs.build.outputs.ver_short }}-exe
+          path: dist
+
+      - name: Bước 1c — Kiểm tra SHA-256 Artifact
+        env:
+          EXE_NAME: ${{ needs.build.outputs.exe_name }}
+          EXPECTED_SHA256: ${{ needs.build.outputs.exe_sha256 }}
+          EXPECTED_SIZE: ${{ needs.build.outputs.exe_size }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $exePath = Join-Path "dist" $env:EXE_NAME
+          if (-not (Test-Path $exePath)) {
+            Write-Host "::error::Không tìm thấy $exePath sau khi tải artifact"
+            exit 1
+          }
+          $actualSha = (Get-FileHash $exePath -Algorithm SHA256).Hash.ToLower()
+          $actualSize = (Get-Item $exePath).Length
+          if ($actualSha -ne $env:EXPECTED_SHA256 -or "$actualSize" -ne $env:EXPECTED_SIZE) {
+            Write-Host "::error::Artifact $exePath không khớp SHA-256 hoặc kích thước từ job build"
+            exit 1
+          }
+          Write-Host "Artifact hợp lệ: $exePath ($actualSize byte, $actualSha)"
+
+      - name: Bước 2 — Dựng release_notes.md (lọc nhật ký nội bộ, ĐK-W1-06)
+        env:
+          VER_SHORT: ${{ needs.build.outputs.ver_short }}
+          VER_FULL: ${{ needs.build.outputs.ver_full }}
+          COMMIT_SHORT: ${{ needs.build.outputs.commit_short }}
+          EXE_NAME: ${{ needs.build.outputs.exe_name }}
+          EXE_SIZE: ${{ needs.build.outputs.exe_size }}
+          EXE_SHA256: ${{ needs.build.outputs.exe_sha256 }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $ver = $env:VER_SHORT
+          $filteredLines = New-Object System.Collections.Generic.List[string]
+
+          if (Test-Path "CHANGELOG.md") {
+            $lines = Get-Content "CHANGELOG.md" -Encoding UTF8
+            $inSection = $false
+            $sectionLines = New-Object System.Collections.Generic.List[string]
+            foreach ($line in $lines) {
+              if ($line -match "^##\s+Windows\s+$([regex]::Escape($ver))(\s|$|—|-)") {
+                $inSection = $true
+                continue
+              }
+              if ($inSection) {
+                if ($line -match '^##\s+') { break }
+                $sectionLines.Add($line)
+              }
+            }
+
+            $skipContinuation = $false
+            foreach ($line in $sectionLines) {
+              if ($line -match '^\s*$' -and $filteredLines.Count -eq 0) { continue }
+              if ($line -match '^(Anh:|Côn Bằng TV)') { continue }
+              if ($line -match '^- (bản |Thử:|Đăng lúc |Trang giới thiệu:)') {
+                $skipContinuation = $true
+                continue
+              }
+              if ($skipContinuation) {
+                if ($line -match '^\s+\S') { continue }
+                if ($line -match '^\s*$') { $skipContinuation = $false; continue }
+                $skipContinuation = $false
+              }
+              $filteredLines.Add($line)
+            }
+          }
+
+          $whatNew = ($filteredLines -join "`n").Trim()
+          if ([string]::IsNullOrWhiteSpace($whatNew)) {
+            $whatNew = "- Bản dựng tự động MTV cho Windows $ver (commit $($env:COMMIT_SHORT))."
+          }
+
+          $notes = @(
+            "## Có gì mới"
+            ""
+            $whatNew
+            ""
+            "## Thông tin kiểm chứng (SHA-256)"
+            ""
+            "| Thông số | Giá trị |"
+            "| :--- | :--- |"
+            "| Tên tệp | ``$($env:EXE_NAME)`` |"
+            "| Phiên bản | ``$ver`` (``$($env:VER_FULL)``) |"
+            "| Commit | ``$($env:COMMIT_SHORT)`` |"
+            "| Kích thước (byte) | ``$($env:EXE_SIZE)`` |"
+            "| SHA-256 | ``$($env:EXE_SHA256)`` |"
+          ) -join "`n"
+
+          if ($notes -notmatch '(?m)^\s*##\s*Có gì mới') {
+            Write-Host "::error::release_notes.md thiếu tiêu đề '## Có gì mới'"
+            exit 1
+          }
+
+          [IO.File]::WriteAllText((Join-Path (Get-Location) "release_notes.md"), $notes + "`n", (New-Object System.Text.UTF8Encoding $false))
+          [IO.File]::WriteAllText((Join-Path (Get-Location) "what_new.txt"), $whatNew, (New-Object System.Text.UTF8Encoding $false))
+          Write-Host "Đã tạo release_notes.md:"
+          Write-Host $notes
+
+      - name: Bước 3 & 4 & 5 — Tạo release win-v*, cập nhật cuốn chiếu mtv_windows & hậu kiểm
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET_SHA: ${{ github.sha }}
+          VER_SHORT: ${{ needs.build.outputs.ver_short }}
+          EXE_NAME: ${{ needs.build.outputs.exe_name }}
+          EXE_SIZE: ${{ needs.build.outputs.exe_size }}
+          EXE_SHA256: ${{ needs.build.outputs.exe_sha256 }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $repo = $env:REPO
+          $ver = $env:VER_SHORT
+          $tag = "win-v$ver"
+          $title = "MTV cho Windows $ver"
+          $exePath = Join-Path "dist" $env:EXE_NAME
+          $exeSha256 = $env:EXE_SHA256
+          $exeSize = [long]$env:EXE_SIZE
+
+          function Gh {
+            $out = & gh @args
+            if ($LASTEXITCODE -ne 0) { throw "Lệnh gh $($args -join ' ') lỗi (mã $LASTEXITCODE)" }
+            $out
+          }
+
+          function TagVersion([string]$t) {
+            try { [version]($t -replace '^[a-z-]*v', '') } catch { [version]"0.0" }
+          }
+
+          function LatestTag {
+            try {
+              ("" + (Gh api "repos/$repo/releases/latest" --jq ".tag_name")).Trim()
+            } catch {
+              ""
+            }
+          }
+
+          # --- Bước 3: Release đánh số win-v<ver> (LUÔN --latest=false) ---
+          & gh release view $tag --repo $repo *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Gh release upload $tag $exePath --repo $repo --clobber | Out-Host
+            Gh release edit $tag --repo $repo --title $title --notes-file release_notes.md --latest=false | Out-Host
+          } else {
+            Gh release create $tag $exePath --repo $repo --target $env:TARGET_SHA --title $title --notes-file release_notes.md --latest=false | Out-Host
+          }
+          Write-Host "Đã phát hành release $tag (--latest=false)."
+
+          # --- Bước 4: Release cuốn chiếu mtv_windows (Update-Rolling + chặn downgrade ĐK-W1-01) ---
+          $rollTag = "mtv_windows"
+          $rollName = "MTV-Windows.exe"
+          $rollTitle = "MTV cho Windows — link cố định (luôn là bản mới nhất)"
+          $rollLink = "https://github.com/$repo/releases/download/$rollTag/$rollName"
+
+          $tags = @(Gh api "repos/$repo/releases?per_page=100" --jq '.[].tag_name')
+          $newestWinTag = @($tags | Where-Object { $_ -match '^win-v[0-9]' } | Sort-Object { TagVersion $_ } -Descending)[0]
+
+          $shouldUpdateRolling = (-not $newestWinTag) -or ((TagVersion $tag) -ge (TagVersion $newestWinTag))
+          if (-not $shouldUpdateRolling) {
+            Write-Host "Bỏ qua cập nhật cuốn chiếu $rollTag vì $tag cũ hơn bản mới nhất $newestWinTag (ĐK-W1-01)."
+          } else {
+            $whatNew = (Get-Content "what_new.txt" -Raw -Encoding UTF8).Trim()
+            $rollBody = @(
+              "Tệp ở đây **luôn là bản Windows mới nhất** — link tải không bao giờ đổi:"
+              ""
+              $rollLink
+              ""
+              "Hiện là **bản $ver** (giống hệt tệp của release [$tag](https://github.com/$repo/releases/tag/$tag)) · SHA-256 ``$exeSha256``"
+              ""
+              "Tải về, để vào thư mục nào cũng được rồi mở (Windows 10 / 11). Đã cài rồi thì không cần tải lại: app tự cập nhật."
+              ""
+              "## Có gì mới"
+              ""
+              $whatNew
+            ) -join "`n"
+            [IO.File]::WriteAllText((Join-Path (Get-Location) "link-co-dinh.md"), $rollBody + "`n", (New-Object System.Text.UTF8Encoding $false))
+
+            if ($tags -notcontains $rollTag) {
+              Write-Host "Tạo release giữ link cố định: $rollTag"
+              Gh release create $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false --target main | Out-Host
+              $tags = @($rollTag) + $tags
+            }
+
+            $roll = ((Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+            $old = $roll.assets | Where-Object { $_.name -eq $rollName }
+            if ($old -and $old.digest -eq "sha256:$exeSha256") {
+              Write-Host "Link cố định đã là bản $ver."
+            } else {
+              $tmpName = "$rollName.moi"
+              $tmpCopy = Join-Path "dist" $tmpName
+              Copy-Item $exePath $tmpCopy -Force
+              Gh release upload $rollTag $tmpCopy --repo $repo --clobber | Out-Host
+
+              $roll = ((Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+              $new = $roll.assets | Where-Object { $_.name -eq $tmpName }
+              if (-not $new -or $new.digest -ne "sha256:$exeSha256") {
+                throw "Tệp tạm $tmpName trên $rollTag không khớp SHA-256 ($exeSha256) — giữ nguyên asset cũ."
+              }
+              if ($old) {
+                Gh api -X DELETE "repos/$repo/releases/assets/$($old.id)" | Out-Null
+              }
+              Gh api -X PATCH "repos/$repo/releases/assets/$($new.id)" -f "name=$rollName" | Out-Null
+              Write-Host "Link cố định -> bản ${ver}: $rollLink"
+            }
+
+            Gh release edit $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false | Out-Null
+          }
+
+          # --- Bước 5: Hậu kiểm (Test-Published + ĐK-W1-01) ---
+          $nowLatest = LatestTag
+          $wantTvTag = @($tags | Where-Object { $_ -match '^v[0-9]' } | Sort-Object { TagVersion $_ } -Descending)[0]
+          if ($wantTvTag -and $nowLatest -ne $wantTvTag) {
+            Write-Warning "Latest đang là '$nowLatest', cần là '$wantTvTag' (bản TV mới nhất) — đang khôi phục."
+            Gh release edit $wantTvTag --repo $repo --latest | Out-Null
+            $nowLatest = LatestTag
+          }
+          if ($nowLatest -match '^(win-v|mtv_windows)') {
+            throw "Cờ Latest đang trỏ sai vào bản Windows ('$nowLatest') — chặn ngay (ĐK-W1-01)!"
+          }
+          if ($wantTvTag -and $nowLatest -ne $wantTvTag) {
+            throw "Latest vẫn là '$nowLatest', cần là '$wantTvTag'!"
+          }
+          Write-Host "Latest OK: $nowLatest"
+
+          $pubRel = ((Gh api "repos/$repo/releases/tags/$tag") -join "`n") | ConvertFrom-Json
+          $pubAsset = $pubRel.assets | Where-Object { $_.name -eq $env:EXE_NAME }
+          if (-not $pubAsset) { throw "Release $tag thiếu tệp $($env:EXE_NAME)" }
+          if ($pubAsset.digest -ne "sha256:$exeSha256" -or [long]$pubAsset.size -ne $exeSize) {
+            throw "Asset $($env:EXE_NAME) trên $tag không khớp SHA-256 hoặc kích thước"
+          }
+          Write-Host "Release $tag OK: $($pubAsset.name) ($($pubAsset.size) byte, $($pubAsset.digest))"
+
+          if ($shouldUpdateRolling) {
+            $roll = ((Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+            $rollAsset = $roll.assets | Where-Object { $_.name -eq $rollName }
+            if (-not $rollAsset) { throw "Release $rollTag thiếu tệp $rollName" }
+            if ($rollAsset.digest -ne "sha256:$exeSha256" -or [long]$rollAsset.size -ne $exeSize) {
+              throw "Asset $rollName trên $rollTag không khớp SHA-256 hoặc kích thước"
+            }
+
+            $ok = $false
+            foreach ($wait in 0, 5, 15) {
+              if ($wait -gt 0) { Start-Sleep -Seconds $wait }
+              $headers = @(& curl -sIL -m 60 $rollLink)
+              $status = @($headers | Where-Object { $_ -match '^HTTP/' })[-1]
+              $length = @($headers | Where-Object { $_ -match '^content-length:\s*(\d+)' } | ForEach-Object { [long]($_ -replace '\D', '') })[-1]
+              if ($status -match '\s200(\s|$)' -and $length -eq $exeSize) {
+                $ok = $true
+                break
+              }
+            }
+            if (-not $ok) {
+              throw "Link cố định $rollLink không trả về HTTP 200 với content-length=$exeSize"
+            }
+            Write-Host "Link cố định OK: $rollLink (HTTP 200, $exeSize byte)"
+          }
