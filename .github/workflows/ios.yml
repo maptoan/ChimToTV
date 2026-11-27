@@ -1,17 +1,38 @@
-# Bản iPad (iPadOS 15+, cài bằng TrollStore) và bản Mac (Mac Catalyst): dựng trên máy macOS của GitHub (repo công khai → miễn phí).
-# - Đẩy nhánh `ios` (đổi gì trong ios/ hoặc assets JS dùng chung) → test lõi trên macOS + IPA bản thử + bản Mac thử (Beta).
-# - Chạy tay (workflow_dispatch) với release = true → dựng thêm bản chính (Release) của cả hai: artifact `ipa` và `mac`.
-# IPA chưa ký: ký giả bằng ldid, TrollStore cài được; không cần tài khoản Apple.
+# Bản iPad / iPhone (iOS / iPadOS 15+, cài bằng TrollStore) và bản Mac (Mac Catalyst): dựng trên macOS của GitHub (repo công khai → miễn phí).
+# - Đẩy nhánh `ios` (đổi gì trong ios/ hoặc assets JS dùng chung) → test lõi trên macOS + IPA bản thử (Beta).
+# - Đẩy tag `ios-v<bản>` (đặt trên commit thuộc `main`) hoặc dispatch với publish_release=true → test + Release + phát hành `ios-v<bản>` & `mtv_ios`.
+# - IPA chưa ký Apple: ký giả bằng ldid + entitlements TROLLTROLL/CarPlay, TrollStore cài được.
+# - Rủi ro RI-14 (ĐK-IP1-05): NEXTDNS_ID được nhúng vào Info.plist (CBNextDnsId) trong .ipa công khai (giống Android/Windows, chủ dự án đã chấp nhận).
 name: iOS
 
 on:
   push:
     branches: [ios]
+    # ĐK-IP1-02: GitHub Actions bỏ qua `paths` đối với sự kiện đẩy tag (`refs/tags/ios-v*`),
+    # nên đẩy tag `ios-v*` luôn chạy đủ workflow bất kể file nào thay đổi — đây là hành vi mong muốn.
     paths: ['ios/**', 'app/src/main/assets/**', '.github/workflows/ios.yml']
+    tags:
+      - 'ios-v[0-9]*'
   workflow_dispatch:
     inputs:
-      release:
-        description: 'Dựng cả bản chính (Release)'
+      build_release:
+        description: 'Dựng bản chính (Release, vn.mtv.tv) — bắt buộc nếu muốn phát hành'
+        type: boolean
+        default: true
+      build_beta:
+        description: 'Dựng thêm bản thử (Beta, vn.mtv.tv.debug, có cổng gỡ lỗi LAN) — không bao giờ phát hành'
+        type: boolean
+        default: false
+      publish_release:
+        description: 'Tạo release ios-v<bản> và cập nhật link cố định mtv_ios'
+        type: boolean
+        default: false
+      version:
+        description: 'Ghi đè số bản để THỬ tự cập nhật (VD 1.27.9) — cấm dùng cùng publish_release'
+        type: string
+        default: ''
+      mac:
+        description: 'Dựng thêm bản Mac Catalyst (artifact, không phát hành)'
         type: boolean
         default: false
       shots:
@@ -23,9 +44,12 @@ on:
         type: string
         default: 'iPhone SE (3rd generation)'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ios-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 env:
   HOMEBREW_NO_AUTO_UPDATE: '1'
@@ -39,7 +63,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Công cụ
-        run: brew install xcodegen xcbeautify
+        run: |
+          set -euo pipefail
+          if brew info xcodegen@2.45 >/dev/null 2>&1; then
+            XCODEGEN_PKG="xcodegen@2.45"
+          else
+            XCODEGEN_PKG="xcodegen"
+          fi
+          brew install "$XCODEGEN_PKG" xcbeautify
+          echo "### Công cụ job test" >> "$GITHUB_STEP_SUMMARY"
+          echo "- xcodegen ($XCODEGEN_PKG): \`$(xcodegen --version)\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- xcbeautify: \`$(xcbeautify --version)\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Xcode: \`$(xcodebuild -version | tr '\n' ' ' | sed 's/ *$//')\`" >> "$GITHUB_STEP_SUMMARY"
       - name: Dựng project
         working-directory: ios
         run: xcodegen generate
@@ -48,55 +83,789 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild test -project ConBangTV.xcodeproj -scheme CoreTests -destination 'platform=macOS' \
-            CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO | xcbeautify --renderer github-actions
+            CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO | tee test.log | xcbeautify --renderer github-actions
+          PASS_COUNT=$(grep -c "Test Case '.*' passed" test.log || true)
+          echo "- CoreTests passed: \`$PASS_COUNT\`" >> "$GITHUB_STEP_SUMMARY"
 
   build:
     name: IPA
+    needs: test
+    if: ${{ github.event_name == 'push' || inputs.build_release || inputs.build_beta || inputs.publish_release }}
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 35
+    outputs:
+      ipa_name: ${{ steps.verify.outputs.ipa_name }}
+      ipa_sha256: ${{ steps.verify.outputs.ipa_sha256 }}
+      ipa_size: ${{ steps.verify.outputs.ipa_size }}
+      ver: ${{ steps.meta.outputs.ver }}
+      build: ${{ steps.meta.outputs.build }}
+      commit_short: ${{ steps.meta.outputs.commit_short }}
+      has_release: ${{ steps.meta.outputs.has_release }}
+      has_beta: ${{ steps.meta.outputs.has_beta }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Công cụ
-        run: brew install xcodegen ldid xcbeautify
+        id: tools
+        run: |
+          set -euo pipefail
+          if brew info xcodegen@2.45 >/dev/null 2>&1; then
+            XCODEGEN_PKG="xcodegen@2.45"
+          else
+            XCODEGEN_PKG="xcodegen"
+          fi
+          brew install "$XCODEGEN_PKG" ldid xcbeautify
+          XCODEGEN_VER=$(xcodegen --version)
+          LDID_VER=$(ldid 2>&1 | head -n 1 || true)
+          XCBEAUTIFY_VER=$(xcbeautify --version)
+          XCODE_VER=$(xcodebuild -version | tr '\n' ' ' | sed 's/ *$//')
+          {
+            echo "xcodegen_ver=$XCODEGEN_VER ($XCODEGEN_PKG)"
+            echo "ldid_ver=$LDID_VER"
+            echo "xcbeautify_ver=$XCBEAUTIFY_VER"
+            echo "xcode_ver=$XCODE_VER"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Xác định phiên bản và chế độ dựng (meta)
+        id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          REF_NAME: ${{ github.ref_name }}
+          IN_BUILD_RELEASE: ${{ inputs.build_release }}
+          IN_BUILD_BETA: ${{ inputs.build_beta }}
+          IN_PUBLISH_RELEASE: ${{ inputs.publish_release }}
+          IN_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          IS_TAG="false"
+          HAS_RELEASE="false"
+          HAS_BETA="false"
+          VER_OVERRIDE=""
+
+          if [ "$EVENT_NAME" = "push" ]; then
+            if [[ "$REF" == refs/tags/ios-v* ]]; then
+              IS_TAG="true"
+              HAS_RELEASE="true"
+              HAS_BETA="false"
+            else
+              HAS_RELEASE="false"
+              HAS_BETA="true"
+            fi
+          else
+            # ĐK-IP1-01: thực thi quy tắc ma trận §2.1 — publish_release bắt buộc build_release=true
+            if [ "$IN_PUBLISH_RELEASE" = "true" ] && [ "$IN_BUILD_RELEASE" != "true" ]; then
+              echo "::error::ĐK-IP1-01: publish_release=true bắt buộc build_release=true (không thể phát hành khi không dựng bản chính)."
+              exit 1
+            fi
+            if [ "$IN_PUBLISH_RELEASE" = "true" ] && [ -n "$IN_VERSION" ]; then
+              echo "::error::Cấm dùng version ghi đè ($IN_VERSION) cùng publish_release=true."
+              exit 1
+            fi
+            [ "$IN_BUILD_RELEASE" = "true" ] && HAS_RELEASE="true"
+            [ "$IN_BUILD_BETA" = "true" ] && HAS_BETA="true"
+            VER_OVERRIDE="$IN_VERSION"
+          fi
+
+          PROJ_VER=$(python3 -c 'import re, pathlib; s = pathlib.Path("ios/project.yml").read_text(encoding="utf-8"); m = re.search(r"MARKETING_VERSION:\s*\"?([0-9.]+)\"?", s); assert m; print(m.group(1))')
+          BUILD_NUM=$(python3 -c 'import re, pathlib; s = pathlib.Path("ios/project.yml").read_text(encoding="utf-8"); m = re.search(r"CURRENT_PROJECT_VERSION:\s*\"?([0-9]+)\"?", s); assert m; print(m.group(1))')
+
+          if [ "$IS_TAG" = "true" ]; then
+            TAG_VER="${REF_NAME#ios-v}"
+            if ! [[ "$TAG_VER" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+              echo "::error::Tag $REF_NAME không khớp định dạng ios-v<x.y[.z]>."
+              exit 1
+            fi
+            if [ "$TAG_VER" != "$PROJ_VER" ]; then
+              echo "::error::ĐK-I1-01: Tag $REF_NAME ($TAG_VER) lệch với MARKETING_VERSION trong ios/project.yml ($PROJ_VER)."
+              exit 1
+            fi
+          fi
+
+          VER="$PROJ_VER"
+          if [ -n "$VER_OVERRIDE" ]; then
+            if ! [[ "$VER_OVERRIDE" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+              echo "::error::inputs.version '$VER_OVERRIDE' không hợp lệ."
+              exit 1
+            fi
+            VER="$VER_OVERRIDE"
+          fi
+
+          COMMIT_SHORT=$(git rev-parse --short HEAD)
+          {
+            echo "ver=$VER"
+            echo "build=$BUILD_NUM"
+            echo "commit_short=$COMMIT_SHORT"
+            echo "has_release=$HAS_RELEASE"
+            echo "has_beta=$HAS_BETA"
+            echo "ver_override=$VER_OVERRIDE"
+            echo "is_tag=$IS_TAG"
+          } >> "$GITHUB_OUTPUT"
+          echo "meta: ver=$VER build=$BUILD_NUM commit=$COMMIT_SHORT release=$HAS_RELEASE beta=$HAS_BETA tag=$IS_TAG"
+
+      - name: Kiểm secret NEXTDNS_ID
+        env:
+          NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
+        run: |
+          set -euo pipefail
+          if [ -n "$NEXTDNS_ID" ]; then
+            if ! [[ "$NEXTDNS_ID" =~ ^[a-z0-9]+$ ]]; then
+              echo "::error::Secret NEXTDNS_ID không hợp lệ (chỉ cho phép [a-z0-9]+)."
+              exit 1
+            fi
+            echo "NEXTDNS_ID: hợp lệ (đã cấu hình)."
+          else
+            echo "::warning::Secret NEXTDNS_ID trống — app sẽ lùi về Cloudflare / Google DNS."
+          fi
+
+      - name: Chốt chặn nguồn (ĐK-I1-12)
+        run: |
+          set -euo pipefail
+          grep -qF "https://api.github.com/repos/maptoan/MTV/releases?per_page=100" ios/ConBangTV/Sources/Core/UpdateCheck.swift || {
+            echo "::error::ĐK-I1-12: UpdateCheck.swift không trỏ về maptoan/MTV."
+            exit 1
+          }
+          if grep -rnE "conbangtv/ChimToTV|Circling5714|t\.me/tivikit|9192365" ios/ConBangTV ios/Shared ios/Widget; then
+            echo "::error::ĐK-I1-12: Phát hiện chuỗi cũ của tác giả trong mã nguồn iOS."
+            exit 1
+          fi
+          grep -qF 'name="MTV-iPad-${version}"' ios/scripts/package.sh || {
+            echo "::error::ĐK-I1-12: ios/scripts/package.sh chưa dùng tên MTV-iPad-\${version}."
+            exit 1
+          }
+          echo "Chốt chặn nguồn ĐK-I1-12 đạt."
+
       - name: Dựng project
         working-directory: ios
         run: xcodegen generate
+
       - name: Dựng bản thử (Beta)
+        if: ${{ steps.meta.outputs.has_beta == 'true' }}
         working-directory: ios
         env:
           NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -o pipefail
           xcodebuild build -project ConBangTV.xcodeproj -scheme ConBangTV -configuration Beta -sdk iphoneos \
-            -destination 'generic/platform=iOS' -derivedDataPath build CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            -destination 'generic/platform=iOS' -derivedDataPath build CURRENT_PROJECT_VERSION="$RUN_NUMBER" \
             NEXTDNS_ID="$NEXTDNS_ID" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= | xcbeautify --renderer github-actions
+
       - name: Dựng bản chính (Release)
-        if: ${{ inputs.release }}
+        if: ${{ steps.meta.outputs.has_release == 'true' }}
         working-directory: ios
         env:
           NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
+          VER_OVERRIDE: ${{ steps.meta.outputs.ver_override }}
         run: |
           set -o pipefail
+          EXTRA_ARGS=()
+          if [ -n "$VER_OVERRIDE" ]; then
+            EXTRA_ARGS+=("MARKETING_VERSION=$VER_OVERRIDE")
+          fi
           xcodebuild build -project ConBangTV.xcodeproj -scheme ConBangTV -configuration Release -sdk iphoneos \
-            -destination 'generic/platform=iOS' -derivedDataPath build NEXTDNS_ID="$NEXTDNS_ID" \
+            -destination 'generic/platform=iOS' -derivedDataPath build "${EXTRA_ARGS[@]}" NEXTDNS_ID="$NEXTDNS_ID" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= | xcbeautify --renderer github-actions
+
       - name: Đóng gói IPA
         run: bash ios/scripts/package.sh
-      - uses: actions/upload-artifact@v4
+
+      - name: Chốt chặn sau build (ĐK-I1-01..11, ĐK-IP1-04, ĐK-I2-02)
+        id: verify
+        env:
+          VER: ${{ steps.meta.outputs.ver }}
+          BUILD_NUM: ${{ steps.meta.outputs.build }}
+          COMMIT_SHORT: ${{ steps.meta.outputs.commit_short }}
+          HAS_RELEASE: ${{ steps.meta.outputs.has_release }}
+          HAS_BETA: ${{ steps.meta.outputs.has_beta }}
+          RUN_NUMBER: ${{ github.run_number }}
+          NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
+          XCODEGEN_VER: ${{ steps.tools.outputs.xcodegen_ver }}
+          LDID_VER: ${{ steps.tools.outputs.ldid_ver }}
+          XCBEAUTIFY_VER: ${{ steps.tools.outputs.xcbeautify_ver }}
+          XCODE_VER: ${{ steps.tools.outputs.xcode_ver }}
+        run: |
+          set -euo pipefail
+          IPA_NAME=""
+          IPA_SHA256=""
+          IPA_SIZE=""
+          DNS_STATUS="trống (cảnh báo)"
+          SUMMARY_BUNDLE_ID="—"
+          SUMMARY_GROUP="—"
+          SUMMARY_MIN_OS="—"
+          SUMMARY_ENT="—"
+
+          if [ "$HAS_RELEASE" = "true" ]; then
+            # ĐK-I1-11: đếm tệp Release không chứa '-thu-' trong tên
+            REL_FILES=()
+            while IFS= read -r f; do
+              [ -n "$f" ] && REL_FILES+=("$f")
+            done < <(find ios/dist -maxdepth 1 -type f -name '*.ipa' ! -name '*-thu-*' | sort)
+            if [ "${#REL_FILES[@]}" -ne 1 ]; then
+              echo "::error::ĐK-I1-11: Cần đúng 1 tệp Release .ipa (không chứa -thu-) trong ios/dist/, tìm thấy ${#REL_FILES[@]}."
+              exit 1
+            fi
+            IPA_NAME="MTV-iPad-${VER}.ipa"
+            IPA_PATH="ios/dist/${IPA_NAME}"
+            if [ "${REL_FILES[0]}" != "$IPA_PATH" ]; then
+              echo "::error::ĐK-I1-11: Tên tệp '${REL_FILES[0]}' không khớp '$IPA_PATH'."
+              exit 1
+            fi
+
+            IPA_SIZE=$(stat -f%z "$IPA_PATH")
+            IPA_SHA256=$(shasum -a 256 "$IPA_PATH" | cut -d' ' -f1)
+
+            # ĐK-I1-09: kích thước hợp lý (3 MiB < size < 60 MiB)
+            if [ "$IPA_SIZE" -le 3145728 ] || [ "$IPA_SIZE" -ge 62914560 ]; then
+              echo "::error::ĐK-I1-09: Kích thước $IPA_NAME ($IPA_SIZE byte) ngoài khoảng 3–60 MiB."
+              exit 1
+            fi
+
+            # ĐK-I1-03: cấu trúc zip
+            ZIP_LIST=$(unzip -Z1 "$IPA_PATH")
+            if echo "$ZIP_LIST" | grep -qv '^Payload/ConBangTV\.app/'; then
+              echo "::error::ĐK-I1-03: Có mục trong IPA không nằm dưới Payload/ConBangTV.app/."
+              exit 1
+            fi
+            for req in \
+              "Payload/ConBangTV.app/ConBangTV" \
+              "Payload/ConBangTV.app/Info.plist" \
+              "Payload/ConBangTV.app/PlugIns/ConBangWidget.appex/ConBangWidget" \
+              "Payload/ConBangTV.app/PlugIns/ConBangWidget.appex/Info.plist" \
+              "Payload/ConBangTV.app/player-agent.js" \
+              "Payload/ConBangTV.app/player.html" \
+              "Payload/ConBangTV.app/hls.html"; do
+              echo "$ZIP_LIST" | grep -qxF "$req" || {
+                echo "::error::ĐK-I1-03: Thiếu tệp bắt buộc '$req' trong IPA."
+                exit 1
+              }
+            done
+
+            CHK=$(mktemp -d)
+            unzip -q "$IPA_PATH" -d "$CHK"
+            APP="$CHK/Payload/ConBangTV.app"
+            WIDGET="$APP/PlugIns/ConBangWidget.appex"
+
+            # ĐK-I1-01 + ĐK-IP1-04: số bản thống nhất (app + widget)
+            APP_SHORT=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Info.plist")
+            APP_BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP/Info.plist")
+            WID_SHORT=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$WIDGET/Info.plist")
+            WID_BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$WIDGET/Info.plist")
+            [ "$APP_SHORT" = "$VER" ] || { echo "::error::ĐK-I1-01: App CFBundleShortVersionString=$APP_SHORT != $VER"; exit 1; }
+            [ "$WID_SHORT" = "$VER" ] || { echo "::error::ĐK-I1-01: Widget CFBundleShortVersionString=$WID_SHORT != $VER"; exit 1; }
+            [ "$APP_BUILD" = "$BUILD_NUM" ] || { echo "::error::ĐK-I1-02: App CFBundleVersion=$APP_BUILD != $BUILD_NUM"; exit 1; }
+            [ "$WID_BUILD" = "$BUILD_NUM" ] || { echo "::error::ĐK-IP1-04: Widget CFBundleVersion=$WID_BUILD != $BUILD_NUM"; exit 1; }
+
+            # ĐK-I1-02: định danh và cấu hình Release
+            APP_ID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP/Info.plist")
+            WID_ID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$WIDGET/Info.plist")
+            APP_DISP=$(/usr/libexec/PlistBuddy -c "Print CFBundleDisplayName" "$APP/Info.plist")
+            APP_GRP=$(/usr/libexec/PlistBuddy -c "Print ConBangAppGroup" "$APP/Info.plist")
+            APP_URL=$(/usr/libexec/PlistBuddy -c "Print ConBangURLScheme" "$APP/Info.plist")
+            APP_EXE=$(/usr/libexec/PlistBuddy -c "Print CFBundleExecutable" "$APP/Info.plist")
+            [ "$APP_ID" = "vn.mtv.tv" ] || { echo "::error::ĐK-I1-02: CFBundleIdentifier=$APP_ID != vn.mtv.tv"; exit 1; }
+            [ "$WID_ID" = "vn.mtv.tv.widget" ] || { echo "::error::ĐK-I1-02: Widget CFBundleIdentifier=$WID_ID != vn.mtv.tv.widget"; exit 1; }
+            [ "$APP_DISP" = "MTV" ] || { echo "::error::ĐK-I1-02: CFBundleDisplayName=$APP_DISP != MTV"; exit 1; }
+            [ "$APP_GRP" = "group.vn.mtv.tv" ] || { echo "::error::ĐK-I1-02: ConBangAppGroup=$APP_GRP != group.vn.mtv.tv"; exit 1; }
+            [ "$APP_URL" = "mtv" ] || { echo "::error::ĐK-I1-02: ConBangURLScheme=$APP_URL != mtv"; exit 1; }
+            [ "$APP_EXE" = "ConBangTV" ] || { echo "::error::ĐK-I1-02: CFBundleExecutable=$APP_EXE != ConBangTV"; exit 1; }
+
+            # ĐK-I1-04: chữ ký ldid
+            otool -l "$APP/ConBangTV" | grep -q "LC_CODE_SIGNATURE" || { echo "::error::ĐK-I1-04: ConBangTV thiếu LC_CODE_SIGNATURE"; exit 1; }
+            otool -l "$WIDGET/ConBangWidget" | grep -q "LC_CODE_SIGNATURE" || { echo "::error::ĐK-I1-04: ConBangWidget thiếu LC_CODE_SIGNATURE"; exit 1; }
+            codesign -dv "$APP/ConBangTV" >/dev/null 2>&1 || { echo "::error::ĐK-I1-04: codesign -dv thất bại trên ConBangTV"; exit 1; }
+            codesign -dv "$WIDGET/ConBangWidget" >/dev/null 2>&1 || { echo "::error::ĐK-I1-04: codesign -dv thất bại trên ConBangWidget"; exit 1; }
+
+            # ĐK-I1-05: entitlements bắt buộc cho TrollStore (app + widget)
+            APP_ENT=$(mktemp)
+            WID_ENT=$(mktemp)
+            ldid -e "$APP/ConBangTV" > "$APP_ENT"
+            ldid -e "$WIDGET/ConBangWidget" > "$WID_ENT"
+            codesign -d --entitlements :- "$APP/ConBangTV" >/dev/null 2>&1 || true
+            python3 - "$APP_ENT" "$WID_ENT" "group.vn.mtv.tv" <<'PY'
+          import plistlib, sys
+          with open(sys.argv[1], "rb") as f:
+              app = plistlib.load(f)
+          with open(sys.argv[2], "rb") as f:
+              wid = plistlib.load(f)
+          grp = sys.argv[3]
+          assert app.get("com.apple.security.application-groups") == [grp], f"app groups={app.get('com.apple.security.application-groups')}"
+          assert app.get("application-identifier") == "TROLLTROLL.*", f"app id={app.get('application-identifier')}"
+          assert app.get("com.apple.developer.team-identifier") == "TROLLTROLL", f"team={app.get('com.apple.developer.team-identifier')}"
+          kag = set(app.get("keychain-access-groups") or [])
+          assert {"TROLLTROLL.*", "com.apple.token"}.issubset(kag), f"keychain={kag}"
+          assert app.get("SBStarkCapable") is True, "thiếu SBStarkCapable"
+          assert app.get("com.apple.runningboard.assertions.webkit") is True, "thiếu runningboard.webkit"
+          assert app.get("com.apple.multitasking.systemappassertions") is True, "thiếu systemappassertions"
+          assert "com.apple.private.security.no-container" not in app, "CẤM no-container"
+
+          assert wid.get("com.apple.security.application-groups") == [grp], f"wid groups={wid.get('com.apple.security.application-groups')}"
+          assert wid.get("application-identifier") == "TROLLTROLL.*", f"wid app id={wid.get('application-identifier')}"
+          assert wid.get("com.apple.developer.team-identifier") == "TROLLTROLL", f"wid team={wid.get('com.apple.developer.team-identifier')}"
+          wkag = set(wid.get("keychain-access-groups") or [])
+          assert {"TROLLTROLL.*", "com.apple.token"}.issubset(wkag), f"wid keychain={wkag}"
+          assert "SBStarkCapable" not in wid, "widget không được có SBStarkCapable"
+          PY
+            rm -f "$APP_ENT" "$WID_ENT"
+
+            # ĐK-I1-06: không lọt cổng gỡ lỗi
+            if grep -qF "Cổng gỡ lỗi MTV" "$APP/ConBangTV"; then
+              echo "::error::ĐK-I1-06: Phát hiện chuỗi cổng gỡ lỗi trong binary Release!"
+              exit 1
+            fi
+            [[ "$APP_ID" != *.debug ]] || { echo "::error::ĐK-I1-06: Bundle ID chứa .debug"; exit 1; }
+
+            # ĐK-I1-07 + ĐK-IP1-04: MinimumOSVersion (app + widget) & arm64 & UIDeviceFamily
+            APP_MIN_OS=$(/usr/libexec/PlistBuddy -c "Print MinimumOSVersion" "$APP/Info.plist")
+            WID_MIN_OS=$(/usr/libexec/PlistBuddy -c "Print MinimumOSVersion" "$WIDGET/Info.plist")
+            [ "$APP_MIN_OS" = "15.0" ] || { echo "::error::ĐK-I1-07: App MinimumOSVersion=$APP_MIN_OS != 15.0"; exit 1; }
+            [ "$WID_MIN_OS" = "15.0" ] || { echo "::error::ĐK-IP1-04: Widget MinimumOSVersion=$WID_MIN_OS != 15.0"; exit 1; }
+            lipo -archs "$APP/ConBangTV" | grep -qw "arm64" || { echo "::error::ĐK-I1-07: Thiếu kiến trúc arm64"; exit 1; }
+            python3 - "$APP/Info.plist" <<'PY'
+          import plistlib, sys
+          with open(sys.argv[1], "rb") as f:
+              info = plistlib.load(f)
+          fam = set(info.get("UIDeviceFamily") or [])
+          assert {1, 2}.issubset(fam), f"UIDeviceFamily={fam}"
+          PY
+
+            # ĐK-I1-08: NextDNS đã nhúng
+            PLIST_DNS=$(/usr/libexec/PlistBuddy -c "Print CBNextDnsId" "$APP/Info.plist" 2>/dev/null || true)
+            if [ -n "$NEXTDNS_ID" ]; then
+              if [ "$PLIST_DNS" = "$NEXTDNS_ID" ]; then
+                DNS_STATUS="khớp"
+                echo "ĐK-I1-08: CBNextDnsId khớp với secret."
+              else
+                echo "::error::ĐK-I1-08: CBNextDnsId trong Info.plist không khớp secret NEXTDNS_ID."
+                exit 1
+              fi
+            else
+              echo "::warning::ĐK-I1-08: Secret NEXTDNS_ID trống (CBNextDnsId='$PLIST_DNS')."
+            fi
+
+            SUMMARY_BUNDLE_ID="$APP_ID"
+            SUMMARY_GROUP="$APP_GRP"
+            SUMMARY_MIN_OS="$APP_MIN_OS (widget $WID_MIN_OS)"
+            SUMMARY_ENT="TROLLTROLL.*, $APP_GRP, SBStarkCapable, webkit/multitasking, không no-container"
+            rm -rf "$CHK"
+          fi
+
+          # ĐK-I2-02: Chốt chặn Beta (mức cảnh báo, lấy giá trị kỳ vọng từ chính Info.plist của Beta)
+          if [ "$HAS_BETA" = "true" ]; then
+            BETA_IPA="ios/dist/MTV-iPad-${VER}-thu-${RUN_NUMBER}.ipa"
+            if [ ! -f "$BETA_IPA" ]; then
+              echo "::warning::Không tìm thấy bản Beta $BETA_IPA để kiểm chứng."
+            else
+              BETA_SIZE=$(stat -f%z "$BETA_IPA")
+              if [ "$BETA_SIZE" -le 3145728 ] || [ "$BETA_SIZE" -ge 62914560 ]; then
+                echo "::warning::ĐK-I1-09 (Beta): Kích thước $BETA_IPA ($BETA_SIZE byte) ngoài khoảng 3–60 MiB."
+              fi
+              BCHK=$(mktemp -d)
+              unzip -q "$BETA_IPA" -d "$BCHK"
+              BAPP="$BCHK/Payload/ConBangTV.app"
+              BWID="$BAPP/PlugIns/ConBangWidget.appex"
+              B_ID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$BAPP/Info.plist" 2>/dev/null || true)
+              B_DISP=$(/usr/libexec/PlistBuddy -c "Print CFBundleDisplayName" "$BAPP/Info.plist" 2>/dev/null || true)
+              B_GRP=$(/usr/libexec/PlistBuddy -c "Print ConBangAppGroup" "$BAPP/Info.plist" 2>/dev/null || true)
+              [ "$B_ID" = "vn.mtv.tv.debug" ] || echo "::warning::ĐK-I2-02 (Beta): CFBundleIdentifier=$B_ID (kỳ vọng vn.mtv.tv.debug)"
+              [ "$B_DISP" = "MTV (thử)" ] || echo "::warning::ĐK-I2-02 (Beta): CFBundleDisplayName=$B_DISP (kỳ vọng MTV (thử))"
+              [ "$B_GRP" = "group.vn.mtv.tv.debug" ] || echo "::warning::ĐK-I2-02 (Beta): ConBangAppGroup=$B_GRP (kỳ vọng group.vn.mtv.tv.debug)"
+              otool -l "$BAPP/ConBangTV" | grep -q "LC_CODE_SIGNATURE" || echo "::warning::ĐK-I1-04 (Beta): Thiếu LC_CODE_SIGNATURE trên app"
+              otool -l "$BWID/ConBangWidget" | grep -q "LC_CODE_SIGNATURE" || echo "::warning::ĐK-I1-04 (Beta): Thiếu LC_CODE_SIGNATURE trên widget"
+              B_ENT=$(mktemp)
+              ldid -e "$BAPP/ConBangTV" > "$B_ENT" || echo "::warning::ĐK-I1-05 (Beta): Không đọc được entitlements app"
+              grep -qF "$B_GRP" "$B_ENT" || echo "::warning::ĐK-I1-05 (Beta): Thiếu App Group '$B_GRP' trong entitlements"
+              grep -qF "TROLLTROLL.*" "$B_ENT" || echo "::warning::ĐK-I1-05 (Beta): Thiếu TROLLTROLL.* trong entitlements"
+              rm -f "$B_ENT"
+              rm -rf "$BCHK"
+            fi
+          fi
+
+          {
+            echo "ipa_name=$IPA_NAME"
+            echo "ipa_sha256=$IPA_SHA256"
+            echo "ipa_size=$IPA_SIZE"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Kiểm chứng bản dựng iOS"
+            echo ""
+            echo "| Hạng mục | Giá trị |"
+            echo "| :--- | :--- |"
+            echo "| Tên tệp Release | \`${IPA_NAME:-—}\` |"
+            echo "| Phiên bản / Build | \`$VER\` / \`$BUILD_NUM\` |"
+            echo "| Bundle ID | \`$SUMMARY_BUNDLE_ID\` |"
+            echo "| Commit | \`$COMMIT_SHORT\` |"
+            echo "| Kích thước (byte) | \`${IPA_SIZE:-—}\` |"
+            echo "| SHA-256 | \`${IPA_SHA256:-—}\` |"
+            echo "| App Group | \`$SUMMARY_GROUP\` |"
+            echo "| Entitlements | $SUMMARY_ENT |"
+            echo "| MinimumOSVersion | \`$SUMMARY_MIN_OS\` |"
+            echo "| NextDNS | $DNS_STATUS |"
+            echo "| Xcode | \`$XCODE_VER\` |"
+            echo "| xcodegen | \`$XCODEGEN_VER\` |"
+            echo "| ldid | \`$LDID_VER\` |"
+            echo "| xcbeautify | \`$XCBEAUTIFY_VER\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifact Release
+        if: ${{ steps.meta.outputs.has_release == 'true' }}
+        uses: actions/upload-artifact@v4
         with:
-          name: ipa
-          path: ios/dist/*.ipa
+          name: MTV-iPad-${{ steps.meta.outputs.ver }}-ipa
+          path: ios/dist/MTV-iPad-${{ steps.meta.outputs.ver }}.ipa
           retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload artifact Beta
+        if: ${{ steps.meta.outputs.has_beta == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: MTV-iPad-${{ steps.meta.outputs.ver }}-thu-${{ github.run_number }}-ipa
+          path: ios/dist/MTV-iPad-${{ steps.meta.outputs.ver }}-thu-${{ github.run_number }}.ipa
+          retention-days: 14
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: ${{ needs.build.outputs.has_release == 'true' && ((github.event_name == 'push' && startsWith(github.ref, 'refs/tags/ios-v')) || (github.event_name == 'workflow_dispatch' && inputs.publish_release)) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Bước 1a — Checkout mã nguồn (đọc CHANGELOG.md)
+        uses: actions/checkout@v4
+
+      - name: Bước 1b — Tải Artifact Release từ job build
+        uses: actions/download-artifact@v4
+        with:
+          name: MTV-iPad-${{ needs.build.outputs.ver }}-ipa
+          path: dist
+
+      - name: Bước 1c — Kiểm tra SHA-256 Artifact (ĐK-I1-10)
+        env:
+          IPA_NAME: ${{ needs.build.outputs.ipa_name }}
+          EXPECTED_SHA256: ${{ needs.build.outputs.ipa_sha256 }}
+          EXPECTED_SIZE: ${{ needs.build.outputs.ipa_size }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $ipaPath = Join-Path "dist" $env:IPA_NAME
+          if (-not (Test-Path $ipaPath)) {
+            Write-Host "::error::Không tìm thấy $ipaPath sau khi tải artifact"
+            exit 1
+          }
+          $actualSha = (Get-FileHash $ipaPath -Algorithm SHA256).Hash.ToLower()
+          $actualSize = (Get-Item $ipaPath).Length
+          if ($actualSha -ne $env:EXPECTED_SHA256 -or "$actualSize" -ne $env:EXPECTED_SIZE) {
+            Write-Host "::error::Artifact $ipaPath không khớp SHA-256 hoặc kích thước từ job build"
+            exit 1
+          }
+          Write-Host "Artifact hợp lệ: $ipaPath ($actualSize byte, $actualSha)"
+
+      - name: Bước 1d — Kiểm tra commit thuộc main (ĐK-I1-13) và tag thừa kế (ĐK-I1-14)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET_SHA: ${{ github.sha }}
+          VER: ${{ needs.build.outputs.ver }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $repo = $env:REPO
+          $targetSha = $env:TARGET_SHA
+          $tag = "ios-v$($env:VER)"
+
+          $cmpStatus = ("" + (& gh api "repos/$repo/compare/main...$targetSha" --jq ".status")).Trim()
+          if ($LASTEXITCODE -ne 0) { throw "Không thể kiểm tra compare/main...$targetSha" }
+          if ($cmpStatus -notin @("identical", "behind")) {
+            throw "ĐK-I1-13: Commit $targetSha không nằm trong lịch sử nhánh main (status=$cmpStatus) — từ chối phát hành."
+          }
+          Write-Host "ĐK-I1-13 OK: commit $targetSha thuộc main (status=$cmpStatus)."
+
+          $refJson = & gh api "repos/$repo/git/ref/tags/$tag" 2>$null
+          if ($LASTEXITCODE -eq 0 -and $refJson) {
+            $refObj = ($refJson -join "`n") | ConvertFrom-Json
+            $tagCommit = $refObj.object.sha
+            if ($refObj.object.type -eq "tag") {
+              $tagCommit = ("" + (& gh api "repos/$repo/git/tags/$($refObj.object.sha)" --jq ".object.sha")).Trim()
+              if ($LASTEXITCODE -ne 0) { throw "Không thể giải tham chiếu annotated tag $tag" }
+            }
+            if ($tagCommit -ne $targetSha) {
+              throw "ĐK-I1-14: Tag $tag đang trỏ commit khác ($tagCommit != $targetSha, có thể là tag thừa kế của tác giả) — hãy xóa tag trước."
+            }
+            Write-Host "ĐK-I1-14 OK: tag $tag trỏ đúng $targetSha."
+          } else {
+            Write-Host "ĐK-I1-14 OK: tag $tag chưa tồn tại trên remote."
+          }
+
+      - name: Bước 2 — Dựng release_notes.md (lọc nhật ký nội bộ, ĐK-I1-16)
+        env:
+          VER: ${{ needs.build.outputs.ver }}
+          BUILD_NUM: ${{ needs.build.outputs.build }}
+          COMMIT_SHORT: ${{ needs.build.outputs.commit_short }}
+          IPA_NAME: ${{ needs.build.outputs.ipa_name }}
+          IPA_SIZE: ${{ needs.build.outputs.ipa_size }}
+          IPA_SHA256: ${{ needs.build.outputs.ipa_sha256 }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $ver = $env:VER
+          $filteredLines = New-Object System.Collections.Generic.List[string]
+
+          if (Test-Path "CHANGELOG.md") {
+            $lines = Get-Content "CHANGELOG.md" -Encoding UTF8
+            $inSection = $false
+            $sectionLines = New-Object System.Collections.Generic.List[string]
+            foreach ($line in $lines) {
+              if ($line -match "^##\s+(iPad / iPhone|iPad)\s+$([regex]::Escape($ver))(\s|$|—|-)") {
+                $inSection = $true
+                continue
+              }
+              if ($inSection) {
+                if ($line -match '^##\s+') { break }
+                $sectionLines.Add($line)
+              }
+            }
+
+            $skipContinuation = $false
+            foreach ($line in $sectionLines) {
+              if ($line -match '^\s*$' -and $filteredLines.Count -eq 0) { continue }
+              if ($line -match '^(Anh:|Côn Bằng TV)') { continue }
+              if ($line -match '^- ((bản |Thử:|Đăng lúc |Trang giới thiệu:)|(iPad / iPhone|iPad): bản |Mac: bản )') {
+                $skipContinuation = $true
+                continue
+              }
+              if ($skipContinuation) {
+                if ($line -match '^\s+\S') { continue }
+                if ($line -match '^\s*$') { $skipContinuation = $false; continue }
+                $skipContinuation = $false
+              }
+              $filteredLines.Add($line)
+            }
+          }
+
+          $whatNew = ($filteredLines -join "`n").Trim()
+          if ([string]::IsNullOrWhiteSpace($whatNew)) {
+            $whatNew = "- Bản dựng tự động MTV cho iPad / iPhone $ver (commit $($env:COMMIT_SHORT))."
+          }
+
+          $notes = @(
+            "## Có gì mới"
+            ""
+            $whatNew
+            ""
+            "## Thông tin kiểm chứng (SHA-256)"
+            ""
+            "| Thông số | Giá trị |"
+            "| :--- | :--- |"
+            "| Tên tệp | ``$($env:IPA_NAME)`` |"
+            "| Phiên bản | ``$ver`` (build ``$($env:BUILD_NUM)``) |"
+            "| Commit | ``$($env:COMMIT_SHORT)`` |"
+            "| Kích thước (byte) | ``$($env:IPA_SIZE)`` |"
+            "| SHA-256 | ``$($env:IPA_SHA256)`` |"
+          ) -join "`n"
+
+          if ($notes -notmatch '(?m)^\s*##\s*Có gì mới') {
+            Write-Host "::error::ĐK-I1-16: release_notes.md thiếu tiêu đề '## Có gì mới'"
+            exit 1
+          }
+
+          [IO.File]::WriteAllText((Join-Path (Get-Location) "release_notes.md"), $notes + "`n", (New-Object System.Text.UTF8Encoding $false))
+          [IO.File]::WriteAllText((Join-Path (Get-Location) "what_new.txt"), $whatNew, (New-Object System.Text.UTF8Encoding $false))
+          Write-Host "Đã tạo release_notes.md:"
+          Write-Host $notes
+
+      - name: Bước 3 & 4 & 5 — Tạo release ios-v*, cập nhật cuốn chiếu mtv_ios & hậu kiểm
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET_SHA: ${{ github.sha }}
+          VER: ${{ needs.build.outputs.ver }}
+          IPA_NAME: ${{ needs.build.outputs.ipa_name }}
+          IPA_SIZE: ${{ needs.build.outputs.ipa_size }}
+          IPA_SHA256: ${{ needs.build.outputs.ipa_sha256 }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $repo = $env:REPO
+          $ver = $env:VER
+          $tag = "ios-v$ver"
+          $title = "MTV cho iPad $ver"
+          $ipaPath = Join-Path "dist" $env:IPA_NAME
+          $ipaSha256 = $env:IPA_SHA256
+          $ipaSize = [long]$env:IPA_SIZE
+
+          function Invoke-Gh {
+            $out = & gh @args
+            if ($LASTEXITCODE -ne 0) { throw "Lệnh gh $($args -join ' ') lỗi (mã $LASTEXITCODE)" }
+            $out
+          }
+
+          # ĐK-IP1-03: so sánh phiên bản bằng ép kiểu [version] như release.ps1:116 & windows.yml:613,644 (VD: 1.28 > 1.9)
+          function TagVersion([string]$t) {
+            try { [version]($t -replace '^[a-z-]*v', '') } catch { [version]"0.0" }
+          }
+
+          function LatestTag {
+            try {
+              ("" + (Invoke-Gh api "repos/$repo/releases/latest" --jq ".tag_name")).Trim()
+            } catch {
+              ""
+            }
+          }
+
+          # --- Bước 3: Release đánh số ios-v<ver> (LUÔN --latest=false, không --prerelease) ---
+          & gh release view $tag --repo $repo *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Invoke-Gh release upload $tag $ipaPath --repo $repo --clobber | Out-Host
+            Invoke-Gh release edit $tag --repo $repo --title $title --notes-file release_notes.md --latest=false | Out-Host
+          } else {
+            Invoke-Gh release create $tag $ipaPath --repo $repo --target $env:TARGET_SHA --title $title --notes-file release_notes.md --latest=false | Out-Host
+          }
+          Write-Host "Đã phát hành release $tag (--latest=false)."
+
+          # --- Bước 4: Release cuốn chiếu mtv_ios (Update-Rolling + ĐK-I2-01) ---
+          $rollTag = "mtv_ios"
+          $rollName = "MTV-iPad.ipa"
+          $rollTitle = "MTV cho iPad / iPhone — link cố định (luôn là bản mới nhất)"
+          $rollLink = "https://github.com/$repo/releases/download/$rollTag/$rollName"
+
+          $tags = @(Invoke-Gh api "repos/$repo/releases?per_page=100" --jq '.[].tag_name')
+          # ĐK-I2-01: so với version LỚN NHẤT trong toàn bộ release có tag ios-v* (trừ chính $tag đang xét),
+          # cập nhật cuốn chiếu chỉ khi ver > max (dấu > chặt, không dùng thời gian tạo).
+          $otherIosTags = @($tags | Where-Object { $_ -match '^ios-v[0-9]' -and $_ -ne $tag })
+          $maxIosTag = ($otherIosTags | Sort-Object { TagVersion $_ } -Descending | Select-Object -First 1)
+          $shouldUpdateRolling = (-not $maxIosTag) -or ((TagVersion $tag) -gt (TagVersion $maxIosTag))
+
+          if (-not $shouldUpdateRolling) {
+            Write-Host "ĐK-I2-01: Bỏ qua cập nhật cuốn chiếu $rollTag vì $tag không lớn hơn bản cao nhất hiện có $maxIosTag."
+          } else {
+            $whatNew = (Get-Content "what_new.txt" -Raw -Encoding UTF8).Trim()
+            $rollBody = @(
+              "Tệp ở đây **luôn là bản iPad / iPhone mới nhất** — link tải không bao giờ đổi:"
+              ""
+              $rollLink
+              ""
+              "Hiện là **bản $ver** (giống hệt tệp của release [$tag](https://github.com/$repo/releases/tag/$tag)) · SHA-256 ``$ipaSha256``"
+              ""
+              "Cài bằng TrollStore (iOS / iPadOS 15 trở lên): mở tệp bằng TrollStore rồi chọn Install. Đã cài rồi thì không cần tải lại: app tự kiểm tra và mở TrollStore để cập nhật."
+              ""
+              "## Có gì mới"
+              ""
+              $whatNew
+            ) -join "`n"
+            [IO.File]::WriteAllText((Join-Path (Get-Location) "link-co-dinh.md"), $rollBody + "`n", (New-Object System.Text.UTF8Encoding $false))
+
+            if ($tags -notcontains $rollTag) {
+              Write-Host "Tạo release giữ link cố định: $rollTag"
+              Invoke-Gh release create $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false --target main | Out-Host
+              $tags = @($rollTag) + $tags
+            }
+
+            $roll = ((Invoke-Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+            $old = $roll.assets | Where-Object { $_.name -eq $rollName }
+            if ($old -and $old.digest -eq "sha256:$ipaSha256") {
+              Write-Host "Link cố định đã là bản $ver."
+            } else {
+              $tmpName = "$rollName.moi"
+              $tmpCopy = Join-Path "dist" $tmpName
+              Copy-Item $ipaPath $tmpCopy -Force
+              Invoke-Gh release upload $rollTag $tmpCopy --repo $repo --clobber | Out-Host
+
+              $roll = ((Invoke-Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+              $new = $roll.assets | Where-Object { $_.name -eq $tmpName }
+              if (-not $new -or $new.digest -ne "sha256:$ipaSha256") {
+                throw "Tệp tạm $tmpName trên $rollTag không khớp SHA-256 ($ipaSha256) — giữ nguyên asset cũ."
+              }
+              if ($old) {
+                Invoke-Gh api -X DELETE "repos/$repo/releases/assets/$($old.id)" | Out-Null
+              }
+              Invoke-Gh api -X PATCH "repos/$repo/releases/assets/$($new.id)" -f "name=$rollName" | Out-Null
+              Write-Host "Link cố định -> bản ${ver}: $rollLink"
+            }
+
+            Invoke-Gh release edit $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false | Out-Null
+          }
+
+          # --- Bước 5: Hậu kiểm (ĐK-I1-15, ĐK-I1-17) ---
+          $nowLatest = LatestTag
+          $wantTvTag = @($tags | Where-Object { $_ -match '^v[0-9]' } | Sort-Object { TagVersion $_ } -Descending)[0]
+          if ($wantTvTag -and $nowLatest -ne $wantTvTag) {
+            Write-Warning "Latest đang là '$nowLatest', cần là '$wantTvTag' (bản TV mới nhất) — đang khôi phục."
+            Invoke-Gh release edit $wantTvTag --repo $repo --latest | Out-Null
+            $nowLatest = LatestTag
+          }
+          if ($nowLatest -match '^(ios-v|mtv_ios)') {
+            throw "Cờ Latest đang trỏ sai vào bản iOS ('$nowLatest') — chặn ngay (ĐK-I1-15)!"
+          }
+          if ($wantTvTag -and $nowLatest -ne $wantTvTag) {
+            throw "Latest vẫn là '$nowLatest', cần là '$wantTvTag'!"
+          }
+          Write-Host "Latest OK: $nowLatest"
+
+          $pubRel = ((Invoke-Gh api "repos/$repo/releases/tags/$tag") -join "`n") | ConvertFrom-Json
+          $ipaAssets = @($pubRel.assets | Where-Object { $_.name -like '*.ipa' })
+          if ($ipaAssets.Count -ne 1) {
+            throw "ĐK-I1-17: Release $tag phải có đúng 1 tệp .ipa, hiện có $($ipaAssets.Count)."
+          }
+          $pubAsset = $ipaAssets[0]
+          if ($pubAsset.name -ne $env:IPA_NAME) {
+            throw "Release $tag có tệp '$($pubAsset.name)' thay vì '$($env:IPA_NAME)'."
+          }
+          if ($pubAsset.digest -ne "sha256:$ipaSha256" -or [long]$pubAsset.size -ne $ipaSize) {
+            throw "Asset $($env:IPA_NAME) trên $tag không khớp SHA-256 hoặc kích thước"
+          }
+          Write-Host "Release $tag OK: $($pubAsset.name) ($($pubAsset.size) byte, $($pubAsset.digest))"
+
+          if ($shouldUpdateRolling) {
+            $roll = ((Invoke-Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+            $rollAsset = $roll.assets | Where-Object { $_.name -eq $rollName }
+            if (-not $rollAsset) { throw "Release $rollTag thiếu tệp $rollName" }
+            if ($rollAsset.digest -ne "sha256:$ipaSha256" -or [long]$rollAsset.size -ne $ipaSize) {
+              throw "Asset $rollName trên $rollTag không khớp SHA-256 hoặc kích thước"
+            }
+
+            $dlFile = Join-Path "dist" "verify-rolling.ipa"
+            $ok = $false
+            foreach ($wait in 0, 5, 15) {
+              if ($wait -gt 0) { Start-Sleep -Seconds $wait }
+              & curl -fsSL -m 120 -o $dlFile $rollLink
+              if ($LASTEXITCODE -eq 0 -and (Test-Path $dlFile)) {
+                $dlSize = (Get-Item $dlFile).Length
+                $dlSha = (Get-FileHash $dlFile -Algorithm SHA256).Hash.ToLower()
+                if ($dlSize -eq $ipaSize -and $dlSha -eq $ipaSha256) {
+                  $ok = $true
+                  break
+                }
+              }
+            }
+            if (-not $ok) {
+              throw "Link cố định $rollLink tải về không khớp kích thước ($ipaSize) hoặc SHA-256 ($ipaSha256)"
+            }
+            Write-Host "Link cố định OK: $rollLink ($ipaSize byte, SHA-256 khớp)"
+          }
 
   # Bản Mac = app iPad dựng bằng Mac Catalyst (macOS 12+, Intel + Apple Silicon), ký ad-hoc, nén .zip (scripts/package-mac.sh)
   mac:
     name: Bản Mac (Mac Catalyst)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mac }}
     runs-on: macos-15
     timeout-minutes: 40
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Công cụ
-        run: brew install xcodegen xcbeautify
+        run: |
+          set -euo pipefail
+          if brew info xcodegen@2.45 >/dev/null 2>&1; then
+            XCODEGEN_PKG="xcodegen@2.45"
+          else
+            XCODEGEN_PKG="xcodegen"
+          fi
+          brew install "$XCODEGEN_PKG" xcbeautify
       - name: Dựng project
         working-directory: ios
         run: xcodegen generate
@@ -111,7 +880,7 @@ jobs:
             ONLY_ACTIVE_ARCH=NO CURRENT_PROJECT_VERSION=${{ github.run_number }} NEXTDNS_ID="$NEXTDNS_ID" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= | xcbeautify --renderer github-actions
       - name: Dựng bản chính (Release)
-        if: ${{ inputs.release }}
+        if: ${{ inputs.build_release }}
         working-directory: ios
         env:
           NEXTDNS_ID: ${{ secrets.NEXTDNS_ID }}
@@ -131,13 +900,22 @@ jobs:
 
   shots:
     name: Chụp màn hình máy ảo iPhone
-    if: ${{ inputs.shots }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.shots }}
     runs-on: macos-15
     timeout-minutes: 40
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Công cụ
-        run: brew install xcodegen xcbeautify
+        run: |
+          set -euo pipefail
+          if brew info xcodegen@2.45 >/dev/null 2>&1; then
+            XCODEGEN_PKG="xcodegen@2.45"
+          else
+            XCODEGEN_PKG="xcodegen"
+          fi
+          brew install "$XCODEGEN_PKG" xcbeautify
       - name: Dựng project
         working-directory: ios
         run: xcodegen generate
@@ -153,7 +931,9 @@ jobs:
             -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
             IPHONEOS_DEPLOYMENT_TARGET="$SIM_OS" CODE_SIGNING_ALLOWED=NO | xcbeautify --renderer github-actions
       - name: Chụp
-        run: bash ios/scripts/sim-shots.sh "${{ inputs.device }}"
+        env:
+          SIM_DEVICE: ${{ inputs.device }}
+        run: bash ios/scripts/sim-shots.sh "$SIM_DEVICE"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

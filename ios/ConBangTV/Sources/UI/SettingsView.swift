@@ -270,14 +270,14 @@ struct SettingsView: View {
                     NavigationLink("Cài lên tivi / mời bạn bè — mã Downloader \(Invite.code)", isActive: $inviteShown) {
                         InviteView().appDynamicType()
                     }
-                    Button("Telegram: t.me/tivikit") {
-                        if let u = URL(string: "https://t.me/tivikit") { UIApplication.shared.open(u) }
+                    Button("Báo lỗi / góp ý: github.com/maptoan/MTV/issues") {
+                        if let u = URL(string: "https://github.com/maptoan/MTV/issues") { UIApplication.shared.open(u) }
                     }
                     NavigationLink("Miễn trừ trách nhiệm & quyền riêng tư") {
                         DisclaimerView(gate: false).appDynamicType()
                     }
                 } header: { Text("Liên hệ") } footer: {
-                    Text("Góp ý, báo lỗi, hỏi đáp: nhắn nhóm Telegram @tivikit.")
+                    Text("Góp ý, báo lỗi, hỏi đáp: mở mục Issues tại github.com/maptoan/MTV/issues.")
                 }
 
                 #if DEVTOOLS

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Đóng gói .app đã dựng thành .ipa cho TrollStore: ký giả bằng ldid (không cần chứng chỉ Apple) rồi nén Payload/.
-#   ios/build/Build/Products/<Beta|Release>-iphoneos/ConBangTV.app → ios/dist/ConBangTV-iPad-<bản>[-thu].ipa
+#   ios/build/Build/Products/<Beta|Release>-iphoneos/ConBangTV.app → ios/dist/MTV-iPad-<bản>[-thu-<build>].ipa
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p dist
@@ -39,7 +39,7 @@ EOF
   ldid -S"$ent" "$app/ConBangTV"
   rm -f "$ent"
   # Tên tệp giữ "iPad" (bản 1.2 trở về trước tìm tệp .ipa bất kỳ trong release ios-v*); dùng cho cả iPhone
-  name="ConBangTV-iPad-${version}"
+  name="MTV-iPad-${version}"
   [ "$cfg" = Beta ] && name="${name}-thu-${build}"
   tmp=$(mktemp -d)
   mkdir "$tmp/Payload"

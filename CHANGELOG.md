@@ -9,6 +9,14 @@ Bản Windows (Windows 10 / 11, một tệp `.exe`) ghi riêng với tiêu đề
 Bản Mac (macOS 12+) ghi riêng với tiêu đề "Mac …", tag `mac-v…`.
 Bản Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, tệp `.deb`) ghi riêng với tiêu đề "Linux …", tag `linux-v…`.
 
+## iPad / iPhone 1.28 — 27/11/2026 (Phát hành MTV đầu tiên)
+
+- Đây là bản **MTV** đầu tiên cho iPad / iPhone (`vn.mtv.tv`, repo `maptoan/MTV`).
+- Cài song song được với bản cũ (dùng định danh `vn.mtv.tv` và App Group `group.vn.mtv.tv` riêng; có thể chuyển lịch sử từ bản cũ qua tính năng «Đồng bộ trong nhà» trong mạng LAN).
+- Cần cài đặt bằng **TrollStore** (hỗ trợ iOS / iPadOS 15.0 trở lên trong dải TrollStore iOS 14.0–17.0; app yêu cầu tối thiểu iOS 15.0).
+- Cập nhật luồng tự kiểm tra phiên bản mới (`maptoan/MTV`), màn «Cài lên tivi / mời bạn bè» (mã Downloader `1806154`), thông tin miễn trừ trách nhiệm và kênh báo lỗi (`github.com/maptoan/MTV/issues`).
+- Phát hành tệp `MTV-iPad-1.28.ipa` (build `36`).
+
 ## 2.24 — 27/11/2026 (Phát hành MTV đầu tiên)
 
 - Chuyển định danh chính thức của fork sang **MTV** (`vn.mtv.tv`, repo `maptoan/MTV`).
