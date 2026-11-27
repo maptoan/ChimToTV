@@ -1,7 +1,7 @@
 # Nhật ký phiên bản
 
 MTV — phát triển từ mã nguồn mở Côn Bằng TV (GPL-3.0). Tải bản mới nhất ở [GitHub Releases](https://github.com/maptoan/MTV/releases/latest). Bản mới nhất ở trên cùng.
-Mọi bản ký cùng một khoá (chứng chỉ SHA-256 `5e8b3fdf3b9adefad9b9ad573b7f56048555bdffc586dd346718331864f441d2`), cài đè
+Mọi bản MTV ký cùng một khoá (chứng chỉ SHA-256 `5e8b3fdf3b9adefad9b9ad573b7f56048555bdffc586dd346718331864f441d2`), cài đè
 được lên nhau và giữ nguyên lịch sử xem.
 
 Bản iPad / iPhone (iOS / iPadOS 15+, cài bằng TrollStore) ghi riêng với tiêu đề "iPad …", tag `ios-v…`.
@@ -9,19 +9,30 @@ Bản Windows (Windows 10 / 11, một tệp `.exe`) ghi riêng với tiêu đề
 Bản Mac (macOS 12+) ghi riêng với tiêu đề "Mac …", tag `mac-v…`.
 Bản Linux (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, tệp `.deb`) ghi riêng với tiêu đề "Linux …", tag `linux-v…`.
 
-## iPad / iPhone 1.28 — 27/11/2026 (Phát hành MTV đầu tiên)
+## iPad / iPhone 1.28 — 27/11/2026 (Chưa phát hành — đang chờ cài thử trên máy thật)
 
 - Đây là bản **MTV** đầu tiên cho iPad / iPhone (`vn.mtv.tv`, repo `maptoan/MTV`).
 - Cài song song được với bản cũ (dùng định danh `vn.mtv.tv` và App Group `group.vn.mtv.tv` riêng; có thể chuyển lịch sử từ bản cũ qua tính năng «Đồng bộ trong nhà» trong mạng LAN).
 - Cần cài đặt bằng **TrollStore** (hỗ trợ iOS / iPadOS 15.0 trở lên trong dải TrollStore iOS 14.0–17.0; app yêu cầu tối thiểu iOS 15.0).
 - Cập nhật luồng tự kiểm tra phiên bản mới (`maptoan/MTV`), màn «Cài lên tivi / mời bạn bè» (mã Downloader `1806154`), thông tin miễn trừ trách nhiệm và kênh báo lỗi (`github.com/maptoan/MTV/issues`).
-- Phát hành tệp `MTV-iPad-1.28.ipa` (build `36`).
+- Sẽ phát hành tệp `MTV-iPad-1.28.ipa` (build `36`) sau khi cài thử Beta trên máy thật đạt. Bản thử Beta `MTV-iPad-1.28-thu-2.ipa` (5.502.595 byte, SHA-256 `5fdff44bbc8cd2fd50cac9b78001af45d98c0e85c53120ef078b659df47fdacd`) đã chạy xong 27/11/2026 (184 test, 0 fail).
+
+## Windows 1.22 — 27/11/2026 (Phát hành MTV đầu tiên)
+
+- Đây là bản **MTV** đầu tiên cho Windows (`maptoan/MTV`).
+- Logo mới Mẫu 5 (monogram MTV trong lục giác đôi, cam đồng) thay cho ô kính của tác giả.
+- Cập nhật luồng tự cập nhật (`maptoan/MTV`), màn «Mời bạn bè» (mã Downloader `1806154`), thông tin miễn trừ trách nhiệm và kênh báo lỗi (`github.com/maptoan/MTV/issues`).
+- Phát hành tệp `MTV-Windows-1.22.exe` (119.839.927 byte, SHA-256 `c9d58fd2c4dd0f6066928c048915a54dbca71b28ddb643a8622b90df51f0c769`) và link cố định `mtv_windows/MTV-Windows.exe`.
 
 ## 2.24 — 27/11/2026 (Phát hành MTV đầu tiên)
 
 - Chuyển định danh chính thức của fork sang **MTV** (`vn.mtv.tv`, repo `maptoan/MTV`).
 - Cập nhật luồng tự cập nhật OTA (`UPDATE_URL`), màn «Mời bạn bè cài app» (mã Downloader `1806154`, mã QR hướng dẫn mới), thông tin miễn trừ trách nhiệm và liên hệ (`github.com/maptoan/MTV/issues`).
 - Phát hành tệp `MTV-2.24.apk` và `MTV.apk` (`versionCode = 48`, `versionName = "2.24"`).
+
+---
+
+*Các mục dưới đây là lịch sử các bản của tác giả (repo `conbangtv/ChimToTV`) trước khi fork đổi tên thành MTV — tên tệp, số liệu và mã Downloader trong đó là của bản gốc, không phải bản MTV.*
 
 ## 2.24 — 26/11/2026 (biểu tượng mới như bản Côn Bằng TV Legacy)
 

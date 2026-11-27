@@ -15,21 +15,15 @@ M3U bạn tự thêm, xem [Truyền hình · Radio](#truyền-hình--radio-từ-
 **Cài nhanh trên Android TV:** mở app **Downloader** (AFTVnews) trên tivi, nhập mã **`1806154`** — xem
 [Cài trên Android TV bằng Downloader](#cài-trên-android-tv-bằng-downloader).
 
-**Bản iPad / iPhone** (iOS / iPadOS 15+, cài bằng TrollStore): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa)
-(link cố định) · [release `ios-v1.28`](https://github.com/maptoan/MTV/releases/tag/ios-v1.28)
-— xem mục [Bản iPad](#bản-ipad). TV và iPad / iPhone đồng bộ được với nhau — xem [Đồng bộ trong nhà](#đồng-bộ-trong-nhà-từ-22).
+**Bản iPad / iPhone** (iOS / iPadOS 15+, cài bằng TrollStore): **sắp có** — bản thử Beta đã chạy xong, đang chờ cài thử trên máy thật rồi mới phát hành (xem mục [Bản iPad](#bản-ipad)). TV và iPad / iPhone đồng bộ được với nhau — xem [Đồng bộ trong nhà](#đồng-bộ-trong-nhà-từ-22).
 
 **Bản Windows** (Windows 10 / 11, một tệp `.exe` chạy ngay): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_windows/MTV-Windows.exe)
 (link cố định) · [release `win-v1.22`](https://github.com/maptoan/MTV/releases/tag/win-v1.22)
 — xem mục [Bản Windows](#bản-windows). Đồng bộ được với TV và iPad / iPhone.
 
-**Bản Mac** (macOS 12+, máy Intel và chip Apple): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip)
-(link cố định) · [release `mac-v1.28`](https://github.com/maptoan/MTV/releases/tag/mac-v1.28)
-— xem mục [Bản Mac](#bản-mac) (lần đầu mở: Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở).
+**Bản Mac** (macOS 12+, máy Intel và chip Apple): **chưa có** — chưa dựng bản Mac nào của fork (xem mục [Bản Mac](#bản-mac)).
 
-**Bản Linux** (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, máy 64-bit, tệp `.deb`): [tải bản mới nhất](https://github.com/maptoan/MTV/releases/download/mtv_linux/MTV-Linux.deb)
-(link cố định) · [release `linux-v1.8`](https://github.com/maptoan/MTV/releases/tag/linux-v1.8)
-— xem mục [Bản Linux](#bản-linux). Đồng bộ được với TV, iPad / iPhone, Windows và Mac.
+**Bản Linux** (Ubuntu 22.04+ / Linux Mint 21+ / Debian 12+, máy 64-bit, tệp `.deb`): **chưa có** — chưa dựng bản Linux nào của fork (xem mục [Bản Linux](#bản-linux)). Đồng bộ được với TV, iPad / iPhone, Windows và Mac.
 
 **Mã nguồn mở:** giấy phép GPL-3.0 — xem [Giấy phép](#giấy-phép).
 
@@ -360,7 +354,7 @@ Latest, bản Windows / iPad thì không — xem [Phát hành bản mới](#phá
 Cùng app cho iPad và iPhone (iOS / iPadOS 15 trở lên, cài bằng TrollStore; iPhone từ 1.3), viết riêng bằng Swift (thư mục
 `ios/`), đủ các tính năng chính của bản TV, điều khiển bằng chạm:
 
-- **Cài:** cần TrollStore. Tải bản mới nhất qua
+- **Cài:** cần TrollStore. Tải bản mới nhất qua (sau khi phát hành — hiện chưa có release iOS nào)
   [link cố định](https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa) (hoặc
   `MTV-iPad-<bản>.ipa` ở release `ios-v<bản>`; một tệp cho cả iPad và iPhone) → mở bằng TrollStore → Install. Bản sau app tự tìm trên GitHub (release `ios-v…`) và mở TrollStore để cài đè, giữ lịch sử xem:
   hộp thoại «Có bản mới» → **Cài đặt ngay** → TrollStore tự tải rồi hỏi Install (cả iOS / iPadOS 15 từ 1.8.2; bản 1.8.1 trở
@@ -431,7 +425,7 @@ Chính app iPad dựng thành app Mac bằng **Mac Catalyst** (cùng mã nguồn
 máy Intel và máy chip Apple (M1…), giao diện và tính năng như bản iPad, dùng chuột / bàn di chuột / bàn phím (phím tắt như
 mục «Bàn phím rời» của [Bản iPad](#bản-ipad)).
 
-- **Cài:** tải bản mới nhất qua [link cố định](https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip)
+- **Cài:** tải bản mới nhất qua (sau khi có bản Mac đầu tiên) [link cố định](https://github.com/maptoan/MTV/releases/download/mtv_macos/MTV-Mac.zip)
   (hoặc `MTV-Mac-<bản>.zip` ở release `mac-v<bản>`), mở tệp .zip, kéo **MTV** vào thư mục
   **Applications** (Ứng dụng) rồi mở. App không mua chứng chỉ của Apple (ký ad-hoc) nên lần đầu macOS chặn — mở hộp thoại:
   «Không thể mở "MTV" vì ứng dụng này đến từ một nhà phát triển chưa được xác định» → **OK** → **Cài đặt hệ thống → Quyền riêng tư & Bảo mật**, kéo xuống mục Bảo mật → «"MTV" đã bị chặn…» → **Vẫn mở** → nhập mật khẩu máy → **Mở**. Chỉ làm một lần; các bản sau app tự cập
@@ -841,7 +835,7 @@ vd `JSON.stringify(__chimtoState.box)`: cỡ khung trang + khung video, kiểu c
 `files/force_phone` (+ `force_portrait` / `force_landscape`) bằng `adb shell run-as vn.mtv.tv.debug touch …`.
 
 **Bản Windows:** `.\windows\build.ps1` → chạy test (`windows/ConBangTV.Tests`, cùng ca với test của TV / iPad) rồi đóng
-gói một tệp tự chạy `dist\MTV-Windows-<bản>.exe` (~70 MB, kèm .NET, nén). Cần .NET 8 SDK (đã cài riêng cho người
+gói một tệp tự chạy `dist\MTV-Windows-<bản>.exe` (~114 MB, kèm .NET, nén). Cần .NET 8 SDK (đã cài riêng cho người
 dùng ở `%LOCALAPPDATA%\Microsoft\dotnet` — script tự đặt `DOTNET_ROOT`). Số bản: `<Version>` trong
 `windows/ConBangTV/ConBangTV.csproj`. Bản Debug (`dotnet build windows\ConBangTV\ConBangTV.csproj`) có **cổng gỡ lỗi**
 `http://localhost:8790` (chỉ máy này): `/info`, `/shot` (ảnh PNG cửa sổ), `/key?k=Down,Enter`, `/click?text=…` (bấm nút
@@ -854,11 +848,11 @@ cần Mac:
 
 - Đẩy nhánh `ios` (đổi gì trong `ios/` hoặc các tệp JS dùng chung ở `app/src/main/assets/`) → test phần lõi trên macOS
   (`CoreTests`) + IPA bản thử (cấu hình Beta: mã gói `vn.mtv.tv.debug`, tên "MTV (thử)", có cổng gỡ lỗi trong
-  mạng LAN, cổng 8790). Tải IPA ở artifact `ipa` của lượt chạy (`gh run download <id> -n ipa`).
-- Chạy tay `gh workflow run ios.yml --ref main -f release=true` → thêm IPA bản chính (`vn.mtv.tv`, "MTV").
+  mạng LAN, cổng 8790). Tải IPA ở artifact `MTV-iPad-<bản>-thu-<số lượt chạy>-ipa` của lượt chạy (`gh run download <id> -n MTV-iPad-<bản>-thu-<số lượt chạy>-ipa`).
+- Phát hành thật: đẩy tag `ios-v<bản>` lên commit thuộc `main` → workflow tự tạo release `ios-v<bản>` (`--latest=false`) + cuốn chiếu `mtv_ios`, kèm IPA bản chính (`vn.mtv.tv`, "MTV", artifact `MTV-iPad-<bản>-ipa`). Dispatch tay cũng được: `gh workflow run ios.yml --ref ios -f build_release=true -f publish_release=true`.
 - Project Xcode sinh bằng XcodeGen từ `ios/project.yml`; đọc HTML bằng SwiftSoup. IPA ký giả bằng `ldid` (không cần
   tài khoản Apple) → chỉ cài được bằng TrollStore.
-- Icon: `node design/render.mjs ios c` (icon 1024 + logo trong app, không đụng ảnh của bản Android).
+- Icon: `node design/render.mjs ios j` (icon 1024 + logo trong app, không đụng ảnh của bản Android).
 - **Dựng nhanh trên Mac trong nhà (từ 13/11/2026):** `.\ios\scripts\mac-build.ps1 [-Release] [-NoTest] [-SyncOnly]` gửi mã
   nguồn đang sửa trong máy (cả phần chưa commit) sang Mac qua SSH, chạy test lõi, dựng và đóng gói y như job IPA của CI (cùng
   `ios/scripts/package.sh`), kéo IPA về `dist\mac\` — không phải đẩy nhánh `ios`. Đăng nhập Mac đọc từ tệp ngoài repo
@@ -880,12 +874,12 @@ Repo **`maptoan/MTV`** được fork từ `conbangtv/ChimToTV` (tác giả `Circ
 
 1. Tăng `versionCode` / `versionName` trong `app/build.gradle.kts`.
 2. `.\build.ps1` → `dist\MTV-<phiên bản>.apk` (ký bằng `keys\` — phải cùng khoá thì app mới nhận).
-3. `git push`, rồi `.\release.ps1 tv -Notes ghi-chu.md` — tạo release tag `v<phiên bản>`, **đánh dấu Latest**, đính kèm hai
+3. `git push` tag `v<phiên bản>` → workflow `.github/workflows/android.yml` tự dựng và tạo release tag `v<phiên bản>`, **đánh dấu Latest**, đính kèm hai
    tệp giống hệt nhau: `MTV-<phiên bản>.apk` và `MTV.apk` (link cố định cho [link Downloader](#cài-trên-android-tv-bằng-downloader), mã `1806154`). Bộ tự
    cập nhật lấy tệp `.apk` đầu tiên, tên nào cũng được. Mục `## Có gì mới` trong ghi chú được hiện trong hộp thoại cập
-   nhật trên TV.
+   nhật trên TV. Dựng tay trong máy rồi đăng bằng `.\release.ps1 tv -Notes ghi-chu.md` vẫn được (dự phòng khi CI lỗi).
 
-**`release.ps1` — không gọi `gh release create` tay nữa.** Các nền tảng dùng chung một trang Releases, và hai
+**Phát hành bằng CI, `release.ps1` là dự phòng — không gọi `gh release create` tay nữa.** Các bản phát hành của fork hiện dựng và đăng bằng GitHub Actions (`.github/workflows/android.yml`, `windows.yml`, `ios.yml`); `release.ps1` chỉ dùng khi dựng tay trong máy. Các nền tảng dùng chung một trang Releases, và hai
 thứ đi theo release đang là **Latest**: app TV tự cập nhật (hỏi `releases/latest` rồi lấy tệp `.apk`) và link cố định
 `…/releases/latest/download/MTV.apk`. Script đặt sẵn cờ theo nền tảng: `tv` luôn `--latest`, `windows` / `ipad` / `mac` / `linux` luôn
 `--latest=false`. Trước khi đăng nó kiểm: ghi chú có `## Có gì mới`, tên tệp đúng số bản trong mã nguồn, code đã đẩy, tag chưa
@@ -893,7 +887,7 @@ có; riêng APK: đúng gói, đúng số bản, đúng chứng chỉ ký. Sau k
 trên GitHub khớp SHA-256 với tệp trong máy, bản TV thì tải thử qua link cố định. `-DryRun` chỉ in lệnh; `.\release.ps1
 <tv|windows|ipad|mac|linux> -Verify` kiểm lại một bản đã đăng, không sửa gì.
 
-**Link tải cố định của bản Windows / iPad / Mac / Linux** — luôn là bản mới nhất, như link APK:
+**Link tải cố định của bản Windows / iPad / Mac / Linux** — luôn là bản mới nhất, như link APK (hiện chỉ link Windows đang sống; 3 link còn lại sẽ sống sau lần phát hành đầu tiên của từng nền tảng):
 
 - `https://github.com/maptoan/MTV/releases/download/mtv_windows/MTV-Windows.exe`
 - `https://github.com/maptoan/MTV/releases/download/mtv_ios/MTV-iPad.ipa`
@@ -907,8 +901,8 @@ của release đang là bản nào, rồi kiểm SHA-256 và tải thử link. `
 bản đã đăng vào link cố định — dùng khi link lệch. **Đừng đổi các tag / tên tệp này và đừng xoá các release đó**. Bộ tự cập nhật không nhìn thấy chúng: TV đọc `releases/latest`, Windows / iPad / Mac / Linux chỉ
 nhận tag `win-v…` / `ios-v…` / `mac-v…` / `linux-v…`.
 
-**Mã Downloader `1806154`** (aftv.news, trỏ vào link cố định) nằm ở năm chỗ — đổi mã thì sửa cả năm: `Invite.kt` (TV: màn «Mời
-bạn bè cài app»), `Invite.swift` (iPad / iPhone) và `Invite.cs` (Windows) — Cài đặt → «Cài lên tivi / mời bạn bè»: mã to,
+**Mã Downloader `1806154`** (aftv.news, trỏ vào link cố định) nằm ở sáu chỗ — đổi mã thì sửa cả sáu: `Invite.kt` (TV: màn «Mời
+bạn bè cài app»), `Invite.swift` (iPad / iPhone), `Invite.cs` (Windows) và `invite.rs` (Linux) — Cài đặt → «Cài lên tivi / mời bạn bè»: mã to,
 ba bước, nút gửi / chép hướng dẫn, không có mã QR —, `release.ps1` (mục «Cài mới trên Android TV» script tự thêm vào cuối ghi chú
 mỗi bản TV; hộp cập nhật chỉ lấy «Có gì mới» nên không dài ra) và README. Tin nhắn gửi người quen (`MESSAGE` / `message`) giống
 hệt nhau ở các bản — mỗi bản có test so đúng từng chữ. Mã QR của màn đó vẽ sẵn trong `Invite.QR` (không thêm thư viện vào app), mở
@@ -921,13 +915,13 @@ Release TV có hai tệp `.apk` không ảnh hưởng app: `Updater.kt` lấy t�
 chỉ kiểm mã gói + chữ ký + `versionCode` — không dựa vào tên tệp, cỡ hay hash.
 
 **Bản iPad / iPhone** phát hành bằng tag riêng `ios-v<bản>` (vd `ios-v1.0`) và **không bao giờ đánh dấu "latest"**
-(`.\release.ps1 ipad -Notes … -File MTV-iPad-<bản>.ipa`): app TV hỏi `releases/latest` rồi lấy tệp `.apk`,
+(đẩy tag lên commit thuộc `main`, workflow `ios.yml` tự tạo release; dựng tay thì `.\release.ps1 ipad -Notes … -File MTV-iPad-<bản>.ipa`): app TV hỏi `releases/latest` rồi lấy tệp `.apk`,
 release iPad mà thành latest thì mọi TV hết thấy bản mới. Bản iPad duyệt danh sách release, lấy tag `ios-v*` có tệp
 `.ipa` (bỏ bản nháp / thử nghiệm) và mở `apple-magnifier://install?url=<link .ipa>` để TrollStore cài. Số bản ở
 `MARKETING_VERSION` trong `ios/project.yml`; ghi chú phát hành cũng cần mục `## Có gì mới`.
 
-**Bản Windows** cũng vậy: tag `win-v<bản>`, tệp `.exe`, **không bao giờ "latest"** (`.\windows\build.ps1` rồi
-`.\release.ps1 windows -Notes …`).
+**Bản Windows** cũng vậy: tag `win-v<bản>`, tệp `.exe`, **không bao giờ "latest"** (đẩy tag `win-v<bản>` → workflow `windows.yml`
+tự dựng và phát hành; dựng tay thì `.\windows\build.ps1` rồi `.\release.ps1 windows -Notes …`).
 App duyệt danh sách release, lấy tag `win-v*` có tệp `.exe`; tải về, kiểm đúng cỡ, đúng SHA-256 GitHub báo (`digest`),
 đúng tên sản phẩm + số bản trong tệp, rồi đổi tên tệp đang chạy thành `.old`, đặt tệp mới vào chỗ cũ và mở lại app
 (`--updated`; lần mở sau xoá `.old`). Thư mục chứa app không ghi được thì mở trang Releases để tải tay.
@@ -952,24 +946,23 @@ web mà app đọc.
 
 ## Logo
 
-Logo và banner TV vẽ bằng SVG trong `design/logo.html`. Từ 26/11/2026 dùng **phương án E «Ô kính vuông bo tròn»** — đồng bộ với icon
-bản Legacy (`ConBangTV_Legacy/design/icon.html` phương án D, từ 18/11/2026): ô kính vuông bo 4 góc (23% cạnh) trong suốt, ánh sáng
-mép trong, viền sáng, vòng bút mực vàng và ấn triện chữ 鵬 nổi khối cùng một hướng sáng. Trước đó: phương án D «Đĩa kính 3D» (đĩa tròn,
-17/11), phương án C (ấn triện phẳng trên ô vuông nền tối). Legacy đổi icon thì chép số đo sang `glassRounded()` rồi xuất lại.
-Font Spectral SC cho tên có dấu tiếng Việt, Yuji Boku cho chữ bút lông 鵬. Sửa xong thì xuất lại toàn bộ icon bằng Chrome headless:
+Logo và banner TV vẽ bằng SVG trong `design/logo.html`. Từ 27/11/2026 dùng **Mẫu 5 «Monogram hình học»** — chữ MTV lồng trong khung lục giác
+đôi, viền cam đồng (#fb923c / #ea580c) trên nền tối (khái niệm `j` trong `design/logo.html`, commit `96288f4`). Trước đó: phương án E
+«Ô kính vuông bo tròn» (26/11/2026, đồng bộ với icon bản Legacy), phương án D «Đĩa kính 3D» (đĩa tròn, 17/11), phương án C (ấn triện phẳng
+trên ô vuông nền tối). Sửa xong thì xuất lại toàn bộ icon bằng Chrome headless (`design/render.mjs` đã tự thêm `--no-sandbox` để chạy
+được dưới quyền root):
 
 ```powershell
 node design/render.mjs preview xem-truoc.png   # xem các phương án
-node design/render.mjs export e                 # Android: icon, icon thích ứng (nền trong suốt), banner, logo + design/*.png
-node design/render.mjs ios e                    # iPad / iPhone: AppIcon 1024 + logo trong app
-node design/render.mjs mac e                    # Mac: các cỡ icon macOS
-node design/render.mjs desktop e                # Windows: app.ico (tự ghép 9 cỡ) + logo.png; Linux: linux/packaging/icons
-node design/render.mjs site e                   # trang giới thiệu: site/assets/logo.png + apple-touch-icon.png (repo con site/)
+node design/render.mjs export j                 # Android: icon, icon thích ứng (nền trong suốt), banner, logo + design/*.png
+node design/render.mjs ios j                    # iPad / iPhone: AppIcon 1024 + logo trong app
+node design/render.mjs mac j                    # Mac: các cỡ icon macOS
+node design/render.mjs desktop j                # Windows: app.ico (tự ghép 9 cỡ) + logo.png; Linux: linux/packaging/icons
+node design/render.mjs site j                   # trang giới thiệu: site/assets/logo.png + apple-touch-icon.png (repo con site/)
 ```
 
-iPadOS / iOS tô đen phần trong suốt của icon trên màn hình chính (với mọi app), nên riêng icon iPad / iPhone (và biểu tượng trang giới
-thiệu trên iPhone) đặt ô kính phủ cả khung trên nền nâu tối của banner; Mac (ô kính theo lưới icon macOS, bóng đổ ngoài ô), Android
-(ô kính trong vùng an toàn 66dp của icon thích ứng), Windows, Linux giữ nền trong suốt.
+iPadOS / iOS tô đen phần trong suốt của icon trên màn hình chính (với mọi app), nên icon iPad / iPhone của Mẫu 5 vẽ trên nền tối phủ cả
+khung; Android giữ logo trong vùng an toàn 66dp của icon thích ứng, Windows và Linux giữ nền trong suốt.
 
 Đổi tên app không chỉ là đổi **tên hiển thị** (`app_name`), logo và banner mà còn đổi định danh gói `vn.mtv.tv` và repo `maptoan/MTV`.
 
