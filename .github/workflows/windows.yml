@@ -604,7 +604,7 @@ jobs:
           $exeSha256 = $env:EXE_SHA256
           $exeSize = [long]$env:EXE_SIZE
 
-          function Gh {
+          function Invoke-Gh {
             $out = & gh @args
             if ($LASTEXITCODE -ne 0) { throw "Lệnh gh $($args -join ' ') lỗi (mã $LASTEXITCODE)" }
             $out
@@ -616,7 +616,7 @@ jobs:
 
           function LatestTag {
             try {
-              ("" + (Gh api "repos/$repo/releases/latest" --jq ".tag_name")).Trim()
+              ("" + (Invoke-Gh api "repos/$repo/releases/latest" --jq ".tag_name")).Trim()
             } catch {
               ""
             }
@@ -625,10 +625,10 @@ jobs:
           # --- Bước 3: Release đánh số win-v<ver> (LUÔN --latest=false) ---
           & gh release view $tag --repo $repo *> $null
           if ($LASTEXITCODE -eq 0) {
-            Gh release upload $tag $exePath --repo $repo --clobber | Out-Host
-            Gh release edit $tag --repo $repo --title $title --notes-file release_notes.md --latest=false | Out-Host
+            Invoke-Gh release upload $tag $exePath --repo $repo --clobber | Out-Host
+            Invoke-Gh release edit $tag --repo $repo --title $title --notes-file release_notes.md --latest=false | Out-Host
           } else {
-            Gh release create $tag $exePath --repo $repo --target $env:TARGET_SHA --title $title --notes-file release_notes.md --latest=false | Out-Host
+            Invoke-Gh release create $tag $exePath --repo $repo --target $env:TARGET_SHA --title $title --notes-file release_notes.md --latest=false | Out-Host
           }
           Write-Host "Đã phát hành release $tag (--latest=false)."
 
@@ -638,7 +638,7 @@ jobs:
           $rollTitle = "MTV cho Windows — link cố định (luôn là bản mới nhất)"
           $rollLink = "https://github.com/$repo/releases/download/$rollTag/$rollName"
 
-          $tags = @(Gh api "repos/$repo/releases?per_page=100" --jq '.[].tag_name')
+          $tags = @(Invoke-Gh api "repos/$repo/releases?per_page=100" --jq '.[].tag_name')
           $newestWinTag = @($tags | Where-Object { $_ -match '^win-v[0-9]' } | Sort-Object { TagVersion $_ } -Descending)[0]
 
           $shouldUpdateRolling = (-not $newestWinTag) -or ((TagVersion $tag) -ge (TagVersion $newestWinTag))
@@ -663,11 +663,11 @@ jobs:
 
             if ($tags -notcontains $rollTag) {
               Write-Host "Tạo release giữ link cố định: $rollTag"
-              Gh release create $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false --target main | Out-Host
+              Invoke-Gh release create $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false --target main | Out-Host
               $tags = @($rollTag) + $tags
             }
 
-            $roll = ((Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+            $roll = ((Invoke-Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
             $old = $roll.assets | Where-Object { $_.name -eq $rollName }
             if ($old -and $old.digest -eq "sha256:$exeSha256") {
               Write-Host "Link cố định đã là bản $ver."
@@ -675,21 +675,21 @@ jobs:
               $tmpName = "$rollName.moi"
               $tmpCopy = Join-Path "dist" $tmpName
               Copy-Item $exePath $tmpCopy -Force
-              Gh release upload $rollTag $tmpCopy --repo $repo --clobber | Out-Host
+              Invoke-Gh release upload $rollTag $tmpCopy --repo $repo --clobber | Out-Host
 
-              $roll = ((Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+              $roll = ((Invoke-Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
               $new = $roll.assets | Where-Object { $_.name -eq $tmpName }
               if (-not $new -or $new.digest -ne "sha256:$exeSha256") {
                 throw "Tệp tạm $tmpName trên $rollTag không khớp SHA-256 ($exeSha256) — giữ nguyên asset cũ."
               }
               if ($old) {
-                Gh api -X DELETE "repos/$repo/releases/assets/$($old.id)" | Out-Null
+                Invoke-Gh api -X DELETE "repos/$repo/releases/assets/$($old.id)" | Out-Null
               }
-              Gh api -X PATCH "repos/$repo/releases/assets/$($new.id)" -f "name=$rollName" | Out-Null
+              Invoke-Gh api -X PATCH "repos/$repo/releases/assets/$($new.id)" -f "name=$rollName" | Out-Null
               Write-Host "Link cố định -> bản ${ver}: $rollLink"
             }
 
-            Gh release edit $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false | Out-Null
+            Invoke-Gh release edit $rollTag --repo $repo --title $rollTitle --notes-file link-co-dinh.md --latest=false | Out-Null
           }
 
           # --- Bước 5: Hậu kiểm (Test-Published + ĐK-W1-01) ---
@@ -697,7 +697,7 @@ jobs:
           $wantTvTag = @($tags | Where-Object { $_ -match '^v[0-9]' } | Sort-Object { TagVersion $_ } -Descending)[0]
           if ($wantTvTag -and $nowLatest -ne $wantTvTag) {
             Write-Warning "Latest đang là '$nowLatest', cần là '$wantTvTag' (bản TV mới nhất) — đang khôi phục."
-            Gh release edit $wantTvTag --repo $repo --latest | Out-Null
+            Invoke-Gh release edit $wantTvTag --repo $repo --latest | Out-Null
             $nowLatest = LatestTag
           }
           if ($nowLatest -match '^(win-v|mtv_windows)') {
@@ -708,7 +708,7 @@ jobs:
           }
           Write-Host "Latest OK: $nowLatest"
 
-          $pubRel = ((Gh api "repos/$repo/releases/tags/$tag") -join "`n") | ConvertFrom-Json
+          $pubRel = ((Invoke-Gh api "repos/$repo/releases/tags/$tag") -join "`n") | ConvertFrom-Json
           $pubAsset = $pubRel.assets | Where-Object { $_.name -eq $env:EXE_NAME }
           if (-not $pubAsset) { throw "Release $tag thiếu tệp $($env:EXE_NAME)" }
           if ($pubAsset.digest -ne "sha256:$exeSha256" -or [long]$pubAsset.size -ne $exeSize) {
@@ -717,7 +717,7 @@ jobs:
           Write-Host "Release $tag OK: $($pubAsset.name) ($($pubAsset.size) byte, $($pubAsset.digest))"
 
           if ($shouldUpdateRolling) {
-            $roll = ((Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
+            $roll = ((Invoke-Gh api "repos/$repo/releases/tags/$rollTag") -join "`n") | ConvertFrom-Json
             $rollAsset = $roll.assets | Where-Object { $_.name -eq $rollName }
             if (-not $rollAsset) { throw "Release $rollTag thiếu tệp $rollName" }
             if ($rollAsset.digest -ne "sha256:$exeSha256" -or [long]$rollAsset.size -ne $exeSize) {
