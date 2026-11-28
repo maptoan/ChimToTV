@@ -413,6 +413,7 @@ enum SyncHTTP {
             if p.count == 2 { m.headers[p[0].lowercased()] = p[1].trimmingCharacters(in: .whitespaces) }
         }
         let length = Int(m.headers["content-length"] ?? "0") ?? 0
+        guard length >= 0 else { return nil } // IOS-L11: Content-Length am -> subdata(in:) trap/crash
         let start = end.upperBound
         guard data.count - start >= length else { return nil }
         m.body = data.subdata(in: start..<(start + length))
